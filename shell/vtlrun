@@ -1,0 +1,21 @@
+#!/bin/bash
+path=./
+cmd=$1
+CMDLINE=${path}${cmd}
+reportFile=res/report_${cmd}_$2
+vtuneSrc=res/vtune_${cmd}_$2.c
+#this is on core2
+#vtl activity -d 200 -c sampling -o "-ec -en='MEM_LOAD_RETIRED.L1D_LINE_MISS':ea='CMISS',-en='DTLB_MISSES.ANY':ea='DTLBMISS',-en='CPU_CLK_UNHALTED.REF':ea='Time'" -app $CMDLINE run
+vtl activity -d 200 -c sampling -o "-ec -en='RESOURCE_STALLS.ANY':ea='STALL.all',-en='RESOURCE_STALLS.LD_ST':ea='STALL.mem',-en='INST_RETIRED.ANY':ea='instr',-en='INST_RETIRED.LOADS':ea='loads',-en='CPU_CLK_UNHALTED.CORE':ea='Time'" -app $CMDLINE run
+
+#this is on xeon
+#vtl activity -d 600 -c sampling -o "-ec -en='2nd Level Cache Load Misses Retired':ea='L2LoadMISS',-en='DTLB Load and Store Misses Retired':ea='DTLBMISS',-en='Non-Halted Clockticks':ea='Time'" -app $CMDLINE run
+#vtl activity -d 200 -c sampling -o "-ec -en='2nd Level Cache Load Misses Retired':ea='L2LoadMISS',-en='2nd Level Cache Read Misses':ea='L2ReadMiss',-en='2nd-Level Cache Read References':ea='L2Read',-en='DTLB Load and Store Misses Retired':ea='DTLBMISS',-en='Non-Halted Clockticks':ea='Time'" -app $CMDLINE run
+#echo vtl activity -d 100 -c sampling -o "-ec -en='MEM_LOAD_RETIRED.L1D_LINE_MISS':ea='CMISS',-en='DTLB_MISSES.ANY':ea='DTLBMISS',-en='CPU_CLK_UNHALTED.REF':ea='Time'" -app $CMDLINE run
+
+vtl view -hf  -mn $cmd > $reportFile 
+vtl view -code -mn $cmd -fn accel_ij > $vtuneSrc 
+#vtl view -code -mn $cmd -fn half_kick > ${cmd}_vtune_$2.c
+#vtl view -code -mn $cmd -fn compute_accel > ${cmd}_vtune_$2.c
+#echo vtl view -hf  -mn $cmd &> ${cmd}_$2 
+
