@@ -1,0 +1,5 @@
+#!/bin/bash
+USER=
+SRC=
+DST=
+mount -t smbfs -o username="$USER",password=$1,rw $SRC $DST 
