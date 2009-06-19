@@ -1,0 +1,18 @@
+#!/bin/bash 
+#run cmd
+#
+if [ $1 == "-h" ]
+then
+    echo $0 cmd
+    exit
+fi
+cmd=$1
+sudo opcontrol --reset
+sudo opcontrol --no-vmlinux
+sudo opcontrol --start
+$cmd
+sudo opcontrol --dump
+sudo opcontrol --stop
+sudo opcontrol --shutdown
+opreport -l $cmd > ${cmd}_report
+opannotate --source --output-dir=${cmd}_cache $cmd
