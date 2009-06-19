@@ -1,0 +1,165 @@
+#!/bin/bash
+# Zhenghua Dai
+#(C) Copyright 2007-2010 All Rights Reserved 
+
+# nrsh -a cmd
+RSH=rsh
+#RSH="echo rsh"
+Default=yes
+ALL=no
+ON=no
+ONSSC=no
+FROM=1
+TO=8
+ARG=$@
+CMD=
+HELP=no
+NODENAME_PRE=node
+HOSTS[0]=node1
+HOSTS[1]=node2
+HOSTS[2]=node3
+HOSTS[3]=node4
+HOSTS[4]=node5
+HOSTS[5]=node6
+HOSTS[6]=node7
+HOSTS[7]=node8
+argnum=1
+# parse the ARGV
+for a in $*
+do
+	if [ "$a" = "-a" ];	then
+	    ALL=yes
+	echo $a=-a
+    	Default=no
+	elif [ "$a" = "-on" ];	then
+	    ONSSC=yes
+		Default=no
+	elif [ "$a" = "-h" ]; then
+		HELP=yes
+	elif [ "$a" = "--on" ]; then
+    	ON=yes 
+		Default=no
+	fi
+	if [ "$argnum" -gt 3 ] ;then
+	break
+	fi
+	let argnum++	
+done
+
+if [  "$HELP" = "yes" ]; then
+	echo nrsh cmd  : execute cmd on all nodes
+	echo nrsh -a cmd : execute cmd on all nodes
+	echo nrsh -on X...Y cmd : execute cmd from nodeX to nodeY
+	echo nrsh --on nodename X...Y cmd : execute cmd from nodenameX to nodenameY
+	echo for example
+	echo "	" nrsh ls /opt
+	echo "	"	nrsh -on 5..20 ls /opt
+	echo "	"	nrsh -on 05..20 ls /opt
+	echo "	"	nrsh --on gnode 5...20 ls /opt
+	exit
+fi
+# on all nodes
+if [  "$ALL" = "yes" ]; then
+	echo all
+	shift
+    for a in ${HOSTS[@]}
+    do
+        $RSH $a $*
+    done	
+#	rsh ihawk1 $*
+     exit
+fi
+if [  "$Default" = "yes" ]; then
+    for a in ${HOSTS[@]}
+    do
+        $RSH $a $*
+    done
+ exit
+fi
+
+if [ "$ONSSC" = "yes" ]; then
+FROMTO=$2
+shift 
+shift 
+CMD=$*
+elif  [ "$ON" = "yes" ]; then
+FROMTO=$3
+NODENAME_PRE=$2
+shift
+shift
+shift
+CMD=$*
+fi
+	DOTPOS=` expr index $FROMTO "."`
+	FROM=`echo $FROMTO | awk -F "." '{printf $1}'`
+	TO=`echo $FROMTO | awk -F "." '{printf $NF}'`
+	
+# chech the number of pad
+PAD=0
+NODENAMELEN=0
+if [ "$FROM" -lt "10" ]; then 
+	if [ "$DOTPOS" = "2" ]; then
+	PAD=0
+	elif [ "$DOTPOS" = "3" ]; then
+	PAD=1
+	NODENAMELEN=2
+	elif [ "$DOTPOS" = "4" ]; then
+	PAD=2
+	NODENAMELEN=3
+	fi
+elif [ "$FROM" -lt 100 ]; then
+	if [ "$DOTPOS" = "3" ]; then
+        PAD=0
+        elif [ "$DOTPOS" = "4" ]; then
+        PAD=1
+	NODENAMELEN=3
+        fi
+else
+	NODENAMELEN=3
+fi
+
+ 	TOlen=`echo $TO | awk '{printf "%d", length($0)}'`
+if [ "$TO" -lt "10" ]; then
+#	TOlen=`echo $TO | wc -L` #`expr length $TO`
+	if [ "$TOlen" != "1" ]; then	
+		if [ "$NODENAMELEN" -lt "$TOlen" ];then
+		NODENAMELEN=$TOlen
+		fi
+	PAD=` expr $TOlen - 1`
+	fi
+elif [ "$TO" -lt 100 ]; then
+	if [ "$TOlen" != "2" ]; then	
+	NODENAMELEN=$TOlen
+	PAD=` expr $TOlen - 1`
+	fi
+fi
+	FROM=`echo $FROM | awk '{printf "%d", $1}'`
+	TO=`echo $TO | awk '{printf "%d", $1}'`
+# end chech the number of pad
+	if [ $FROM -lt $TO ];	then
+		while [  $FROM -le $TO ]
+		do
+			if [ "$NODENAMELEN" = "0" ];then
+				NODENAME="$NODENAME_PRE$FROM"
+			elif [ "$NODENAMELEN" = "2" ];then
+				NODENAME="${NODENAME_PRE}`echo $FROM | awk '{printf "%02d", $1}'`"
+			elif [ "$NODENAMELEN" = "3" ];then
+				NODENAME="${NODENAME_PRE}`echo $FROM | awk '{printf "%03d", $1}'`"
+			fi	
+			 $RSH $NODENAME $CMD
+			let FROM++
+		done	
+	else
+		while [ $FROM -ge $TO ]
+		do
+			if [ "$NODENAMELEN" = "0" ];then
+				NODENAME="$NODENAME_PRE$FROM"
+			elif [ "$NODENAMELEN" = "2" ];then
+				NODENAME="${NODENAME_PRE}`echo $FROM | awk '{printf "%02d", $1}'`"
+			elif [ "$NODENAMELEN" = "3" ];then
+				NODENAME="${NODENAME_PRE}`echo $FROM | awk '{printf "%03d", $1}'`"
+			fi	
+			 $RSH $NODENAME $CMD
+			let FROM--
+		done
+	fi	
