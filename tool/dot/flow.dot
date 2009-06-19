@@ -1,0 +1,42 @@
+digraph G{
+	node [shape=record];
+	main [shape=record];
+	WebView [shape=record, label="<self> WebView:|<WebFramePtr> WebFrame*|<PagePtr> Page*"];
+	WebFrame [shape=record, label="<self> WebFrame:|<FramePtr>Frame*|<WebViewPtr>WebView*"];
+	Page [shape=record, label="<self> Page:|<FramePtr>Frame* m_mainFrame|<BFPTR>BackForwrdList*"];
+	Frame [shape=record, label="<self> Frame:|<FrameLoaderPtr> FrameLoader|<PagePtr> Page*|<FrameViewPtr> FrameView*|<DocPtr>Docutment*|<EventHandler> EventHandler|<FrameTreePtr>FrameTree"];
+	FrameLoader [shape=record, label="<self> FrameLoader:|<FramePtr>Frame*|<DocLoaderPtr>DocumentLoader*|<HashsetPtr>HashSet^Frame*^"];
+	FrameView [shape=record, label="<self>FrameView:"];
+	Document [shape=record, label="<self>Document:|<FramePtr>Frame*|<DocLoaderPtr>DocLoader*|<TokenizerPtr>Tokenizer*|<KURLPTR>KURL*"];
+	Tokenizer [shape=record, label="<self>Tokenizer:|<ParserPtr>Parser*|<DocPtr>Document*"];
+	Parser [shape=record, label="<self>Parser:|<DocPtr>Document*"];
+	DocLoader [shape=record, label="<self>DocLoader*"];
+
+	main -> WebView:self;
+
+	WebView:WebFramePtr -> WebFrame:self;
+	WebView:PagePtr -> Page:self;
+
+	WebFrame:FramePtr -> Frame:self;
+	WebFrame:WebViewPtr -> WebView:self[style=dotted];
+
+	Page:FramePtr -> Frame:self[style=dotted];
+
+	Frame:FrameLoaderPtr -> FrameLoader:self;
+	Frame:PagePtr -> Page:self[style=dotted];
+	Frame:FrameViewPtr -> FrameView:self;
+	Frame:DocPtr -> Document:self;
+
+	FrameLoader:FramePtr -> Frame:self[style=dotted];
+
+	Document:FramePtr -> Frame:self[style=dotted];
+	Document:DocLoaderPtr -> DocLoader:self;
+	Document:TokenizerPtr -> Tokenizer:self;
+
+	Tokenizer:ParserPtr -> Parser:self;
+	Tokenizer:DocPtr -> Document:self[style=dotted]; 
+
+	Parser:DocPtr -> Document:self[style=dotted]; 
+
+
+}
