@@ -1,34 +1,32 @@
 #!/usr/bin/perl 
 use strict;
 
-open LOG, ">/tmp/cpln.log" or die "can not open ";
 main(@ARGV);
 close(LOG);
 
-sub linkTo{
-	my ($srcfn, $dstfn) = @_;
-	if( -e $dstfn){
-	}else {
-		`ln -s $srcfn $dstfn`;
+sub doFile{
+	my ($fn) = @_;
+	open SRC, "<$fn" or die "can not open $fn" ; 
+	while(my $line = <SRC> ){
+		if( $line =~ "class ([a-zA-Z]+) : public ([a-zA-Z]+)"){
+			printf "$1 -> $2;\n";
+		}
 	}
+	close (SRC);
 }
 
-sub linkToFolders
+sub doFolders
 {
-	my ($dir, $dstDir)=@_;
+	my ($dir)=@_;
 	my $next;
 	opendir dir, $dir or die "Cannot open $dir : $!";
-	if ( -d $dstDir ){
-	} else {
-		`mkdir $dstDir`;
-	}
 	foreach $next (readdir dir) {
 		next if "$next" eq "." or "$next" eq ".." or "$next" eq ".svn";
-		if ( -f "$dir/$next" ){
-			linkTo("$dir/$next", "$dstDir/$next");
+		if (( -f "$dir/$next" ) and ( $next =~ "$\.h")){
+			doFile("$dir/$next");
 		}
 		elsif ( -d "$dir/$next" ) {
-			&linkToFolders("$dir/$next", "$dstDir/$next");
+			&doFolders("$dir/$next");
 		}
 	}
 	closedir (dir);
@@ -43,7 +41,6 @@ sub main(){
 		exit;
 	}
 	if ( -f $ARGV[0]){
-		`ln -s $ARGV[0] $ARGV[1]`;
 	} else {
 		my $srcDir = $ARGV[0];
 		if( $srcDir !~ "^\/") {
@@ -51,6 +48,6 @@ sub main(){
 			$srcDir = "$pwd/$srcDir";
 		}
 		
-		linkToFolders($srcDir,$ARGV[1]);
+		doFolders($srcDir);
 	}
 }

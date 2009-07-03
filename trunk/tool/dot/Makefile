@@ -5,7 +5,7 @@ DOTF ?= visual.dot
 DST=$(patsubst %.dot,%.bmp,${DOTF})
 
 all:flow.bmp
-
+webKit:webKit.bmp
 #	for dstfile in $(DST); do \
 #	make $${dstfile};\
 #	done;
