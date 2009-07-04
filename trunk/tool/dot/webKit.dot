@@ -1,6 +1,6 @@
 digraph G{
 	node [shape=record];
-	Document [shape=record];
+	Document [shape=record label="<self> dom::Document"];
 	Noncopyable [shape=record, label="<self> JavaScriptCore::Noncopyable"];
 	TreeShared [shape=record, label="<self> WebCore::TreeShared"];
 	wNode [shape=record, label="<self> dom::Node"];
@@ -97,6 +97,7 @@ digraph G{
 	EventTargetNode -> wNode ;
 	ContainerNode -> EventTargetNode ;
 	Element -> ContainerNode ;
+    Document -> ContainerNode ;
 	StyledElement -> Element;
 
 	HTMLAnchorElement -> HTMLElement;
