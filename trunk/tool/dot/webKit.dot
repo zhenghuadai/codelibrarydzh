@@ -159,6 +159,7 @@ digraph G{
     EllipsisBox                     [shape=record, label="<self> render::EllipsisBox"];
     FixedTableLayout                [shape=record, label="<self> render::FixedTableLayout"];
     IdentityTransformOperation      [shape=record, label="<self> render::IdentityTransformOperation"];
+    InlineBox                       [shape=record, label="<self> render::InlineBox"];
     InlineFlowBox                   [shape=record, label="<self> render::InlineFlowBox"];
     InlineRunBox                    [shape=record, label="<self> render::InlineRunBox"];
     InlineTextBox                   [shape=record, label="<self> render::InlineTextBox"];
@@ -277,7 +278,7 @@ digraph G{
     TranslateTransformOperation		[shape=record, label="<self> render::TranslateTransformOperation"];
 
 	TreeShared -> Noncopyable ;
-
+//! dom
     KeyboardEvent -> UIEventWithKeyState;
     Range -> RefCounted;
     XMLTokenizer -> Tokenizer;
@@ -345,6 +346,7 @@ digraph G{
     NameNodeList -> DynamicNodeList;
     NamedNodeMap -> RefCounted;
     TextEvent -> UIEvent;
+
     // html
     HTMLAnchorElement -> HTMLElement;
     HTMLAppletElement -> HTMLPlugInElement;
@@ -431,6 +433,7 @@ digraph G{
     MediaError -> RefCounted;
     TimeRanges -> RefCounted;
     VoidCallback -> RefCounted;
+
     //! render 
     Animation -> RefCounted;
     AutoTableLayout -> TableLayout;
