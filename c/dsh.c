@@ -17,7 +17,13 @@ int main()
 	int li_inputlen=0,i,j,k,is_bj=0,is_back=0;
 	int pid,status;
 	FILE *pf; 
-	pf=fopen("/home/hpc/dzh/.dshistory","a");
+	char *dshistoryFn;
+	char *home;
+	home = getenv("HOME");
+	dshistoryFn = (char*) malloc( strlen(home) + 16);
+	sprintf(dshistoryFn, "%s/.dshistory", home);
+	pf=fopen(dshistoryFn,"a");
+	free(dshistoryFn);
 	while(1)
 	{
 nextwhile: lc_char=0;
