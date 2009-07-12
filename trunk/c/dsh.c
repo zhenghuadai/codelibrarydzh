@@ -3,7 +3,7 @@
 #include<fcntl.h>
 #include<string.h>
 #include<unistd.h>
-#include<curses.h>
+//#include<curses.h>
 #define BUFFERSIZE 256
 char buffer[BUFFERSIZE];
 
@@ -408,7 +408,7 @@ int pipe1(char*input,int len)
 int  input_cmd()
 {
 	char *path;
-	char in_char;
+unsigned	char in_char;
 	int in_inputlen=0;
 	path=(char*)get_current_dir_name();
 nextenter:  printf("[%s]dzh>$",path);
@@ -428,9 +428,9 @@ nextenter:  printf("[%s]dzh>$",path);
 					case 0xe0:
 						printf("ctrL");
 						break;
-					case KEY_UP:
-						printf("kdkdkdkdkdkdkkd\n");
-						break;
+					//case KEY_UP:
+					//	printf("kdkdkdkdkdkdkkd\n");
+					//	break;
 					default:
 						//	printf("%c",in_char);
 						break;	
