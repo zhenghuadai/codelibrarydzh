@@ -1,0 +1,19 @@
+#!/bin/bash
+cmd=$1
+sudo opcontrol --reset
+sudo opcontrol --no-vmlinux    # set not sampling the kernel
+#sudo opcontrol --event=CPU_CLK_UNHALTED:6000
+sudo opcontrol --setup  --event=MEM_LOAD_RETIRED:500:0x02 --event=DTLB_MISSES:500
+echo sudo opcontrol --setup  --event=MEM_LOAD_RETIRED:500:0x02 --event=DTLB_MISSES:500
+sudo opcontrol --start
+$cmd
+sudo opcontrol --dump
+sudo opcontrol --stop
+sudo opcontrol --shutdown
+
+#list the report 
+#opreport -l ./$cmd
+
+#list the report in the .c file 
+echo opannotate --source --output-dir=${cmd}_cache $cmd
+opannotate --source --output-dir=${cmd}_cache $cmd
