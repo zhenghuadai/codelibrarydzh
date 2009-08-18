@@ -25,14 +25,10 @@
 #include <stdlib.h>
 #include "huffman.h"
 
-typedef struct {
-    size_t freq;
-    huffNode* left;
-    huffNode* right;
-}huffNode;
 
-huffNode* getHuffmanTree(size_t* freq)
+huffNode* buildHuffmanTree(size_t* freq)
 {
+
 }
 
 
