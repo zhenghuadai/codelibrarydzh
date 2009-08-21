@@ -11,9 +11,10 @@ char buffer[BUFFERSIZE];
 int  pipe1();
 int redirect();
 int  input_cmd();
-int main()
+int main(int argc, char** argv/*,char** envi*/)
 {
-	char *path,lc_char=0,*input,*arg[15];
+	char *path,lc_char=0,*arg[15];
+	char input[BUFFERSIZE];
 	int li_inputlen=0,i,j,k,is_bj=0,is_back=0;
 	int pid,status;
 	FILE *pf; 
@@ -27,7 +28,7 @@ int main()
 	while(1)
 	{
 nextwhile: lc_char=0;
-		   input=0;
+		   //input=0;
 		   li_inputlen=0;
 		   is_bj=0;
 		   is_back=0;
@@ -43,12 +44,12 @@ nextwhile: lc_char=0;
 			   buffer[li_inputlen++]=' ';
 			   buffer[li_inputlen]='\0';
 		   }
-		   input=(char *)malloc(sizeof(char)*(li_inputlen+1));
+		   //input=(char *)malloc(sizeof(char)*(li_inputlen+1));
 		   strcpy(input,buffer);
 		   fprintf(pf,"%s\n",input);
 		   fflush(pf);
 		   //     printf("buffer:%s,%d\n",input,li_inputlen);
-		   //888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888
+		   //************************************************************************************************
 		   for(i=0,j=0,k=0;i<=li_inputlen;i++)
 		   {
 			   if(input[i]=='<'||input[i]=='>'||input[i]=='|')
@@ -84,10 +85,10 @@ nextwhile: lc_char=0;
 				   buffer[j++]=input[i];
 			   }
 		   }//edn for(ijk)
-		   free(input);
+		   //free(input);
 
 		   //       printf("arg[0]:%s\n",arg[0]);    
-		   //888888888888888888888888888888888888888888888888888888888888888888888888888888888888
+		   //************************************************************************************
 		   if(strcmp(arg[0],"ls")==0)
 		   {
 
