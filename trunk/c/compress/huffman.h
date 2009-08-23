@@ -23,42 +23,52 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
-
-class huffNode{
+#include <malloc.h>
+#define armLeft 0
+#define armRight 1
+class HuffNode{
 	private:
+	public:
 		unsigned long long freq;
 		unsigned char ch;
 		unsigned char len;
-		unsigned int hcode;
-		huffNode* left;
-		huffNode* right;
-		huffNode* parent;
+        unsigned char arm;
+        unsigned char reserved;
+		unsigned int hCode;
+		HuffNode* left;
+		HuffNode* right;
+		HuffNode* parent;
 	public:
-
+        HuffNode():freq(0), ch(0), len(0), arm(0), hCode(0), left(0), right(0), parent(0){ }
+    public:
+    static int compareHuffNode( const void * node1, const void* node2){
+        return (((HuffNode*)node1)-> freq < ((HuffNode*)node2)->freq ? 1:-1);
+    }
 };
 
-class link{
+class Link{
 	public:
-		link* next;
-		void* node;
+		HuffNode* node;
+		Link* next;
 };
 
 
-class huffmanS
+class HuffmanS
 {
 	private:
 		unsigned long long freq[256]; 
 		void* head;
 		unsigned int codeTable[256];
+        HuffNode mNodes[512];
 	public:
-		huffmanS(char* txt);
+		HuffmanS(char* txt);
 	public:
 		void code(char* txt, char* ctxt);
 		void decode(char* ctxt, char* txt);
 	public:
 		virtual void* buildTree(size_t* freq);
-		void* buildTree(char* txt);
-		void getFreq(char* txt);
+		void* buildTree(unsigned char* txt);
+		void getFreq(unsigned char* txt);
 	private:
 		void hSort(void* hnode);
 		void hSort(unsigned long long *f);
