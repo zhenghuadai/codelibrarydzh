@@ -60,10 +60,12 @@ inline HuffNode* getMinNode(Link*&  head, int arm)
 void SetNodeCode(HuffNode* node)
 {
     HuffNode* parent = node->parent;
-    while(parent )
+    node->hCode = node->arm;
+    node->len =1;
+    while(parent && (parent -> arm !=255))
     {
         node->hCode <<= 1;
-        node->hCode |= parent->hCode;
+        node->hCode |= parent->arm;
         node->len++;
         parent = parent->parent;
     }
@@ -84,9 +86,25 @@ void printLink(Link* head)
     }
     printf("\n");
 }
+
+void HuffmanS::buildCodeTable(unsigned char* txt)
+{
+    buildTree(txt);
+    for(int i= 0; i< leafCount; i++)
+        SetNodeCode(&mNodes[i]);
+
+    for(int i= 0; i< leafCount; i++){
+        unsigned char c = mNodes[i].ch;
+        codeTable[c] = mNodes[i].hCode;
+        codeLen[c] = mNodes[i].len;
+        //printf("[%c: %d, %0x], ", c, codeLen[c], codeTable[c]);   
+    }
+    //printf("\n");
+
+}
 void* HuffmanS::buildTree( unsigned char* txt)
 {
-    int leafCount= 0;
+    leafCount= 0;
     int i;
     getFreq((unsigned char*)txt); 
     hSortFromFrq();
@@ -101,7 +119,7 @@ void* HuffmanS::buildTree( unsigned char* txt)
 
     linkHead = &link[i-1];
     leafCount = i;
-    int curNode = 256;
+    int curNode = leafCount;
     while(linkHead){
         Link* tLink;
         HuffNode* pNode = &mNodes[curNode++];
@@ -116,16 +134,6 @@ void* HuffmanS::buildTree( unsigned char* txt)
         tLink -> next =0; tLink -> node = pNode;
         insertLink(linkHead, tLink);
     }
-    for(int i= 0; i< leafCount; i++)
-        SetNodeCode(&mNodes[i]);
-
-    for(int i= 0; i< leafCount; i++){
-        unsigned char c = mNodes[i].ch;
-        codeTable[c] = mNodes[i].hCode;
-        codeLen[c] = mNodes[i].len;
-        printf("[%d: %d, %0x], ", c, codeLen[c], codeTable[c]);   
-    }
-
 }
 
 void HuffmanS::getFreq(unsigned char* txt)
@@ -167,4 +175,17 @@ void HuffmanS::hSortFromFrq()
 void HuffmanS::hSort(void* nodes)
 {
     qsort(nodes,256, sizeof(HuffNode), HuffNode::compareHuffNode);
+}
+
+size_t HuffmanS::code(char* txt, size_t txtLen,  char*ctxt)
+{
+    reset();
+    buildCodeTable((unsigned char*) txt);
+    int nDesBitIndex = 0;
+    for(int i= 0; i< txtLen; i++)
+    {
+        *(U32*)(ctxt+(nDesBitIndex>>3)) |= codeTable[txt[i]] << (nDesBitIndex&7);
+        nDesBitIndex += codeLen[txt[i]];
+    }
+    return nDesBitIndex;
 }
