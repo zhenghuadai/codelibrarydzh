@@ -59,17 +59,20 @@ class HuffmanS
 		unsigned long long freq[256]; 
 		void* head;
 		unsigned int codeTable[256];
-        HuffNode mNodes[512];
+        unsigned char codeLen[256];
+        HuffNode mNodes[1024];
 	public:
 		HuffmanS(char* txt);
+		HuffmanS(){};
 	public:
 		void code(char* txt, char* ctxt);
 		void decode(char* ctxt, char* txt);
 	public:
-		virtual void* buildTree(size_t* freq);
+		void* buildTree(size_t* freq);
 		void* buildTree(unsigned char* txt);
 		void getFreq(unsigned char* txt);
 	private:
 		void hSort(void* hnode);
 		void hSort(unsigned long long *f);
+        void hSortFromFrq();
 };

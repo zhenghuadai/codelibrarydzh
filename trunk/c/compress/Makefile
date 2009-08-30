@@ -1,3 +1,3 @@
 
-test:test.cpp huffman.cpp
-	g++ -o $@ $^
+test:test.cpp huffman.cpp extract.cpp
+	g++ -g  -o $@ $^

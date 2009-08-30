@@ -32,11 +32,12 @@ HuffNode* buildHuffmanTree(size_t* freq)
 }
 inline void insertLink(Link*& head, Link* tLink)
 {
+    if((! head) ||( !tLink)) return ; 
     Link* pLink = head;
     Link* nLink = head;
     while(nLink && (nLink -> node -> freq < tLink -> node -> freq)){
-        nLink = nLink -> next;
         pLink = nLink;
+        nLink = nLink -> next;
     }
     if(nLink == head){
         tLink -> next = head;
@@ -68,32 +69,46 @@ void SetNodeCode(HuffNode* node)
     }
 }
 
+HuffmanS::HuffmanS(char* txt)
+{
+}
+
+void printLink(Link* head)
+{
+    Link* p=head;
+    int i=0;
+    while(p!=NULL)
+    {
+        printf("<%d %5d> ", i++, p->node->freq);
+        p = p->next;
+    }
+    printf("\n");
+}
 void* HuffmanS::buildTree( unsigned char* txt)
 {
     int leafCount= 0;
     int i;
     getFreq((unsigned char*)txt); 
-    for(i=0;i<256;i++){
-        mNodes[i].ch = i;
-        mNodes[i].freq = freq[i];
-    }
-    hSort((void*)mNodes);
+    hSortFromFrq();
 
-    Link link[256]; 
+    Link link[256]={0}; 
     Link *linkHead;
     link[0].next =0; link[0].node=&mNodes[0];
-    for(i =0; i< 256 && mNodes[i].freq; i++){
+    for(i =1; (i< 256) && (mNodes[i].freq>0); i++){
         link[i].node = &mNodes[i];
         link[i].next = &link[i-1];
     }
 
     linkHead = &link[i-1];
     leafCount = i;
-    int curNode = leafCount;
+    int curNode = 256;
     while(linkHead){
         Link* tLink;
         HuffNode* pNode = &mNodes[curNode++];
+        tLink = linkHead;
         pNode -> left = getMinNode(linkHead, armLeft);
+        tLink -> next =0; tLink -> node = 0;
+
         tLink = linkHead;
         pNode -> right= getMinNode(linkHead, armRight);
         pNode -> freq = pNode -> left -> freq + pNode -> right -> freq;
@@ -104,7 +119,12 @@ void* HuffmanS::buildTree( unsigned char* txt)
     for(int i= 0; i< leafCount; i++)
         SetNodeCode(&mNodes[i]);
 
-
+    for(int i= 0; i< leafCount; i++){
+        unsigned char c = mNodes[i].ch;
+        codeTable[c] = mNodes[i].hCode;
+        codeLen[c] = mNodes[i].len;
+        printf("[%d: %d, %0x], ", c, codeLen[c], codeTable[c]);   
+    }
 
 }
 
@@ -116,6 +136,32 @@ void HuffmanS::getFreq(unsigned char* txt)
     while(*p) {
         freq[*p++] ++;
     }
+}
+
+int cmpLongLong(const void* q1, const void* q2){
+    return ( *(unsigned long long* )q1 < *(unsigned long long*) q2 ? 1: -1);
+}
+void HuffmanS::hSortFromFrq()
+{
+#if 0
+    for(int i=0;i<256;i++){
+        mNodes[i].ch = i;
+        mNodes[i].freq = freq[i];
+    }
+    hSort((void*)mNodes);
+#else
+    int i;
+    for(i=0;i<256;i++){
+        freq[i] = (freq[i] << 8 ) | i;
+    }
+    qsort(freq, 256, sizeof(long long ), cmpLongLong);
+    for(i=0;i<256;i++){
+        unsigned char c = freq[i] & 255;
+        mNodes[i].ch = c;
+        mNodes[i].freq = freq[i]>> 8;
+    }
+
+#endif
 }
 
 void HuffmanS::hSort(void* nodes)

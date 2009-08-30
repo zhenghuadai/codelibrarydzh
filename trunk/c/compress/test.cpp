@@ -23,4 +23,14 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include "huffman.h"
 
+char * Getsubjectfromfile(char *pfname);
+int main(int argc, char** argv)
+{
+    char* txt; 
+    HuffmanS hf;
+    txt = Getsubjectfromfile(argv[1]);
+    hf.buildTree((unsigned char*)txt);
+
+}
