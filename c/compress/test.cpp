@@ -23,6 +23,7 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "huffman.h"
 
 char * Getsubjectfromfile(char *pfname);
@@ -31,6 +32,13 @@ int main(int argc, char** argv)
     char* txt; 
     HuffmanS hf;
     txt = Getsubjectfromfile(argv[1]);
-    hf.buildTree((unsigned char*)txt);
+    int txtLen = strlen(txt);
+    char* ctxt = new char[txtLen+1];
+    size_t bits= hf.code(txt, txtLen, ctxt);
+    FILE* fpout;
+    fpout= fopen("code.hz", "w");
+    fwrite(ctxt,(bits>>3)+1, 1, fpout );
+    fclose(fpout);
+    delete ctxt;
 
 }
