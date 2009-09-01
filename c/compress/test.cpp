@@ -25,12 +25,13 @@
 #include <stdlib.h>
 
 #include "huffman.h"
-
+#include "wordFreq.h"
 char * Getsubjectfromfile(char *pfname);
 int main(int argc, char** argv)
 {
     char* txt; 
     HuffmanS hf;
+	if(argc ==1) return 1;
     txt = Getsubjectfromfile(argv[1]);
     int txtLen = strlen(txt);
     char* ctxt = new char[txtLen+1];
@@ -40,5 +41,11 @@ int main(int argc, char** argv)
     fwrite(ctxt,(bits>>3)+1, 1, fpout );
     fclose(fpout);
     delete ctxt;
+
+	WordFreq wf;
+	wf.stat(txt);
+	wf.print();
+	wf.destroy();
+
 
 }
