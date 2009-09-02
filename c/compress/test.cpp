@@ -43,9 +43,8 @@ int main(int argc, char** argv)
     delete ctxt;
 
 	WordFreq wf;
+    wf.start();
 	wf.stat(txt);
+    wf.end();
 	wf.print();
-	wf.destroy();
-
-
 }
