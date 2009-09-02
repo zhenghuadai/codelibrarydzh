@@ -23,8 +23,10 @@ class WordFreq
 {
 private:
 	Node* pHead;
+	int words;
+	int wordNumTotal;
 public:
-	WordFreq():pHead(0){}
+	WordFreq():pHead(0),words(0), wordNumTotal(0){}
 	~WordFreq(){destroy();}
 	void destroy();
 	void stat(char* txt);
