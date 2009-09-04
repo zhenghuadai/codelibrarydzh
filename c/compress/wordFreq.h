@@ -17,8 +17,36 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+class TrieNode
+{
+    public:
+        size_t freq;
+        union{
+            char c;
+            U32 u32;
+        };
+        TrieNode* mChild;
+        TrieNode* mSib;
+    public:
+        TrieNode():freq(0),c(0),mChild(0),mSib(0){}
+        TrieNode(char tC):freq(0),c(tC),mChild(0),mSib(0){}
+        ~TrieNode(){if(mChild) delete mChild; if(mSib) delete mSib;}
+    public:
+        int add(char* str, int len);
+        int add(char* str){add(str, strlen(str));}
+        TrieNode* add(char tC);
+		int search(char* str, int len);
+    private:
+        void inc(){freq ++;}
+        void addSib(TrieNode* tSib);
+        void addChild(char*str, int len);
+        void addSibNew(char* str, int len);
+        TrieNode* addSibNew(char tC);
+        void addChildNew(char* str, int len);
+        TrieNode* find(char tC);
+};
 
-class Node;
+
 class Entry 
 {
     public:
@@ -45,7 +73,7 @@ class WordFreq
         void print();
         void sort(int key=0);
     private:
-        Node* pHead;
+        TrieNode* pHead;
         int words;
         int wordNumTotal;
         Entry *mEntry;
@@ -57,8 +85,8 @@ class WordFreq
         char* tPstr;
     private:
         void appandEntry(const char* str, size_t freq);
-        void traversTree(Node* root, int level);
-        void visitNode(Node* tNode, int level);
+        void traversTree(TrieNode* root, int level);
+        void visitTrieNode(TrieNode* tTrieNode, int level);
         void destroy();
         void getFreq();
 
