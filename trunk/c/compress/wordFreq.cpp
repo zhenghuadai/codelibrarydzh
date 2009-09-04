@@ -22,57 +22,30 @@ typedef unsigned int U32;
 #include "wordFreq.h"
 #define WORD_NEW 1
 #define WORD_EXIST 0
-class Node
-{
-    public:
-        size_t freq;
-        union{
-            char c;
-            U32 u32;
-        };
-        Node* mChild;
-        Node* mSib;
-    public:
-        Node():freq(0),c(0),mChild(0),mSib(0){}
-        Node(char tC):freq(0),c(tC),mChild(0),mSib(0){}
-        ~Node(){if(mChild) delete mChild; if(mSib) delete mSib;}
-    public:
-        int add(char* str, int len);
-        int add(char* str){add(str, strlen(str));}
-        Node* add(char tC);
-        void inc(){freq ++;}
-    private:
-        void addSib(Node* tSib);
-        void addChild(char*str, int len);
-        void addSibNew(char* str, int len);
-        Node* addSibNew(char tC);
-        void addChildNew(char* str, int len);
-        Node* find(char tC);
-};
-
-void Node::addSib(Node* tSib)
+#define WORD_NONE  1
+void TrieNode::addSib(TrieNode* tSib)
 {
     tSib ->mSib = mSib;
     mSib = tSib;
 }
 
-Node* Node::find(char tC)
+TrieNode* TrieNode::find(char tC)
 {
-    Node* pSib = this;
+    TrieNode* pSib = this;
     while(pSib && pSib->c != tC) pSib = pSib->mSib;
     return pSib;
 }
 
-Node* Node::addSibNew(char tC)
+TrieNode* TrieNode::addSibNew(char tC)
 {
-    Node* tNode = new Node(tC);
-    addSib(tNode);
-    return tNode;
+    TrieNode* tTrieNode = new TrieNode(tC);
+    addSib(tTrieNode);
+    return tTrieNode;
 }
 
-Node* Node::add(char tC)
+TrieNode* TrieNode::add(char tC)
 {
-    Node* pSib = this;
+    TrieNode* pSib = this;
     pSib = find(tC);
     if (pSib ==NULL)
         pSib = addSibNew(tC);
@@ -80,10 +53,10 @@ Node* Node::add(char tC)
 
 }
 
-void  Node::addChild(char*str, int len)
+void  TrieNode::addChild(char*str, int len)
 {
     if( mChild ==0){
-        mChild = new Node(*str);
+        mChild = new TrieNode(*str);
         if(len ==1) {
             mChild -> inc(); 
             return ;
@@ -94,57 +67,71 @@ void  Node::addChild(char*str, int len)
     }
 }
 
-void Node::addChildNew(char* str, int len)
+void TrieNode::addChildNew(char* str, int len)
 {
     //if(len ==0) return;
     int i=0;
-    Node* tNode;
-    tNode= this; 
+    TrieNode* tTrieNode;
+    tTrieNode= this; 
     while(i<len){
-        tNode->mChild = new Node(str[i++]);	
-        tNode = tNode->mChild;
+        tTrieNode->mChild = new TrieNode(str[i++]);	
+        tTrieNode = tTrieNode->mChild;
     }
-    tNode -> inc();
+    tTrieNode -> inc();
 }
 
 
-void Node::addSibNew(char* str, int len)
+void TrieNode::addSibNew(char* str, int len)
 {
     int i=0;
     //if(len ==0) return;
-    Node* tNode;
-    tNode= addSibNew(str[0]);
+    TrieNode* tTrieNode;
+    tTrieNode= addSibNew(str[0]);
     if(len > 1)
-        tNode -> addChildNew(str+1, len-1); 
+        tTrieNode -> addChildNew(str+1, len-1); 
     else 
-        tNode -> inc();
+        tTrieNode -> inc();
 
 }
 
-int Node::add(char* str, int len)
+int TrieNode::search(char* str, int len)
 {
-#if 0
-    Node* tNode;
-    if(len ==0) return;
-    tNode = add(*str);
-    if( len >1) 
-        tNode -> addChild(str+1 ,len -1);
-    else if(len ==1)
-        tNode -> inc();
-#else 
-    Node* tNode=this;
-    Node* pNode =this;
+    TrieNode* tTrieNode=this;
+    TrieNode* pTrieNode =this;
     int tLen = 0;
-    while((tLen <len )&&(pNode) && ((tNode = pNode->find(str[tLen])) !=NULL))
+    while((tLen <len )&&(pTrieNode) && ((tTrieNode = pTrieNode->find(str[tLen])) !=NULL))
     { 
         tLen ++;
-        pNode = tNode->mChild;
+        pTrieNode = tTrieNode->mChild;
     }
-    if(tLen == len) { tNode->inc(); if(tNode->freq ==1 ) return WORD_NEW; else return WORD_EXIST;}
-    if( pNode == NULL){
-        tNode -> addChildNew(str+ tLen , len - tLen );
-    } else if (tNode ==NULL){
-        pNode -> addSibNew(str+ tLen, len - tLen);
+    if(tLen == len) { return WORD_EXIST;}
+	return WORD_NONE;
+}
+
+int TrieNode::add(char* str, int len)
+{
+#if 0
+    TrieNode* tTrieNode;
+    if(len ==0) return;
+    tTrieNode = add(*str);
+    if( len >1) 
+        tTrieNode -> addChild(str+1 ,len -1);
+    else if(len ==1)
+        tTrieNode -> inc();
+#else 
+    TrieNode* tTrieNode=this;
+    TrieNode* pTrieNode =this;
+    int tLen = 0;
+    while((tLen <len )&&(pTrieNode) && ((tTrieNode = pTrieNode->find(str[tLen])) !=NULL))
+    { 
+        tLen ++;
+        pTrieNode = tTrieNode->mChild;
+    }
+    if(tLen == len) { tTrieNode->inc(); if(tTrieNode->freq ==1 ) return WORD_NEW; else return WORD_EXIST;}
+    if( pTrieNode == NULL){
+        tTrieNode -> addChildNew(str+ tLen , len - tLen );
+    } else if (tTrieNode ==NULL){
+        pTrieNode -> addSibNew(str+ tLen, len - tLen);
     }
     return WORD_NEW;
 #endif
@@ -184,7 +171,7 @@ void printStr(char* pStart, int len)
 void WordFreq::start()
 {
     destroy();	
-    pHead = new Node();
+    pHead = new TrieNode();
 }
 
 void WordFreq::stat(char* txt)
@@ -217,22 +204,22 @@ void WordFreq::end()
     this ->sort();
 }
 
-void WordFreq::visitNode(Node* tNode, int level)
+void WordFreq::visitTrieNode(TrieNode* tTrieNode, int level)
 {
     static char strBuf[1024];
-    strBuf[level] = tNode->c;
-    //printf("<%d %c %d %0x %0x >", level, tNode->c, tNode->freq, tNode->mChild, tNode->mSib);
-    if(tNode -> freq >0){
+    strBuf[level] = tTrieNode->c;
+    //printf("<%d %c %d %0x %0x >", level, tTrieNode->c, tTrieNode->freq, tTrieNode->mChild, tTrieNode->mSib);
+    if(tTrieNode -> freq >0){
         strBuf[level+1] =0;
-        //printf("%6d %s\n", tNode->freq, strBuf);
-        appandEntry(strBuf, tNode->freq);
+        //printf("%6d %s\n", tTrieNode->freq, strBuf);
+        appandEntry(strBuf, tTrieNode->freq);
     }
 }
 
-void WordFreq::traversTree(Node* root, int level)
+void WordFreq::traversTree(TrieNode* root, int level)
 {
     if(!root) return ;
-    visitNode(root, level);
+    visitTrieNode(root, level);
     traversTree(root->mChild, level+1);
     traversTree(root->mSib, level);
 }
