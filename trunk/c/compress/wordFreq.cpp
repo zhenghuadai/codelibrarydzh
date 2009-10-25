@@ -168,6 +168,17 @@ void printStr(char* pStart, int len)
     printf(">\n");
 }
 
+WordFreq::WordFreq():pHead(0),words(0), wordNumTotal(0), mEntry(NULL),mEntrySize(0),chNum(0),strPool(0),strPoolSize(0)
+{
+}
+
+WordFreq:: ~WordFreq()
+{
+    destroy(); 
+    if (strPool) delete strPool; 
+    if(mEntry) delete mEntry;
+}
+
 void WordFreq::start()
 {
     destroy();	
@@ -274,4 +285,15 @@ void WordFreq::destroy()
 void WordFreq::sort(int key)
 {
     qsort(mEntry, words, sizeof(Entry), Entry::compareFreq);
+}
+
+void WordFreq::analyse()
+{
+    int i;
+    int firstTypeWords = 0;
+    for(i=0; i<words; i++){
+        if( mEntry[i]. freq < 3 ) break;
+        firstTypeWords += ( mEntry[i].freq * strlen(mEntry[i].str));
+    }
+    printf("firstTypeWords:%d \n", firstTypeWords);
 }

@@ -64,14 +64,14 @@ class Entry
 class WordFreq
 {
     public:
-        WordFreq():pHead(0),words(0), wordNumTotal(0), mEntry(NULL),mEntrySize(0),chNum(0),strPool(0),strPoolSize(0){}
-
-        ~WordFreq(){destroy(); if (strPool) delete strPool; if(mEntry) delete mEntry;}
+        WordFreq();
+        ~WordFreq();
         void start();
         void stat(char* txt);
         void end();
         void print();
         void sort(int key=0);
+        void analyse();
     private:
         TrieNode* pHead;
         int words;
@@ -89,5 +89,4 @@ class WordFreq
         void visitTrieNode(TrieNode* tTrieNode, int level);
         void destroy();
         void getFreq();
-
 };

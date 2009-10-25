@@ -47,4 +47,5 @@ int main(int argc, char** argv)
 	wf.stat(txt);
     wf.end();
 	wf.print();
+    wf.analyse();
 }
