@@ -34,7 +34,7 @@ sub main(){
 	my $pwd = `pwd`;
 	my $numargs = @ARGV;
 	if( $numargs ==0 ) {
-		printf "cpln srcDir dstDir\n";
+		printf "cpln Dir\n";
 		exit;
 	}
 	if ( -f $ARGV[0]){
