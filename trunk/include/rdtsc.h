@@ -33,6 +33,11 @@ static inline double mdtime(int id){
 	}
 }
 
+static inline double mdgetSeconds(double c)
+{
+    return c/ RDTSC_CORE_FREQ;
+}
+
 static double getFrequency()
 {
     double t3;
