@@ -1,0 +1,99 @@
+// Copyright (c) 1999-2003 Robin Davies.
+// Placed into the public domain. 
+// All uses permitted without attribution.
+
+#include"stdio.h"
+#include"math.h"
+
+#ifndef PI
+#define PI 3.1415926535897932384626433832795
+#endif
+
+#if tblTYPE == tblFLOAT 
+#define REAL float 
+#define tblFunc(fn) fn##f
+#else 
+#define REAL double  
+#define tblFunc(fn) fn
+#endif 
+
+#ifndef tblBITS
+#define tblBITS 10
+#endif
+
+struct TSinCos { 
+	REAL m_sin, m_cos;
+};
+
+enum { 
+	kMSBits = tblBITS,
+	kLSBits = tblBITS,
+	kMsTableSize = 1 << kMSBits,
+	kLsTableSize = 1 << kLSBits,
+	kBits = kMSBits + kLSBits
+};
+
+static const double onePart= kMsTableSize*kLsTableSize/(2*PI);
+
+static TSinCos m_MsBitsTable[kMsTableSize+1];
+static TSinCos m_LsBitsTable[kMsTableSize+1];
+
+
+static int tblFunc(initialize)(){
+
+	int i;
+	for (i = 0; i <= kMsTableSize; ++i) {
+		double phi = (2*PI*i/kMsTableSize);
+		m_MsBitsTable[i].m_sin = (REAL)sin(phi);
+		m_MsBitsTable[i].m_cos = (REAL)cos(phi);
+	}
+	for (i = 0; i <= kLsTableSize; ++i) {
+		double phi = (2*PI*i/(kMsTableSize*1.0*kLsTableSize));
+		m_LsBitsTable[i].m_sin = (REAL)sin(phi);
+		m_LsBitsTable[i].m_cos = (REAL)cos(phi);
+	}
+	printf("table initalized\n");
+	return 1;
+}
+static int initialized = tblFunc(initialize)();
+
+static REAL tblSinQ(int nIndex)  {
+	// Based on the identity sin(u+v) = sinu cosv + cosu sinv
+	TSinCos *pscu = m_MsBitsTable +( (nIndex >> kLSBits) & (kMsTableSize-1));
+	TSinCos *pscv = m_LsBitsTable + ( (nIndex) & (kLsTableSize-1));
+	return pscu->m_sin * pscv->m_cos + pscu->m_cos * pscv->m_sin;
+};
+
+static REAL tblCosQ(int nIndex)  {
+	// based on the identity cos(u+v) = cosu cosv + sinu sinv
+	TSinCos *pscu = m_MsBitsTable +( (nIndex >> kLSBits) & (kMsTableSize-1));
+	TSinCos *pscv = m_LsBitsTable + ( (nIndex) & (kLsTableSize-1));
+	return pscu->m_cos * pscv->m_cos - pscu->m_sin * pscv->m_sin;
+};
+
+static void tblSinCosQ(int nIndex, REAL &dSin, REAL &dCos)  {
+	// based on the identity cos(u+v) = cosu cosv + sinu sinv
+	TSinCos *pscu = m_MsBitsTable +( (nIndex >> kLSBits) & (kMsTableSize-1));
+	TSinCos *pscv = m_LsBitsTable + ( (nIndex) & (kLsTableSize-1));
+	dCos = pscu->m_cos * pscv->m_cos - pscu->m_sin * pscv->m_sin;
+	dSin = pscu->m_sin * pscv->m_cos + pscu->m_cos * pscv->m_sin;
+};
+
+REAL tblFunc(tblSin)(double dAngle) // Returns sin with 20 bits of precision.
+{
+	int r = Round(dAngle*(onePart));
+	return tblSinQ(r);
+	//return tblSinQ(Round(dAngle*(onePart)) );
+}
+
+REAL tblFunc(tblCos)(double dAngle)  // Returns cos with 20 bits of precision.
+{
+	return tblCosQ(Round(dAngle*(onePart)) );
+}
+
+void tblFunc(tblSinCos)(double dAngle, REAL &dSin, REAL &dCos)  // Returns cos with 20 bits of precision.
+{
+	tblSinCosQ(Round(dAngle*(onePart)) , dSin, dCos);
+}
+
+
