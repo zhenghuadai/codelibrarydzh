@@ -6,6 +6,8 @@
 
 #define MATH_SSE_FUNC_NAME(fn) fn
 
+static double magic_delta=0.499999999999;
+
 inline 
 int     MATH_SSE_FUNC_NAME(dtoi)(double x) {
 	return _mm_cvtsd_si32(_mm_load_sd(&x));
@@ -37,13 +39,16 @@ int MATH_SSE_FUNC_NAME(ftoit)(float s) {
 }
 
 
-
 inline 
 int MATH_SSE_FUNC_NAME(floor32)(double x) {
+	double xx = x- matic_delta;
+	return _mm_cvtsd_si32(_mm_load_sd(&xx));
 } 
 
 inline 
 int MATH_SSE_FUNC_NAME(ceil32)(double x)  {
+	double xx = x+ matic_delta;
+	return _mm_cvtsd_si32(_mm_load_sd(&xx));
 };
 
 inline long MATH_SSE_FUNC_NAME(ftol)(float x) { 
