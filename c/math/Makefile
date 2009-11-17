@@ -28,6 +28,7 @@ FLAG+= -m32
 endif
 
 FLAG+= -DUSE_SSE2 
+
 ICCFLAG=${FLAG}
 GCCFLAG=${FLAG} -msse2 -DREF_FREQ_MHZ=$(coreFrequencyM) 
 
