@@ -1,25 +1,53 @@
-#include <xmmintrin.h>
-int trunk32(double s)
-{
-	return _mm_cvttsd_si32(_mm_load_sd(&s));
-}
 
+#ifndef  ROUND_SSE__INC
+#define  ROUND_SSE__INC
+
+#include <xmmintrin.h>
+
+#define MATH_SSE_FUNC_NAME(fn) fn
 
 inline 
-int dtoi(double x) {
+int     MATH_SSE_FUNC_NAME(dtoi)(double x) {
 	return _mm_cvtsd_si32(_mm_load_sd(&x));
 }
 
 inline 
-int floor32(double x) {
-} 
+__int64 MATH_SSE_FUNC_NAME(dtol)(double x) {
+	return _mm_cvtsd_si64(_mm_load_sd(&x));
+}
 
 inline 
-int ceil32(double x)  {
-};
+int     MATH_SSE_FUNC_NAME(ftoi)(float x) {
+	return _mm_cvtss_si32(_mm_load_ss(&x));
+}
 
-inline long ftol(float x) 
-{ 
+inline 
+int      MATH_SSE_FUNC_NAME(dtoit)(double s) {
+	return _mm_cvttsd_si32(_mm_load_sd(&s));
+}
+
+inline 
+__int64  MATH_SSE_FUNC_NAME(dtolt)(double s) {
+	return _mm_cvttsd_si64(_mm_load_sd(&s));
+}
+
+inline 
+int MATH_SSE_FUNC_NAME(ftoit)(float s) {
+	return _mm_cvttss_si32(_mm_load_ss(&s));
 }
 
 
+
+inline 
+int MATH_SSE_FUNC_NAME(floor32)(double x) {
+} 
+
+inline 
+int MATH_SSE_FUNC_NAME(ceil32)(double x)  {
+};
+
+inline long MATH_SSE_FUNC_NAME(ftol)(float x) { 
+}
+
+
+#endif   /* ----- #ifndef ROUND_SSE__INC  ----- */

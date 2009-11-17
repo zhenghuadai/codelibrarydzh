@@ -31,6 +31,8 @@ inline double _TWOPOW(int N)
 
 
 static const double g_MagicRoundingConstant =6755399441055744.0;// _TWOPOW(52) + _TWOPOW(51);
+static double m_MagicRoundingConstant =6755399441055744.0;// _TWOPOW(52) + _TWOPOW(51);
+#if 1
 inline 
 int Round(double x) {
 #ifdef USE_SSE2
@@ -40,6 +42,42 @@ int Round(double x) {
 	return *(int*)&mydtemp;
 #endif
 }
+#endif
+
+#if 0
+inline 
+int Round(double x){
+	int t;
+	__asm__(
+	"movsd %1, %%xmm0;"
+	"addsd %2, %%xmm0; "
+	"movd  %%xmm0, %0;"
+	:"=a"(t)
+	:"m"(x), "m"(m_MagicRoundingConstant)
+	);
+	return t;
+}
+#endif
+
+
+#if 0
+inline 
+int Round(double x){
+	union{
+		double t;
+		int ti;
+	};
+	__asm__(
+			"fldl %1;"
+			"faddl %2;  "
+			"fstpl %0;"
+			:"=m"(t)
+			:"m"(x), "m"(m_MagicRoundingConstant)
+		   );
+	return ti;
+}
+#endif
+
 
 
 #endif   /* ----- #ifndef SINCOS_TABLE__INC  ----- */
