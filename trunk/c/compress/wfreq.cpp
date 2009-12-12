@@ -32,6 +32,7 @@ int main(int argc, char** argv)
     char* txt; 
 	char* fnin;
 	if(argc ==1){
+		printf("wfreq textfile\n");
 		return 1;
 	}else{
 	fnin = argv[1];	
