@@ -83,6 +83,7 @@ class WordFreq
         int strPoolSize;
         int tEntryIndex;
         char* tPstr;
+		int charFreq[256];
     private:
         void appandEntry(const char* str, size_t freq);
         void traversTree(TrieNode* root, int level);

@@ -189,111 +189,114 @@ void WordFreq::stat(char* txt)
 {
     char* pStart = txt;
     char* pEnd = txt;
-    while(*pEnd){
-        if (isSeperator(*pEnd)){
-            int len = pEnd - pStart ;
-            int ret;
-            if((len>0) && (len < 1024)){
-                ret =pHead -> add(pStart, len);
-                if(ret){
-                    words ++;
-                    //printStr(pStart, len);
-                    chNum += (len+1);
-                }
-            }
-            wordNumTotal++;
-            pEnd++;
-            pStart =pEnd; 
-        } else 
-            pEnd ++;
-    }
+	while(*pEnd){
+		if (isSeperator(*pEnd)){
+			int len = pEnd - pStart ;
+			int ret;
+			if((len>0) && (len < 1024)){
+				ret =pHead -> add(pStart, len);
+				if(ret){
+					words ++;
+					//printStr(pStart, len);
+					chNum += (len+1);
+				}
+			}
+			wordNumTotal++;
+			pStart =pEnd+1; 
+		} 
+		charFreq[*(unsigned char*)pEnd] ++;
+		pEnd ++;
+	}
 }
 
 void WordFreq::end()
 {
-    getFreq();
-    this ->sort();
+	getFreq();
+	this ->sort();
 }
 
 void WordFreq::visitTrieNode(TrieNode* tTrieNode, int level)
 {
-    static char strBuf[1024];
-    strBuf[level] = tTrieNode->c;
-    //printf("<%d %c %d %0x %0x >", level, tTrieNode->c, tTrieNode->freq, tTrieNode->mChild, tTrieNode->mSib);
-    if(tTrieNode -> freq >0){
-        strBuf[level+1] =0;
-        //printf("%6d %s\n", tTrieNode->freq, strBuf);
-        appandEntry(strBuf, tTrieNode->freq);
-    }
+	static char strBuf[1024];
+	strBuf[level] = tTrieNode->c;
+	//printf("<%d %c %d %0x %0x >", level, tTrieNode->c, tTrieNode->freq, tTrieNode->mChild, tTrieNode->mSib);
+	if(tTrieNode -> freq >0){
+		strBuf[level+1] =0;
+		//printf("%6d %s\n", tTrieNode->freq, strBuf);
+		appandEntry(strBuf, tTrieNode->freq);
+	}
 }
 
 void WordFreq::traversTree(TrieNode* root, int level)
 {
-    if(!root) return ;
-    visitTrieNode(root, level);
-    traversTree(root->mChild, level+1);
-    traversTree(root->mSib, level);
+	if(!root) return ;
+	visitTrieNode(root, level);
+	traversTree(root->mChild, level+1);
+	traversTree(root->mSib, level);
 }
 
 void WordFreq::print()
 {
-    printf("words :%d \n", words);
-    printf("total words :%d \n", wordNumTotal);
-    //traversTree(pHead, 0);
-    for(int i=0;i< words;i++)
-        printf("%6d %s\n", mEntry[i].freq, mEntry[i].str);
+	printf("words :%d \n", words);
+	printf("total words :%d \n", wordNumTotal);
+	//traversTree(pHead, 0);
+	for(int i=0;i< words;i++)
+		printf("%6d %s\n", mEntry[i].freq, mEntry[i].str);
+	for(int i=0;i<256;i++)
+		printf("[%c %d]\n", i, charFreq[i]);
 
 }
 
 void WordFreq::getFreq()
 {
-    if( strPoolSize < chNum) {
-        if(strPool) delete strPool;
-        strPool = new char[chNum];
-        strPoolSize = chNum;
-    }
-    if( mEntrySize < words){
-        if(mEntry) delete mEntry;
-        mEntry = new Entry[words];
-        mEntrySize = words;
-    }
-    tEntryIndex = 0;
-    tPstr = strPool;
-    traversTree(pHead,0);
+	if( strPoolSize < chNum) {
+		if(strPool) delete strPool;
+		strPool = new char[chNum];
+		strPoolSize = chNum;
+	}
+	if( mEntrySize < words){
+		if(mEntry) delete mEntry;
+		mEntry = new Entry[words];
+		mEntrySize = words;
+	}
+	tEntryIndex = 0;
+	tPstr = strPool;
+	traversTree(pHead,0);
 }
 
 void WordFreq::appandEntry(const char* str, size_t freq)
 {
-    if(( tEntryIndex >= mEntrySize ) || (tPstr-strPool >= strPoolSize)){
-        printf(" buf overflow\n");
-        exit(0);
-    }
-    strcpy(tPstr, str);
-    mEntry[tEntryIndex++].set(tPstr, freq);
-    tPstr += (strlen(str)+1);
+	if(( tEntryIndex >= mEntrySize ) || (tPstr-strPool >= strPoolSize)){
+		printf(" buf overflow\n");
+		exit(0);
+	}
+	strcpy(tPstr, str);
+	mEntry[tEntryIndex++].set(tPstr, freq);
+	tPstr += (strlen(str)+1);
 }
 
 void WordFreq::destroy()
 {
-    if(pHead) delete pHead ; pHead =0;
-    words = wordNumTotal = chNum = 0;
-    //if(mEntry) delete mEntry;
-    //if(strPool) delete strPool;
+	if(pHead) delete pHead ; pHead =0;
+	words = wordNumTotal = chNum = 0;
+	memset(charFreq, 0, 256*sizeof(int));
+	//if(mEntry) delete mEntry;
+	//if(strPool) delete strPool;
 }
 
 
 void WordFreq::sort(int key)
 {
-    qsort(mEntry, words, sizeof(Entry), Entry::compareFreq);
+	qsort(mEntry, words, sizeof(Entry), Entry::compareFreq);
 }
 
 void WordFreq::analyse()
 {
-    int i;
-    int firstTypeWords = 0;
-    for(i=0; i<words; i++){
-        if( mEntry[i]. freq < 3 ) break;
-        firstTypeWords += ( mEntry[i].freq * strlen(mEntry[i].str));
-    }
-    printf("firstTypeWords:%d \n", firstTypeWords);
+	int i;
+	int firstTypeWords = 0;
+	for(i=0; i<words; i++){
+		if( mEntry[i]. freq < 3 ) break;
+		firstTypeWords += ( mEntry[i].freq * strlen(mEntry[i].str));
+	}
+	printf("firstTypeWords:%d \n", firstTypeWords);
 }
