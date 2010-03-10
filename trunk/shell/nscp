@@ -1,0 +1,19 @@
+#!/bin/bash
+if [ $# -lt 1 ]; then
+	echo "nscp src dstPath nodesList"
+	echo "for example: nscp \"id.pub readme.txt\" ~/ node1 node2 node3"
+	exit
+fi
+
+if [ $# -ge 3 ];then
+	src=$1
+	dstPath=$2
+	shift
+	shift
+	nodesList=$*
+else
+fi
+for node in $nodesList; do
+	scp $src $node:$dstPath	
+done;
+
