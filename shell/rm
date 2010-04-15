@@ -1,0 +1,74 @@
+#!/bin/bash
+args=$*
+ioption=0
+roption=0
+foption=0
+optargs=""
+trashfolder=/tmp/$USER-trash/
+mvlogf=$trashfolder/.log
+
+cleanAll(){
+	rm -rf $trashfolder
+}
+
+for i in $* ;do
+	if [ "-" = ${i:0:1} ]; then
+		optargs="$optargs $i"
+	fi
+done
+
+while getopts 'iIfrvc' OPT $optargs ;do
+	case $OPT in
+	f)
+		foption=1;;
+	v)
+		voption=1;;
+	r)
+		roption=1;;
+	i)
+		ioption=1;;
+	I)
+		Ioption=1;;
+	c)
+		cleanAll; exit 0;;
+	esac	
+done
+
+if [ ! -e $trashfolder ]; then
+	mkdir -p $trashfolder
+fi
+
+for i in $* ;do
+	if [ "-" != ${i:0:1} ]; then
+		#if [ -d $i ]; then
+			#echo $i is folder
+		#elif [ -e $i ]; then
+			#echo $i is file
+		#fi
+
+		if [ "/" != ${i:0:1} ]; then
+			mvsf=$PWD/$i
+		else
+			mvsf=$i
+		fi
+		basedf=$(echo $mvsf |tr "/" "*" )
+		#basedf=$(basename $i)
+		mvdf=$trashfolder/$basedf
+		mv $mvsf $mvdf
+		if [ 0 -eq $? ]; then
+			echo "mv $mvsf $mvdf;/bin/rm $mvdf; " >> $mvlogf
+		fi
+	fi
+done
+
+cleanHalf(){
+	cmdclean=/tmp/cmdclean
+	awk -F";" '{print $2}' $mvlogf > $cmdclean
+	chmod +x $cmdclean
+	$cmdclean
+	rm $cmdclean
+}
+
+recover(){
+	recovsf=$(echo $mvdf | tr "*" "/" )
+}
