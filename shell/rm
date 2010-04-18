@@ -6,9 +6,10 @@ foption=0
 optargs=""
 trashfolder=/tmp/$USER-trash/
 mvlogf=$trashfolder/.log
+RM=/bin/rm
 
 cleanAll(){
-	rm -rf $trashfolder
+	$RM -rf $trashfolder
 }
 
 for i in $* ;do
@@ -66,9 +67,11 @@ cleanHalf(){
 	awk -F";" '{print $2}' $mvlogf > $cmdclean
 	chmod +x $cmdclean
 	$cmdclean
-	rm $cmdclean
+	$RM $cmdclean
+	$RM $mvlogf
 }
 
 recover(){
 	recovsf=$(echo $mvdf | tr "*" "/" )
 }
+
