@@ -1,5 +1,5 @@
 #!/bin/bash
-args=$*
+args=$@
 ioption=0
 roption=0
 foption=0
@@ -12,7 +12,7 @@ cleanAll(){
 	$RM -rf $trashfolder
 }
 
-for i in $* ;do
+for i in "$@" ;do
 	if [ "-" = ${i:0:1} ]; then
 		optargs="$optargs $i"
 	fi
@@ -39,7 +39,7 @@ if [ ! -e $trashfolder ]; then
 	mkdir -p $trashfolder
 fi
 
-for i in $* ;do
+for i in "$@" ;do
 	if [ "-" != ${i:0:1} ]; then
 		#if [ -d $i ]; then
 			#echo $i is folder
@@ -55,9 +55,9 @@ for i in $* ;do
 		basedf=$(echo $mvsf |tr "/" "*" )
 		#basedf=$(basename $i)
 		mvdf=$trashfolder/$basedf
-		mv $mvsf $mvdf
+		mv "$mvsf" "$mvdf"
 		if [ 0 -eq $? ]; then
-			echo "mv $mvsf $mvdf;/bin/rm $mvdf; " >> $mvlogf
+			echo "$mvsf		$mvdf" >> $mvlogf
 		fi
 	fi
 done
