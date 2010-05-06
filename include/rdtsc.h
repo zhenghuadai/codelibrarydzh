@@ -1,92 +1,116 @@
-#ifndef rdtsc
+#ifndef RDTSC_HEADER
+#define RDTSC_HEADER
 
-#ifndef RDTSC_CORE_FREQ
-#define RDTSC_CORE_FREQ 2.1280493e9
-#endif
+#if defined(__GNUC__)
+
 #define rdtsc(low,high) \
-__asm__ __volatile__("rdtsc" : "=a" (low), "=d" (high))
+__asm__ __volatile__("rdtsc" : "=a" (low), "=d" (high));
 
+#define rdtsc1(t) \
+__asm__ __volatile__("rdtsc" : "=a" (*(int*)&t), "=d" (*(((int*)&t)+1)));
 
+#define nasm0(op) __asm__( #op)
+#else 
+//#elif defined(_MSC_VER)
+#define rdtsc(low32, high32) \
+__asm rdtsc \
+__asm mov low32, eax \
+__asm mov high32, edx 
 
+#define rdtsc1(t) \
+__asm rdtsc \
+__asm mov t, eax \
+__asm mov t+4, edx 
+
+#define nasm0(x) __asm x
+
+#endif
+
+#if  0 
 typedef union {
 	unsigned long long  u64;
 	struct{
 		unsigned int low;
 		unsigned int high;
 	};
-} _U64;
-static inline unsigned long long getrdtc()
-{
-	_U64 a;
-	rdtsc(a.low, a.high);
-	return a.u64;
+} U64;
+#define diffTime(start,end) ((end.u64)-(start.u64))
+#define cast2u64(x) x.u64
+
+#else 
+typedef unsigned long long U64;
+#define diffTime(start,end) (end)-(start)
+#define cast2u64(x) x
+#endif
+
+#define timens(x) timenamespace ## x
+
+
+//static inline unsigned long long getrdtsc()
+//{
+//	U64 a;
+//	rdtsc(a.low, a.high);
+//	return a.u64;
+//}
+
+static inline U64  getrdtsc(){
+	nasm0(rdtsc);
+}
+static U64 startT, endT;
+static inline U64 startTime(){
+		//rdtsc1(startT);
+		startT = getrdtsc();
+		return startT;
+}
+
+static inline U64 endTime(){
+		//rdtsc1(endT);
+		endT = getrdtsc();
+		return (U64) diffTime(startT,endT);
+}
+
+static inline U64 getTime(){
+	return (U64) diffTime(startT,endT);
 }
 
 static inline double mdtime(int id){
-	static _U64 startT, endT;
+	static U64 startT, endT;
 	if(id){
-		rdtsc(endT.low,endT.high);
-		return (double)(endT.u64 - startT.u64);
+		rdtsc1(endT);
+		return (double)(diffTime(startT,endT));
 	}else{
-		rdtsc(startT.low,startT.high);
-	return 0.0;
+		rdtsc1(startT);
+		return (double) cast2u64(startT);
 	}
 }
 
-static inline double mdgetSeconds(double c)
-{
-    return c/ RDTSC_CORE_FREQ;
+static inline double pdtime(int id){
+	static U64 startT, endT;
+	if(id){
+		rdtsc1(endT);
+		printf("time:%f\n",diffTime(startT,endT));
+		return (double)(diffTime(startT,endT));
+	}else{
+		rdtsc1(startT);
+		return (double) cast2u64(startT);
+	}
 }
-
 static double getFrequency()
 {
-    double t3;
-    _U64 startT, endT;
-    rdtsc(startT.low,startT.high);
-    sleep(1);
-    rdtsc(endT.low,endT.high);
-    t3=  (double)(endT.u64 - startT.u64);
-    return t3;
+	double t3;
+	U64 startT, endT;
+	rdtsc1(startT);
+	sleep(1);
+	rdtsc1(endT);
+	t3=  (double)(diffTime(startT,endT));
+	return t3;
 }
 
-
-static inline  double rdtscdiff(unsigned int low1,unsigned int high1,unsigned int low2,unsigned int high2)
+static double RDTSC_CORE_FREQ = 0;
+static inline double mdgetSeconds(double c)
 {
-    const  double MAXintplus1 = 4294967296.0;
-    unsigned int low,high;
-    if (low2<low1) {
-        low = 0xffffffff - low1 + low2;
-        high = high2 - high1 -1;
-    }
-    else {
-        high = high2 - high1;
-        low = low2 - low1;
-    }
-    return (double)high * MAXintplus1 + (double)low ;
+	if (RDTSC_CORE_FREQ ==0) RDTSC_CORE_FREQ = getFrequency();
+	return c/ RDTSC_CORE_FREQ;
 }
 
-static inline double mdtime4(int id)
-{
-    static unsigned int high0,low0,high1,low1;
-    if(id){
-        rdtsc(low1,high1);
-        return rdtscdiff(low0,high0,low1,high1)/RDTSC_CORE_FREQ;	
-    }
-    else{
-        rdtsc(low0,high0);
-        return 0.0;
-    }
-}
-static inline double mdtime2(int id)
-{
-    static unsigned int high0,low0,high1,low1;
-    if(id){
-        rdtsc(low1,high1);
-        return rdtscdiff(low0,high0,low1,high1)/RDTSC_CORE_FREQ;	
-    }
-    else{
-        rdtsc(low0,high0);
-        return 0.0;
-    }
-}
 #endif
