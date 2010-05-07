@@ -1,27 +1,71 @@
 #!/bin/bash
+#Any problem, please contact with djx.zhenghua@gmal.com
 args=$@
 ioption=0
 roption=0
 foption=0
 optargs=""
-trashfolder=/tmp/$USER-trash/
+trashfolder=${TRASHFOLDER:-/tmp/$USER-trash/}
 mvlogf=$trashfolder/.log
 RM=/bin/rm
+########################### define function start ###########################
+rmhelp(){
+	echo Usage: rm [OPTION]... FILE... 
+	echo "    -f"
+	echo "    -c empty the trash bin"
+	echo "    -d delete the file forever"
+	echo "    -u recover the file (unrm)"
+	echo "  example"
+	echo "     rm file0 file1      : move the file file0 file1 to trash bin"
+	echo "     rm -u file0 file1   : recover the file file0 file1"
+	echo "     rm -d file0         : delete the file forever, it will can not be recoverd"
+	echo "     rm -c               : empty the trash bin"
+	echo "     You can check the log file $trashfolder/.log"
+	echo "     To use rm -u, you can do "
+	echo "		  alias unrm=\"rm -u\""
+	echo "     To use rm -d, you can do "
+	echo "		  alias rmd=\"rm -d\""
+}
 
 cleanAll(){
 	$RM -rf $trashfolder
 }
 
+recover(){
+	for i in "$@" ;do
+		if [ "-" != "${i:0:1}" ]; then
+			if [ "/" != "${i:0:1}" ]; then
+				mvsf=$PWD/$i
+			else
+				mvsf=$i
+			fi
+			mvdf=$trashfolder/$(echo $mvsf | tr "/" "*" )
+			if [ -e $mvdf ]; then
+				mv  $mvdf $mvsf
+				if [ 0 -eq $? ]; then
+					echo "restore $mvdf		$mvsf" >> $mvlogf
+				fi
+			else
+				echo $mvsf dose not been stored
+			fi
+		fi
+	done	
+}
+########################### define function end  #############################
+
 for i in "$@" ;do
-	if [ "-" = ${i:0:1} ]; then
+	if [ "-" = "${i:0:1}" ]; then
 		optargs="$optargs $i"
 	fi
 done
 
-while getopts 'iIfrvc' OPT $optargs ;do
+while getopts 'hiIfrvcud' OPT $optargs ;do
 	case $OPT in
 	f)
 		foption=1;;
+	d)
+		/bin/rm $*
+		exit 0;;
 	v)
 		voption=1;;
 	r)
@@ -30,8 +74,14 @@ while getopts 'iIfrvc' OPT $optargs ;do
 		ioption=1;;
 	I)
 		Ioption=1;;
+	u)
+		recover $*;
+		exit 0;;
 	c)
 		cleanAll; exit 0;;
+	h)
+		rmhelp
+		exit 0;;
 	esac	
 done
 
@@ -40,14 +90,14 @@ if [ ! -e $trashfolder ]; then
 fi
 
 for i in "$@" ;do
-	if [ "-" != ${i:0:1} ]; then
+	if [ "-" != "${i:0:1}" ]; then
 		#if [ -d $i ]; then
 			#echo $i is folder
 		#elif [ -e $i ]; then
 			#echo $i is file
 		#fi
 
-		if [ "/" != ${i:0:1} ]; then
+		if [ "/" != "${i:0:1}" ]; then
 			mvsf=$PWD/$i
 		else
 			mvsf=$i
@@ -57,7 +107,7 @@ for i in "$@" ;do
 		mvdf=$trashfolder/$basedf
 		mv "$mvsf" "$mvdf"
 		if [ 0 -eq $? ]; then
-			echo "$mvsf		$mvdf" >> $mvlogf
+			echo "store   $mvsf		$mvdf" >> $mvlogf
 		fi
 	fi
 done
@@ -70,8 +120,3 @@ cleanHalf(){
 	$RM $cmdclean
 	$RM $mvlogf
 }
-
-recover(){
-	recovsf=$(echo $mvdf | tr "*" "/" )
-}
-
