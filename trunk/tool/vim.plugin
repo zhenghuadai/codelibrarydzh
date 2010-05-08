@@ -1,0 +1,13 @@
+#!/bin/bash
+cd ~/.vim/
+# c-support
+wget http://www.vim.org/scripts/download_script.php?src_id=12311 -O cvim.zip;     unzip cvim.zip
+
+# taglist
+wget http://vim.sourceforge.net/scripts/download_script.php?src_id=7701 -O taglist.vim.zip; unzip taglist.vim.zip
+#
+
+#.wgetrc
+#http-proxy=ip:port
+#ftp-proxy=ip:port
+
