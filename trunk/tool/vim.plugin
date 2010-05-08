@@ -1,5 +1,10 @@
 #!/bin/bash
 cd ~/.vim/
+
+make -p plugin
+# cscope_maps
+wget http://cscope.sourceforge.net/cscope_maps.vim -O plugin/cscope_maps.vim
+
 # c-support
 wget http://www.vim.org/scripts/download_script.php?src_id=12311 -O cvim.zip;     unzip cvim.zip
 
@@ -7,7 +12,10 @@ wget http://www.vim.org/scripts/download_script.php?src_id=12311 -O cvim.zip;   
 wget http://vim.sourceforge.net/scripts/download_script.php?src_id=7701 -O taglist.vim.zip; unzip taglist.vim.zip
 #
 
+# supertab
+http://www.vim.org/scripts/download_script.php?src_id=11533 -O plugin/supertab.vim  
 #.wgetrc
 #http-proxy=ip:port
 #ftp-proxy=ip:port
 
+#echo " " >>~/.vimrc
