@@ -2,19 +2,49 @@
 cd ~/.vim/
 
 mkdir -p plugin
+
 # cscope_maps
 if [ ! -e ./plugin/cscope_maps.vim ]; then
 	wget http://cscope.sourceforge.net/cscope_maps.vim -O plugin/cscope_maps.vim
 fi
 
+#GetLatestVimScripts 
+if [ ! -e ./plugin/getscriptPlugin.vim ]; then
+wget http://www.vim.org/scripts/download_script.php?src_id=8136 -O getscript.vba.gz; tar zxvf getscript.vba.gz;  vim +":so %" +":q" getscript.vba.gz; rm getscript.vba
+fi
+
+if [ ! -e ./GetLatest/GetLatestVimScripts.dat ]; then
+	echo "ScriptID SourceID Filename " > ./GetLatest/GetLatestVimScripts.dat
+	echo "-------------------------- " >> ./GetLatest/GetLatestVimScripts.dat
+fi
+
+if [ -z "`sed -n '/^213 /p' ./GetLatest/GetLatestVimScripts.dat`" ]; then
+	echo "213 1 :AutoInstall: cvim.zip" >> ./GetLatest/GetLatestVimScripts.dat
+fi
+
+if [ -z "`sed -n '/^273 /p' ./GetLatest/GetLatestVimScripts.dat`" ]; then
+	echo "273 1 :AutoInstall: taglist_45.zip" >> ./GetLatest/GetLatestVimScripts.dat
+fi
+if [ -z "`sed -n '/^642 /p' ./GetLatest/GetLatestVimScripts.dat`" ]; then
+	echo "642 1 :AutoInstall: GetLatestVimScripts.vim" >> ./GetLatest/GetLatestVimScripts.dat
+fi
+if [ -z "`sed -n '/^1643 /p' ./GetLatest/GetLatestVimScripts.dat`" ]; then
+	echo "1643 1 :AutoInstall: supertab.vba" >> ./GetLatest/GetLatestVimScripts.dat
+fi
+if [ -z "`sed -n '/^52 /p' ./GetLatest/GetLatestVimScripts.dat`" ]; then
+	echo "52 1 :AutoInstall: calendar.vim" >> ./GetLatest/GetLatestVimScripts.dat
+fi
+vim +":let g:GetLatestVimScripts_allowautoinstall=1" +":GLVS" +":q!" /tmp/xxxxxxxx
+
+if [ 0 ]; then
 # c-support
 if [ ! -e ./c-support ]; then
-wget http://www.vim.org/scripts/download_script.php?src_id=12311 -O cvim.zip;     unzip cvim.zip ; rm cvim.zip
+	wget http://www.vim.org/scripts/download_script.php?src_id=12311 -O cvim.zip;     unzip cvim.zip ; rm cvim.zip
 fi
 
 # taglist
 if [ ! -e ./plugin/taglist.vim ]; then
-wget http://vim.sourceforge.net/scripts/download_script.php?src_id=7701 -O taglist.vim.zip; unzip taglist.vim.zip; rm taglist.vim.zip
+	wget http://vim.sourceforge.net/scripts/download_script.php?src_id=7701 -O taglist.vim.zip; unzip taglist.vim.zip; rm taglist.vim.zip
 fi
 #
 
@@ -22,6 +52,8 @@ fi
 if [ ! -e ./plugin/supertab.vim ]; then
 	http://www.vim.org/scripts/download_script.php?src_id=11533 -O plugin/supertab.vim  
 fi
+
+fi # if[ 0 ]
 #.wgetrc
 #http-proxy=ip:port
 #ftp-proxy=ip:port
