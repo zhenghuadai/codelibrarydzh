@@ -1,5 +1,5 @@
 #!/bin/bash
-#Any problem, please contact with djx.zhenghua@gmal.com
+#Any problem, please contact with djx.zhenghua@gmail.com
 args=$@
 ioption=0
 roption=0
@@ -123,11 +123,11 @@ for i in "$@" ;do
 	fi
 done
 
-cleanHalf(){
-	cmdclean=/tmp/cmdclean
-	awk -F";" '{print $2}' $mvlogf > $cmdclean
-	chmod +x $cmdclean
-	$cmdclean
-	$RM $cmdclean
-	$RM $mvlogf
-}
+#cleanHalf(){
+#	cmdclean=/tmp/cmdclean
+#	awk -F";" '{print $2}' $mvlogf > $cmdclean
+#	chmod +x $cmdclean
+#	$cmdclean
+#	$RM $cmdclean
+#	$RM $mvlogf
+#}
