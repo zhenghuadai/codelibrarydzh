@@ -105,7 +105,18 @@ for i in "$@" ;do
 		basedf=$(echo $mvsf |tr "/" "*" )
 		#basedf=$(basename $i)
 		mvdf=$trashfolder/$basedf
-		mv "$mvsf" "$mvdf"
+		if [ -e "$mvsf" ]; then
+			if [ -e "$mvdf" ];then
+				/bin/rm "$mvdf"
+				mv -f "$mvsf" "$mvdf"
+			else
+				mv "$mvsf" "$mvdf"
+			fi
+		else
+			if [ foption != 1 ]; then
+				echo "rm: cannot remove $mvsf: No such file or directory"
+			fi
+		fi 
 		if [ 0 -eq $? ]; then
 			echo "store   $mvsf		$mvdf" >> $mvlogf
 		fi
