@@ -20,6 +20,8 @@
 #define  THREAD_POOL_HEADER__INC
 
 #include "threadWrapper.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 #ifdef  _PTHREAD
 
@@ -99,7 +101,7 @@ static tfunc_ret  thread_func(void *v){
 static int initGroup( int gid, int thread_num)
 {
 	ThreadGroupContext* groupCtx=threadGroupContext;
-	ThreadContext* c= malloc(sizeof(ThreadContext)*THREAD_NUM);
+	ThreadContext* c= (ThreadContext* )malloc(sizeof(ThreadContext)*THREAD_NUM);
 	createWaitingSem(groupCtx[gid].work_sem /*c[0].work_sem*/ );
 
 	createWaitingSem(groupCtx[gid].done_sem /*c[0].done_sem */);
@@ -119,7 +121,7 @@ void closeGroup(int gid) {
 	threadGroupContext[gid].running=0;
 	START_GROUP(gid)
 	for(i=0;i<threadGroupContext[gid].group_size;i++){
-		closeThread(threadGroupContext[gid].tTable[i]);
+		close_thread(threadGroupContext[gid].tTable[i]);
 	}
 }
 
