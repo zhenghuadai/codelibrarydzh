@@ -37,6 +37,7 @@
 typedef pthread_mutex_t mutex_t;
 typedef pthread_barrier_t barrier_t;
 typedef pthread_cond_t cond_t;
+typedef pthread_t thread_t;
 
 #define defaultMutex(x)\
 	pthread_mutex_t x=PTHREAD_MUTEX_INITIALIZER;
@@ -48,7 +49,7 @@ typedef pthread_cond_t cond_t;
 	pthread_barrier_t x;
 
 #define THREAD_VAR \
-pthread_t tTable[THREAD_NUM*2]; \
+thread_t tTable[THREAD_NUM*2]; \
 defaultBarrier(tBarrier);\
 defaultMutex(tMutex);\
 defaultCond(tCond);\
@@ -60,7 +61,14 @@ pthread_barrier_init(&tBarrier, NULL, THREAD_NUM);
 #define create_threads(pfunc, arg) {\
 	for(;tNum<THREAD_NUM;tNum++){\
 		unsigned int tid = tNum;\
-		int ret =pthread_create(&tTable[tNum], NULL, (void *(*)(void *))pfunc, arg);\
+		int ret =pthread_create(&tTable[tid], NULL, (void *(*)(void *))pfunc, arg);\
+	}\
+}
+
+#define create_nthreads(tTable, n, pfunc, arg) {\
+	int tid=0;\
+    for(tid=0;tid<n;tid++){\
+       int ret =pthread_create(&tTable[tid], NULL, (void *(*)(void *))pfunc, arg);\
 	}\
 }
 
@@ -70,18 +78,27 @@ pthread_barrier_init(&tBarrier, NULL, THREAD_NUM);
 #define invoke(pfunc) \
 {int ret = pthread_create(&tTable[tNum++], NULL, (void *(*)(void *))pfunc, NULL);}
 
+#define closeThread(t) pthread_join(t, NULL);
+
 #define waitall_threads() {\
 	int i;\
 	for(i=0;i<tNum;i++)\
-		pthread_join(tTable[i], NULL);\
+		closeThread(tTable[i] );\
 }
 
-#define FREE_VAR() {\
+#define FREE_THREAD_VAR() {\
 }
 
 #define P(s) pthread_mutex_lock(&s); 
 #define V(s) pthread_mutex_unlock(&s)
-#define tP(s) pthread_mutex_trylock(&s); 
+
+#define mP(s) pthread_mutex_lock(&s); 
+#define mV(s) pthread_mutex_unlock(&s)
+
+#define sP(s)
+#define sV(s)
+
+#define tryP(s) pthread_mutex_trylock(&s); 
 #define p() pthread_mutex_lock(&tMutex); 
 #define v() pthread_mutex_unlock(&tMutex)
 #define condP(cond_s, cond_mutex) pthread_cond_wait(&cond_s, &cond_mutex);
@@ -99,25 +116,31 @@ pthread_barrier_init(&tBarrier, NULL, THREAD_NUM);
 #include <windows.h>
 #include <process.h>
 
+typedef HANDLE mutex_t;
+typedef HANDLE cond_t;
+typedef HANDLE barrier_t;
+typedef HANDLE sem_t;
+typedef HANDLE thread_t;
+
 #define defaultMutex(x)\
-	HANDLE x=0;
+	mutex_t x=0;
 
 #define defaultCond(x)\
-	HANDLE x =0;
+	cond_t x =0;
 
 #define defaultBarrier(x)\
-	HANDLE x=0;
+	barrier_t x=0;
 
 #define THREAD_VAR \
-HANDLE tTable[THREAD_NUM*2]; \
-HANDLE tBarrier;\
-HANDLE tMutex;\
+thread_t tTable[THREAD_NUM*2]; \
+barrier_t tBarrier;\
+mutex_t tMutex;\
 defaultCond(tCond);\
 static int tNum=0;
 
 #define INIT_THREAD_VAR()\
 tBarrier= CreateEvent(NULL, TRUE, FALSE, NULL);\
-tMutex= CreateSemaphore(NULL, 1, 1, NULL);//CreateMutex(NULL,FALSE , 0);
+tMutex= /*CreateSemaphore(NULL, 1, 1, NULL); */CreateMutex(NULL,FALSE , 0);
 
 
 #define create_threads(pfunc, arg) {\
@@ -128,21 +151,31 @@ tMutex= CreateSemaphore(NULL, 1, 1, NULL);//CreateMutex(NULL,FALSE , 0);
 	}\
 }
 
+#define create_nthreads(tTable, n, pfunc, arg) {\
+	int tid=0;\
+    for(tid=0;tid<n;tid++){\
+		unsigned int threadid;\
+        tTable[tid] = (HANDLE)_beginthreadex(NULL, 0, pfunc, arg, 0, &threadid );\
+	}\
+}
+
 #define create_thread(pfunc, arg) \
         {unsigned int tid = tNum; tTable[tNum++] = (HANDLE)_beginthreadex(NULL, 0, pfunc, arg, 0, NULL);}
 
 #define invoke(pfunc) \
         {tTable[tNum++] = (HANDLE)_beginthreadex(NULL, 0, pfunc, NULL, 0, NULL);}
 
+#define closeThread(t) CloseHandle(t);
+
 #define waitall_threads() {\
 	int i=0;\
 	WaitForMultipleObjects(tNum, tTable, TRUE, INFINITE);\
 	for(i=0;i<tNum;i++){\
-	CloseHandle(tTable[i]);\
+	closeThread(tTable[i]);\
 	}\
 }
 
-#define FREE_VAR() {\
+#define FREE_THREAD_VAR() {\
     if(tMutex) CloseHandle(tMutex);\
 	if(tBarrier) CloseHandle(tBarrier);\
 	if(tCond) CloseHandle(tCond);\
@@ -150,7 +183,15 @@ tMutex= CreateSemaphore(NULL, 1, 1, NULL);//CreateMutex(NULL,FALSE , 0);
 
 #define P(s) WaitForSingleObject(s, INFINITE); 
 #define V(s) ReleaseSemaphore(s, 1 ,0)
-#define tP(s) pthread_mutex_trylock(&s); 
+
+#define mP(s) WaitForSingleObject(s, INFINITE); 
+#define mV(s) ReleaseMutex(s)
+
+#define sP(s) WaitForSingleObject(s, INFINITE); 
+#define sV(s) ReleaseSemaphore(s, 1 ,0)
+
+#define trymP(s) pthread_mutex_trylock(&s); 
+
 #define p() WaitForSingleObject(tMutex,INFINITE); 
 #define v() ReleaseSemaphore(&tMutex, 1, 0)
 #define condP(cond_s, cond_mutex) pthread_cond_wait(&cond_s, &cond_mutex);
