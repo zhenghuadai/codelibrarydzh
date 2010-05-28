@@ -34,6 +34,9 @@ fi
 if [ -z "`sed -n '/^52 /p' ./GetLatest/GetLatestVimScripts.dat`" ]; then
 	echo "52 1 :AutoInstall: calendar.vim" >> ./GetLatest/GetLatestVimScripts.dat
 fi
+if [ -z "`sed -n '/^1735 /p' ./GetLatest/GetLatestVimScripts.dat`" ]; then
+	echo "1735 1 :AutoInstall: calendar.vim" >> ./GetLatest/GetLatestVimScripts.dat
+fi
 vim +":let g:GetLatestVimScripts_allowautoinstall=1" +":GLVS" +":q!" /tmp/xxxxxxxx
 
 if [ 0 ]; then
