@@ -113,7 +113,7 @@ for i in "$@" ;do
 				mv "$mvsf" "$mvdf"
 			fi
 		else
-			if [ foption != 1 ]; then
+			if [ $foption != 1 ]; then
 				echo "rm: cannot remove $mvsf: No such file or directory"
 			fi
 		fi 
