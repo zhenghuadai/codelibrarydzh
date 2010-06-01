@@ -44,7 +44,7 @@ typedef void*  (*tkernel_t )(void *arg);
 /****************************************************************************************/
 
 typedef sem_t GroupBarrier_t;
-typedef void*  (__stdcall *tkernel_t )(void *arg);
+typedef unsigned  (__stdcall *tkernel_t )(void *arg);
 #define START_GROUP(gid) ReleaseSemaphore(threadGroupContext[gid].work_sem, threadGroupContext[gid].group_size, 0);
 #define FINISH_GROUP(gid) {\
 for(j=0; j<threadGroupContext[gid].group_size; j++)\
@@ -111,6 +111,12 @@ static int initGroup( int gid, int thread_num)
 	groupCtx[gid].group_size = thread_num;
 	groupCtx[gid].c=c;
 	groupCtx[gid].running = 1;
+	
+	{
+		int i;
+		for(i=0;i<thread_num;i++)
+			c[i].groupID = gid; 
+	}
 
 	create_nthreads(groupCtx[gid].tTable,thread_num, thread_func,&c[tid]);
 	 
