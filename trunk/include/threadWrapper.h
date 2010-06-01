@@ -239,7 +239,7 @@ pArg->arg3=c;\
 }
 
 #define launchfunc( pfuncKernel) c[tid].func = pfuncKernel; {\
-fArgTypename(pfuncKernel)* pArg = (fArgTypename(pfuncKernel)*)&kArg[tid];  c[tid].arg= (void*)pArg; pushtArg 
+fArgTypename(pfuncKernel)* pArg = (fArgTypename(pfuncKernel)*)kArg[tid];  c[tid].arg= (void*)pArg; pushtArg 
 #define launch(tid0) { int tid = tid0; launchfunc 
 			
 #if 0
@@ -251,7 +251,7 @@ tfunc_ret name(void* p)
 #define definethreadf2(name, arg) \
 typedef structname2 arg name##Arg_t;\
 tfunc_ret name(void*p)
-#define launch(tid0, pfuncKernel) { int tid = tid0; c[tid].func = pfuncKernel; c[tid].arg= (void*)&kArg[tid]; pushtArg
+#define launch(tid0, pfuncKernel) { int tid = tid0; c[tid].func = pfuncKernel; c[tid].arg= (void*)kArg[tid]; pushtArg
 
 #define poptArg( at,a, bt,b, ct, c)\
 at a = ((structname(at,bt,ct)*)p)->arg1;\
