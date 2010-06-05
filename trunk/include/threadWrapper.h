@@ -225,7 +225,7 @@ tMutex= /*CreateSemaphore(NULL, 1, 1, NULL); */CreateMutex(NULL,FALSE , 0);
  *
  ***********************************************************************************/
 #define fArgTypename(f) f##Arg_t
-#define structname(a, b, c)  struct ## a ## b ## c
+#define structname(a, b, c)  struct__ ## a ## b ## c
 
 #define AAAint(x) int
 #define BBBint(x) x 
@@ -253,7 +253,7 @@ typedef struct{\
 #define poptArg( a, b,c)\
 AAA(a) BBB(a) = ((structname_pre(a,b,c)*)p)->arg1;\
 AAA(b) BBB(b) = ((structname_pre(a,b,c)*)p)->arg2;\
-AAA(c) BBB(c) = ((structname_pre(a,b,c)*)p)->arg3;\
+AAA(c) BBB(c) = ((structname_pre(a,b,c)*)p)->arg3 
 
 #define pushtArg(a, b, c)\
 pArg->arg1=a;\
