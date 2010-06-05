@@ -69,7 +69,7 @@ typedef struct ThreadContext{
 	void *arg;
 	void *ret;
 	int groupID;
-
+	char kArg[128];
 }ThreadContext, *pThreadContext;
 
 typedef struct ThreadGroupContext{
