@@ -20,6 +20,7 @@
 #include "threadPool.h"
 //#include "launch.h"
 defineArg(int , int , int );
+defineArg(pu32, int , int );
 THREAD_VAR ;
 
 long long x = 0;
@@ -44,6 +45,24 @@ definethreadf(pfunc0,( int(x0), int(y), int(z)))
 	}
 	//v();
 }
+
+definethreadf(pfunc3_0,( pu32(x0), int(y), int(z)))
+{
+	poptArg(pu32( x0), int( y), int( z));
+	int i;
+	//poptArg(int, x0, int, y, int, z);
+	printf("thread %d\n", *x0);
+	printf("thread arg 3%d\n", z);
+	for(i=0;i<100000 ;i++)
+	{
+	P(tMutex);
+	
+	x ++;
+	mV(tMutex);
+	}
+	//v();
+}
+
 
 tfunc_ret pfunc1(void*p){
 	int i;
@@ -79,9 +98,16 @@ void testPool()
 
 	for(i=0;i<10;i++){
 		int j=0;
+
+		for(j=0;j<THREAD_NUM;j++){
+			launch(j)(pfunc3_0)(&i,0,'a');
+		}
+
+		START_GROUP(0);
+		FINISH_GROUP(0);
+
 		for(j=0;j<THREAD_NUM;j++){
 			launch(j)(pfunc0)(i*THREAD_NUM+j,0,'a');
-			c[j].groupID = 0;
 		}
 
 		START_GROUP(0);

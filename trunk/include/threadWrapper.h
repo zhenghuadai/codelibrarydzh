@@ -19,6 +19,26 @@
 #ifndef  THREADWRAPPER_HEADER__INC
 #define  THREADWRAPPER_HEADER__INC
 
+typedef unsigned char u8;
+typedef unsigned short u16;
+typedef unsigned int u32;
+typedef unsigned long long u64;
+typedef float f32;
+typedef double f64;
+typedef char i8;
+typedef short i16;
+typedef int i32;
+typedef long long i64;
+typedef unsigned char *pu8;
+typedef unsigned short *pu16;
+typedef unsigned int *pu32;
+typedef unsigned long long *pu64;
+typedef float *pf32;
+typedef double *pf64;
+typedef char *pi8;
+typedef short *pi16;
+typedef int *pi32;
+typedef long long *pi64;
 #ifndef THREAD_NUM
 #define THREAD_NUM 2
 #endif
@@ -209,9 +229,13 @@ tMutex= /*CreateSemaphore(NULL, 1, 1, NULL); */CreateMutex(NULL,FALSE , 0);
 
 #define AAAint(x) int
 #define BBBint(x) x 
+#define AAApu32(x) pu32 
+#define BBBpu32(x) x 
+
 #define AAA(a) AAA##a
 #define BBB(a) BBB##a  // BBB(int(a))
-#define structname_mid(a, b, c) structname(a, b, c)
+#define structname_mid_second(a, b, c) structname(a, b, c)
+#define structname_mid(a, b, c) structname_mid_second(a, b, c)
 #define structname_pre(a, b, c) structname_mid( AAA(a), AAA(b), AAA(c)) 
 
 #define definethreadf(name, arg) \
