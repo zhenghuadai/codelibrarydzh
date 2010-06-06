@@ -23,6 +23,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef struct{
+	void* f;
+	int argSize;
+	char esp[128];
+}funcInfo_t;
+
+funcInfo_t global_funcInfo;
+
+
 #ifdef  _PTHREAD
 
 typedef barrier_t GroupBarrier_t;
@@ -34,6 +43,19 @@ typedef void*  (*tkernel_t )(void *arg);
 #define FINISH_GROUP(gid) pthread_barrier_wait(&(threadGroupContext[gid].done_sem));
 #define START_TASK(gid)  pthread_barrier_wait(&(threadGroupContext[gid].work_sem));
 #define FINISH_TASK(gid) pthread_barrier_wait(&(threadGroupContext[gid].done_sem));
+
+void* thread_func_g(void*p){
+	funcInfo_t* ft = (funcInfo_t*)p;
+	__asm__(
+	"subl %%ecx, %%esp\n"
+	"movl %%esp, %%edi\n"
+	"rep movsb\n"
+	"call *%%eax\n"
+	:
+	:"a"(ft->f),"c"(ft->argSize), "S"(ft->esp)
+	:"edi");
+}
+
 
 /****************************************************************************************/
 /**************************pthread*******************************************************/
