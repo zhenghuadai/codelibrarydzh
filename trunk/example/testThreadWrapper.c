@@ -148,7 +148,6 @@ int main()
 	
 	slaunch3(sfunc0)((int)1,(int) 2,(int) 3);
 	waitall_threads();
-	waitall_threads();
 	printf("%d\n",x);
 	FREE_THREAD_VAR() ;
 	}
