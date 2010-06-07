@@ -52,6 +52,10 @@ typedef long long *pi64;
 	#endif
 #endif
 
+#ifndef _INTSIZEOF
+#define _INTSIZEOF(n)  ((sizeof(n)+sizeof(int)-1)&~(sizeof(int) - 1) )
+#endif
+
 #ifdef  _PTHREAD
 #include <pthread.h>
 #include <semaphore.h>
@@ -87,12 +91,13 @@ typedef pthread_barrier_t barrier_t;
 #define invoke(pfunc) \
 {int ret = pthread_create(&tTable[tNum++], NULL, (void *(*)(void *))pfunc, NULL);}
 
-#define close_thread(t) pthread_join(t, NULL);
+#define close_thread(t) if(t) {pthread_join(t, NULL); t=0;}
 
 #define waitall_threads() {\
 	int i;\
-	for(i=0;i<tNum;i++)\
+	for(i=0;i<tNum;i++){\
 		close_thread(tTable[i] );\
+	}\
 }
 
 #define THREAD_VAR \
@@ -126,6 +131,7 @@ pthread_barrier_init(&tBarrier, NULL, THREAD_NUM);
 #define Barrier() pthread_barrier_wait(&tBarrier);
 
 #define tfunc_ret void* 
+#define kernel_ret 	void* __attribute__((stdcall)) 
 /****************************************************************************************/
 /**************************pthread*******************************************************/
 /****************************************************************************************/
@@ -170,7 +176,7 @@ typedef HANDLE barrier_t;
 #define invoke(pfunc) \
         {tTable[tNum++] = (HANDLE)_beginthreadex(NULL, 0, pfunc, NULL, 0, NULL);}
 
-#define close_thread(t) CloseHandle(t);
+#define close_thread(t) if(t){CloseHandle(t); t=0;}
 
 #define waitall_threads() {\
 	int i=0;\
@@ -192,9 +198,9 @@ tBarrier= CreateEvent(NULL, TRUE, FALSE, NULL);\
 tMutex= /*CreateSemaphore(NULL, 1, 1, NULL); */CreateMutex(NULL,FALSE , 0);
 
 #define FREE_THREAD_VAR() {\
-    if(tMutex) CloseHandle(tMutex);\
-	if(tBarrier) CloseHandle(tBarrier);\
-	if(tCond) CloseHandle(tCond);\
+    if(tMutex) {CloseHandle(tMutex); tMutex=0;}\
+	if(tBarrier) {CloseHandle(tBarrier); tBarrier=0;}\
+	if(tCond) {CloseHandle(tCond); tCond=0;}\
 }
 
 #define P(s) WaitForSingleObject(s, INFINITE); 
@@ -217,6 +223,7 @@ tMutex= /*CreateSemaphore(NULL, 1, 1, NULL); */CreateMutex(NULL,FALSE , 0);
 #define Barrier()  //WaitForSingleObject(tBarrier, INFINITE);
 
 #define tfunc_ret unsigned WINAPI
+#define kernel_ret unsigned WINAPI	
 //typedef  unsigned WINAPI tfunc_ret ;
 #endif   /* ----- #ifndef _PTHREAD  ----- */
 /************************************************************************************
@@ -466,6 +473,21 @@ tMutex= /*CreateSemaphore(NULL, 1, 1, NULL); */CreateMutex(NULL,FALSE , 0);
 #define launchfunc16( pfuncKernel) c[tid].func = pfuncKernel; {\
 	fArgTypename(pfuncKernel)* pArg = (fArgTypename(pfuncKernel)*)c[tid].kArg;  c[tid].arg= (void*)pArg; pushtArg16 
 #define launch16(tid0) { int tid = tid0; launchfunc16  
+////////////////////////***** launch a single function **////////////////////////////
+
+#define launchTemplateThread() \
+create_thread(thread_func_g, &global_funcInfo);
+	//thread_func_g(&global_funcInfo);
+
+#define slaunchArg3( a00, a01, a02) {char* pcur= global_funcInfo.esp; \
+	(*(__typeof__(a00)*)pcur)=a00; pcur += _INTSIZEOF(__typeof__(a00));\
+	(*(__typeof__(a01)*)pcur)=a01; pcur += _INTSIZEOF(__typeof__(a01));\
+	(*(__typeof__(a02)*)pcur)=a02; pcur += _INTSIZEOF(__typeof__(a02));\
+	global_funcInfo.argSize = pcur - global_funcInfo.esp;\
+}\
+launchTemplateThread();
+
+#define slaunch3(sfunc) global_funcInfo.f = (void*) sfunc; slaunchArg3
 	
 /************************************************************************************
  *
