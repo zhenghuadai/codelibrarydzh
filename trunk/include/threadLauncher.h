@@ -250,10 +250,41 @@
 	fArgTypename(pfuncKernel)* pArg = (fArgTypename(pfuncKernel)*)c[tid].kArg;  c[tid].arg= (void*)pArg; pushtArg16 
 #define launch16(tid0) { int tid = tid0; launchfunc16  
 ////////////////////////***** launch a single function **////////////////////////////
+typedef struct{
+	void* f;
+	int argSize;
+	char esp[128];
+}funcInfo_t;
+static funcInfo_t global_funcInfo;
+
 #ifdef _PTHREAD
 #define push2stack(v) (*(typeof(v)*)pcur)=v 
 
-#else 
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  thread_func_g
+ *  Description:  the thread template for launching simple function,
+ *                it copy the arguments from p->esp to the stack, then call the p->f;
+ *  	  Input:  
+ *       Output:
+ *      Example:  thread_func_g
+ * =====================================================================================
+ */
+static void* thread_func_g(void*p){
+	funcInfo_t* ft = (funcInfo_t*)p;
+	__asm__(
+	"subl %%ecx, %%esp\n"
+	"movl %%esp, %%edi\n"
+	"rep movsb\n"
+	"call *%%eax\n"
+	:
+	:"a"(ft->f),"c"(ft->argSize), "S"(ft->esp)
+	:"%edi");
+}
+
+
+#else      /* -----  not _PTHREAD  ----- */
+#define typeof(x) x
 #define push2stack(v){ switch(_INTSIZEOF(typeof(v))) {\
 case 1: *(char*)(pcur) = v; break; \
 case 2: *(short*)(pcur) = v; break; \
@@ -261,8 +292,39 @@ case 4: *(int*)(pcur) = v; break; \
 case 8: *(long long*)(pcur) = v; break; \
 }}
 
-#define typeof(x) x
-#endif
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  thread_func_g
+ *  Description:  the thread template for launching simple function,
+ *                it copy the arguments from p->esp to the stack, then call the p->f;
+ *  	  Input:  
+ *       Output:
+ *      Example:  thread_func_g
+ * =====================================================================================
+ */
+kernel_ret thread_func_g(void*p){
+	funcInfo_t* ft = (funcInfo_t*)p;
+	unsigned int f = (unsigned int)ft->f;
+	unsigned int argSize = (unsigned int)ft->argSize;
+	unsigned int stack = (unsigned int)ft->esp;
+	__asm{ 
+			__asm push esi
+			__asm push edi
+			__asm mov eax, f
+			__asm mov ecx,  argSize
+			__asm mov esi, stack
+
+			__asm sub esp, ecx
+			__asm mov edi, esp
+			__asm rep movsb
+			__asm call eax
+
+			__asm pop edi
+			__asm pop esi
+ 
+	}
+}
+#endif     /* -----  not _PTHREAD  ----- */
 
 #define launchTemplateThread() \
 create_thread(thread_func_g, &global_funcInfo);// /*thread_func_g(&global_funcInfo);*/
@@ -294,7 +356,7 @@ launchTemplateThread();
 
 #define slaunch2(sfunc) global_funcInfo.f = (void*) sfunc; slaunchArg2
 
-///////////////////// 3 args ////////////////////////////////////////////
+///////////////////// 3 args ///////////////////////////////////////////
 
 #define slaunchArg3( a00, a01, a02) {char* pcur= global_funcInfo.esp; \
 	push2stack(a00); pcur += _INTSIZEOF(typeof(a00));\
@@ -306,10 +368,10 @@ launchTemplateThread();
 
 #define slaunch3(sfunc) global_funcInfo.f = (void*) sfunc; slaunchArg3
 	
-/************************************************************************************
+/***************************************************************************************
  *
  *the Launcher end
  *
- ***********************************************************************************/
+ **************************************************************************************/
 
 #endif   /* ----- #ifndef THREADLAUNCHER_HEADER__INC  ----- */

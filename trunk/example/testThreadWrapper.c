@@ -38,6 +38,7 @@ kernel_ret sfunc0( int x0, int y, int z )
 	x ++;
 	mV(tMutex);
 	}
+	return (void*) x;
 	//v();
 }
 
@@ -135,6 +136,7 @@ void testPool()
 
 int main()
 {
+	void *ret;
 	INIT_THREAD_VAR();
 #if 0
 	create_threads(pfunc, tid);
@@ -148,6 +150,8 @@ int main()
 	
 	slaunch3(sfunc0)((int)1,(int) 2,(int) 3);
 	waitall_threads();
+
+	printf("ret %d\n", retTable[0]);
 	printf("%d\n",x);
 	FREE_THREAD_VAR() ;
 }

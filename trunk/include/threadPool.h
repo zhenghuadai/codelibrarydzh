@@ -23,15 +23,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct{
-	void* f;
-	int argSize;
-	char esp[128];
-}funcInfo_t;
-
-static funcInfo_t global_funcInfo;
-
-
 #ifdef  _PTHREAD
 
 typedef barrier_t GroupBarrier_t;
@@ -43,19 +34,6 @@ typedef void*  (*tkernel_t )(void *arg);
 #define FINISH_GROUP(gid) pthread_barrier_wait(&(threadGroupContext[gid].done_sem));
 #define START_TASK(gid)  pthread_barrier_wait(&(threadGroupContext[gid].work_sem));
 #define FINISH_TASK(gid) pthread_barrier_wait(&(threadGroupContext[gid].done_sem));
-
-static void* thread_func_g(void*p){
-	funcInfo_t* ft = (funcInfo_t*)p;
-	__asm__(
-	"subl %%ecx, %%esp\n"
-	"movl %%esp, %%edi\n"
-	"rep movsb\n"
-	"call *%%eax\n"
-	:
-	:"a"(ft->f),"c"(ft->argSize), "S"(ft->esp)
-	:"%edi");
-}
-
 
 /****************************************************************************************/
 /**************************pthread*******************************************************/
@@ -77,36 +55,12 @@ for(j=0; j<threadGroupContext[gid].group_size; j++)\
 #define FINISH_TASK(gid) sV(threadGroupContext[gid].done_sem );
 
 #define createWaitingSem(tBarrier) tBarrier= CreateSemaphore(NULL, 0, INT_MAX, NULL)
-kernel_ret thread_func_g(void*p){
-	funcInfo_t* ft = (funcInfo_t*)p;
-	unsigned int f = (unsigned int)ft->f;
-	unsigned int argSize = (unsigned int)ft->argSize;
-	unsigned int stack = (unsigned int)ft->esp;
-	__asm{ 
-			__asm push esi
-			__asm push edi
-			__asm mov eax, f
-			__asm mov ecx,  argSize
-			__asm mov esi, stack
-
-			__asm sub esp, ecx
-			__asm mov edi, esp
-			__asm rep movsb
-			__asm call eax
-
-			__asm pop edi
-			__asm pop esi
- 
-	}
-}
-
 
 #endif   /* ----- #ifndef _PTHREAD  ----- */
 
 
 typedef struct ThreadContext{
-
-	thread_t thread;
+	//thread_t thread;
 	GroupBarrier_t work_sem;
 	GroupBarrier_t done_sem;
 	tkernel_t func;
@@ -128,7 +82,15 @@ typedef struct ThreadGroupContext{
 static ThreadGroupContext threadGroupContext[32]={0};
 
 
-
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  thread_func
+ *  Description:  the thread pool template,  when it is woken up, it will run c->func
+ *  	  Input:  v: the ThreadContext pointer 
+ *       Output:  TBD
+ *      Example:  
+ * =====================================================================================
+ */
 static tfunc_ret  thread_func(void *v){
 	ThreadContext *c= (ThreadContext *)v;
 	ThreadGroupContext* groupCtx = & threadGroupContext[c->groupID ];
@@ -141,6 +103,17 @@ static tfunc_ret  thread_func(void *v){
 	return 0;
 }
 
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  initGroup
+ *  	  Input:  
+ *  	         gid:        thre group id that you want to initialize
+ *  	         thread_num: the number of threads that you want to create
+ *       Output: TBD
+ *      Example:  initGroup(0, 2)
+ * =====================================================================================
+ */
 static int initGroup( int gid, int thread_num)
 {
 	ThreadGroupContext* groupCtx=threadGroupContext;
@@ -165,6 +138,14 @@ static int initGroup( int gid, int thread_num)
 	return 0; 
 }
 
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  closeGroup
+ *  	  Input:  gid:  the group that you want to close
+ *       Output:
+ *      Example:  closeGroup(0)
+ * =====================================================================================
+ */
 void closeGroup(int gid) {
 	int i;
 	threadGroupContext[gid].running=0;
