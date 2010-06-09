@@ -76,9 +76,31 @@ for(j=0; j<threadGroupContext[gid].group_size; j++)\
 #define START_TASK(gid) sP(threadGroupContext[gid].work_sem)
 #define FINISH_TASK(gid) sV(threadGroupContext[gid].done_sem );
 
-
-
 #define createWaitingSem(tBarrier) tBarrier= CreateSemaphore(NULL, 0, INT_MAX, NULL)
+kernel_ret thread_func_g(void*p){
+	funcInfo_t* ft = (funcInfo_t*)p;
+	unsigned int f = (unsigned int)ft->f;
+	unsigned int argSize = (unsigned int)ft->argSize;
+	unsigned int stack = (unsigned int)ft->esp;
+	__asm{ 
+			__asm push esi
+			__asm push edi
+			__asm mov eax, f
+			__asm mov ecx,  argSize
+			__asm mov esi, stack
+
+			__asm sub esp, ecx
+			__asm mov edi, esp
+			__asm rep movsb
+			__asm call eax
+
+			__asm pop edi
+			__asm pop esi
+ 
+	}
+}
+
+
 #endif   /* ----- #ifndef _PTHREAD  ----- */
 
 
@@ -111,7 +133,6 @@ static tfunc_ret  thread_func(void *v){
 	ThreadContext *c= (ThreadContext *)v;
 	ThreadGroupContext* groupCtx = & threadGroupContext[c->groupID ];
 	for(;;){
-		int ret, jobnr;
 		START_TASK(c->groupID); //sP(groupCtx->work_sem); 
 		if ((!c->func  )|| (groupCtx->running == 0))	break;		 
 		   c->ret= c->func((void*)c->arg); 
@@ -141,7 +162,7 @@ static int initGroup( int gid, int thread_num)
 	}
 
 	create_nthreads(groupCtx[gid].tTable,thread_num, thread_func,&c[tid]);
-	 
+	return 0; 
 }
 
 void closeGroup(int gid) {
