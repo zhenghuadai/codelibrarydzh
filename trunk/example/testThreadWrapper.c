@@ -150,4 +150,4 @@ int main()
 	waitall_threads();
 	printf("%d\n",x);
 	FREE_THREAD_VAR() ;
-	}
+}

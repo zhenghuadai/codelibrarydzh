@@ -29,7 +29,7 @@ typedef struct{
 	char esp[128];
 }funcInfo_t;
 
-funcInfo_t global_funcInfo;
+static funcInfo_t global_funcInfo;
 
 
 #ifdef  _PTHREAD
@@ -44,7 +44,7 @@ typedef void*  (*tkernel_t )(void *arg);
 #define START_TASK(gid)  pthread_barrier_wait(&(threadGroupContext[gid].work_sem));
 #define FINISH_TASK(gid) pthread_barrier_wait(&(threadGroupContext[gid].done_sem));
 
-void* thread_func_g(void*p){
+static void* thread_func_g(void*p){
 	funcInfo_t* ft = (funcInfo_t*)p;
 	__asm__(
 	"subl %%ecx, %%esp\n"
@@ -53,7 +53,7 @@ void* thread_func_g(void*p){
 	"call *%%eax\n"
 	:
 	:"a"(ft->f),"c"(ft->argSize), "S"(ft->esp)
-	:"edi");
+	:"%edi");
 }
 
 
