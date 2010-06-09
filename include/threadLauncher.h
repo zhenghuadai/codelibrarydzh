@@ -251,7 +251,7 @@
 #define launch16(tid0) { int tid = tid0; launchfunc16  
 ////////////////////////***** launch a single function **////////////////////////////
 #ifdef _PTHREAD
-#define push2stack(v) (*(typeof(v)*)pcur)=a00
+#define push2stack(v) (*(typeof(v)*)pcur)=v 
 
 #else 
 #define push2stack(v){ switch(_INTSIZEOF(typeof(v))) {\
