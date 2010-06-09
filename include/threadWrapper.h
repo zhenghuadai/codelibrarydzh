@@ -89,16 +89,18 @@ typedef pthread_barrier_t barrier_t;
 {int ret = pthread_create(&tTable[tNum++], NULL, (void *(*)(void *))pfunc, NULL);}
 
 #define close_thread(t) if(t) {pthread_join(t, NULL); t=0;}
+#define close_thread2(t) if(t) {pthread_join(t, &retTable[tid]); t=0;} // wait and get the return value of the thread
 
 #define waitall_threads() {\
-	int i;\
-	for(i=0;i<tNum;i++){\
-		close_thread(tTable[i] );\
+	int tid;\
+	for(tid=0;tid<tNum;tid++){\
+		close_thread2(tTable[tid] );\
 	}\
 }
 
 #define THREAD_VAR \
 thread_t tTable[THREAD_NUM*2]; \
+void* retTable[THREAD_NUM*2]; \
 declare_barrier(tBarrier);\
 declare_mutex(tMutex);\
 declare_cond(tCond);\
@@ -174,17 +176,19 @@ typedef HANDLE barrier_t;
         {tTable[tNum++] = (HANDLE)_beginthreadex(NULL, 0, pfunc, NULL, 0, NULL);}
 
 #define close_thread(t) if(t){CloseHandle(t); t=0;}
+#define close_thread2(t) if(t){GetExitCodeThread(t, (LPDWORD)&retTable[tid]); CloseHandle(t); t=0;}
 
 #define waitall_threads() {\
-	int i=0;\
+	int tid=0;\
 	WaitForMultipleObjects(tNum, tTable, TRUE, INFINITE);\
-	for(i=0;i<tNum;i++){\
-		close_thread(tTable[i]);\
+	for(tid=0;tid<tNum;tid++){\
+		close_thread2(tTable[tid]);\
 	}\
 }
 
 #define THREAD_VAR \
 thread_t tTable[THREAD_NUM*2]; \
+unsigned int  retTable[THREAD_NUM*2]; \
 barrier_t tBarrier;\
 mutex_t tMutex;\
 declare_cond(tCond);\
