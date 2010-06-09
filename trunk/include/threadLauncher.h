@@ -82,8 +82,8 @@
 	
 //////////////////// 3 args ////////////////////////////////////////////////////
 #define structname3(a00,a01,a02)  		struct__ ## a00 ## a01 ## a02
-#define structname_mid_second3(...) 	structname3(__VA_ARGS__)
-#define structname_mid3(...) 			structname_mid_second3(__VA_ARGS__)
+#define structname_mid_second3(a00,a01,a02) 	structname3(a00,a01,a02)
+#define structname_mid3(a00,a01,a02) 			structname_mid_second3(a00,a01,a02)
 #define structname_pre3(a00,a01,a02) 	structname_mid3( AAA(a00),AAA(a01),AAA(a02)) 
 
 #define defineArg3(a00,a01,a02)\
@@ -103,7 +103,7 @@
 #define poptArg3(a00,a01,a02)\
 	AAA(a00) BBB(a00) = ((structname_pre3(a00,a01,a02)*)p)->arg0 ;\
 	AAA(a01) BBB(a01) = ((structname_pre3(a00,a01,a02)*)p)->arg1 ;\
-	AAA(a02) BBB(a02) = ((structname_pre3(a00,a01,a02)*)p)->arg2 ;\
+	AAA(a02) BBB(a02) = ((structname_pre3(a00,a01,a02)*)p)->arg2 \
 
 #define pushtArg3(a00,a01,a02)\
 	pArg->arg0 =a00; pArg->arg1 =a01; pArg->arg2 =a02;\
@@ -250,6 +250,19 @@
 	fArgTypename(pfuncKernel)* pArg = (fArgTypename(pfuncKernel)*)c[tid].kArg;  c[tid].arg= (void*)pArg; pushtArg16 
 #define launch16(tid0) { int tid = tid0; launchfunc16  
 ////////////////////////***** launch a single function **////////////////////////////
+#ifdef _PTHREAD
+#define push2stack(v) (*(typeof(v)*)pcur)=a00
+
+#else 
+#define push2stack(v){ switch(_INTSIZEOF(typeof(v))) {\
+case 1: *(char*)(pcur) = v; break; \
+case 2: *(short*)(pcur) = v; break; \
+case 4: *(int*)(pcur) = v; break; \
+case 8: *(long long*)(pcur) = v; break; \
+}}
+
+#define typeof(x) x
+#endif
 
 #define launchTemplateThread() \
 create_thread(thread_func_g, &global_funcInfo);// /*thread_func_g(&global_funcInfo);*/
@@ -264,7 +277,7 @@ launchTemplateThread();
 
 ///////////////////// 1 args ////////////////////////////////////////////
 #define slaunchArg1( a00) {char* pcur= global_funcInfo.esp; \
-	(*(__typeof__(a00)*)pcur)=a00; pcur += _INTSIZEOF(__typeof__(a00));\
+	push2stack(a00); pcur += _INTSIZEOF(typeof(a00));\
 	global_funcInfo.argSize = pcur - global_funcInfo.esp;\
 }\
 launchTemplateThread();
@@ -273,8 +286,8 @@ launchTemplateThread();
 
 ///////////////////// 2 args ////////////////////////////////////////////
 #define slaunchArg2( a00, a01) {char* pcur= global_funcInfo.esp; \
-	(*(__typeof__(a00)*)pcur)=a00; pcur += _INTSIZEOF(__typeof__(a00));\
-	(*(__typeof__(a01)*)pcur)=a01; pcur += _INTSIZEOF(__typeof__(a01));\
+	push2stack(a00); pcur += _INTSIZEOF(typeof(a00));\
+	push2stack(a01); pcur += _INTSIZEOF(typeof(a01));\
 	global_funcInfo.argSize = pcur - global_funcInfo.esp;\
 }\
 launchTemplateThread();
@@ -282,10 +295,11 @@ launchTemplateThread();
 #define slaunch2(sfunc) global_funcInfo.f = (void*) sfunc; slaunchArg2
 
 ///////////////////// 3 args ////////////////////////////////////////////
+
 #define slaunchArg3( a00, a01, a02) {char* pcur= global_funcInfo.esp; \
-	(*(__typeof__(a00)*)pcur)=a00; pcur += _INTSIZEOF(__typeof__(a00));\
-	(*(__typeof__(a01)*)pcur)=a01; pcur += _INTSIZEOF(__typeof__(a01));\
-	(*(__typeof__(a02)*)pcur)=a02; pcur += _INTSIZEOF(__typeof__(a02));\
+	push2stack(a00); pcur += _INTSIZEOF(typeof(a00));\
+	push2stack(a01); pcur += _INTSIZEOF(typeof(a01));\
+	push2stack(a02); pcur += _INTSIZEOF(typeof(a02));\
 	global_funcInfo.argSize = pcur - global_funcInfo.esp;\
 }\
 launchTemplateThread();

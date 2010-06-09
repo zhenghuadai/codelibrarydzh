@@ -52,9 +52,6 @@ typedef long long *pi64;
 	#endif
 #endif
 
-#ifndef _INTSIZEOF
-#define _INTSIZEOF(n)  ((sizeof(n)+sizeof(int)-1)&~(sizeof(int) - 1) )
-#endif
 
 #ifdef  _PTHREAD
 #include <pthread.h>
@@ -226,6 +223,12 @@ tMutex= /*CreateSemaphore(NULL, 1, 1, NULL); */CreateMutex(NULL,FALSE , 0);
 #define kernel_ret unsigned WINAPI	
 //typedef  unsigned WINAPI tfunc_ret ;
 #endif   /* ----- #ifndef _PTHREAD  ----- */
-#endif   /* ----- #ifndef THREADWRAPPER_HEADER__INC  ----- */
+
+#ifndef _INTSIZEOF 
+#define _INTSIZEOF(n)  ((sizeof(n)+sizeof(int)-1)&~(sizeof(int) - 1) )
+#endif
 
 #include "threadLauncher.h"
+#endif   /* ----- #ifndef THREADWRAPPER_HEADER__INC  ----- */
+
+
