@@ -6,7 +6,8 @@ const int MICRO = 1000;
 static double mdtime(int id)
 {
 	static double startT,stopT;
-	LARGE_INTEGER time_1, time_fre;
+	static LARGE_INTEGER time_1;
+    LARGE_INTEGER time_fre;
 	if(id==0)
 	{
 		QueryPerformanceCounter(&time_1);
@@ -16,7 +17,6 @@ static double mdtime(int id)
 	}
 	else 
 	{
-		QueryPerformanceCounter(&time_1);
 		QueryPerformanceFrequency(&time_fre);
 		stopT = (double)time_1.QuadPart * MICRO / (double)time_fre.QuadPart;
 		return (stopT - startT);
@@ -24,6 +24,7 @@ static double mdtime(int id)
 }
 #else
 #include <sys/time.h>
+#include <stdio.h>
 static double mdtime(int id)
 {
 	static struct timeval _tstart ,_tend;
