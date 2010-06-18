@@ -10,8 +10,7 @@ __asm__ __volatile__("rdtsc" : "=a" (low), "=d" (high));
 __asm__ __volatile__("rdtsc" : "=a" (*(int*)&t), "=d" (*(((int*)&t)+1)));
 
 #define nasm0(op) __asm__( #op)
-#else 
-//#elif defined(_MSC_VER)
+#elif defined(_MSC_VER)
 #define rdtsc(low32, high32) \
 __asm rdtsc \
 __asm mov low32, eax \
@@ -26,36 +25,16 @@ __asm mov t+4, edx
 
 #endif
 
-#if  0 
-typedef union {
-	unsigned long long  u64;
-	struct{
-		unsigned int low;
-		unsigned int high;
-	};
-} U64;
-#define diffTime(start,end) ((end.u64)-(start.u64))
-#define cast2u64(x) x.u64
-
-#else 
 typedef unsigned long long U64;
 #define diffTime(start,end) (end)-(start)
 #define cast2u64(x) x
-#endif
 
 #define timens(x) timenamespace ## x
-
-
-//static inline unsigned long long getrdtsc()
-//{
-//	U64 a;
-//	rdtsc(a.low, a.high);
-//	return a.u64;
-//}
 
 static inline U64  getrdtsc(){
 	nasm0(rdtsc);
 }
+
 static U64 startT, endT;
 static inline U64 startTime(){
 		//rdtsc1(startT);
@@ -95,6 +74,8 @@ static inline double pdtime(int id){
 		return (double) cast2u64(startT);
 	}
 }
+
+#if defined(__GNUC__)
 static double getFrequency()
 {
 	double t3;
@@ -105,12 +86,19 @@ static double getFrequency()
 	t3=  (double)(diffTime(startT,endT));
 	return t3;
 }
-
+#else
+static double getFrequency()
+{
+    U64 freq;
+    QueryPerformanceFrequency((LARGE_INTEGER*)&freq);
+    return freq;
+}
+#endif
 static double RDTSC_CORE_FREQ = 0;
 static inline double mdgetSeconds(double c)
 {
-	if (RDTSC_CORE_FREQ ==0) RDTSC_CORE_FREQ = getFrequency();
-	return c/ RDTSC_CORE_FREQ;
+    if (RDTSC_CORE_FREQ ==0) RDTSC_CORE_FREQ = getFrequency();
+    return c/ RDTSC_CORE_FREQ;
 }
 
 #endif
