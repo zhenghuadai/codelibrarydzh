@@ -1,10 +1,12 @@
-#include <sys/time.h>
+#ifndef __MDTIME_HEADER__
+#define __MDTIME_HEADER__
 #ifdef WIN32
 #include "windows.h"
+const int MICRO = 1000;
 static double mdtime(int id)
 {
 	static double startT,stopT;
-	LARGE_INTEGER time_1, time_frei;
+	LARGE_INTEGER time_1, time_fre;
 	if(id==0)
 	{
 		QueryPerformanceCounter(&time_1);
@@ -21,6 +23,7 @@ static double mdtime(int id)
 	}
 }
 #else
+#include <sys/time.h>
 static double mdtime(int id)
 {
 	static struct timeval _tstart ,_tend;
@@ -87,4 +90,6 @@ inline static double dtime()
 	gettimeofday(&_tstart, NULL);
 	return (double)_tstart.tv_sec + (double)_tstart.tv_usec/(1000*1000);
 }
+#endif
+
 #endif
