@@ -272,6 +272,7 @@ static funcInfo_t global_funcInfo;
  */
 static void* thread_func_g(void*p){
 	funcInfo_t* ft = (funcInfo_t*)p;
+    printf("%0x - %0x = %d\n", (unsigned int) pthread_self(), &ft, (unsigned int) pthread_self() -(unsigned int) &ft);
 	__asm__(
 	"subl %%ecx, %%esp\n"
 	"movl %%esp, %%edi\n"
