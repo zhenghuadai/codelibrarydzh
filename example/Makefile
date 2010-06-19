@@ -1,5 +1,5 @@
 all:testThreadWrapper.exe
-
+CC=gcc -g
 %.o:%.c
 	$(CC) -c $< -I../include 
 %.exe:%.o

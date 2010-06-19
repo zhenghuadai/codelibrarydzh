@@ -24,11 +24,12 @@ defineArg3(pu32, int , int );
 THREAD_VAR ;
 
 long long x = 0;
-
+__thread threadX;
 kernel_ret sfunc0( int x0, int y, int z )
 {
 	int i;
 	//poptArg(int, x0, int, y, int, z);
+	printf("threadX %0x\n", &threadX);
 	printf("thread %d\n", x0);
 	printf("thread loop %d\n", y);
 	for(i=0;i<100000 ;i++)
@@ -68,6 +69,7 @@ defineThreadFunc3(pfunc3_0,( pu32(x0), int(y), int(z)))
 {
 	poptArg3(pu32( x0), int( y), int( z));
 	int i;
+	printf("threadX %0x\n", &threadX);
 	//poptArg(int, x0, int, y, int, z);
 	printf("thread %d\n", *x0);
 	printf("thread loop %d\n", y);
@@ -146,7 +148,7 @@ int main()
 	printf("%d\n",x);
 #endif
 	testPool();
-	printf("%d\n",x);
+	//printf("%d\n",x);
 	
 	slaunch3(sfunc0)((int)1,(int) 2,(int) 3);
 	waitall_threads();
