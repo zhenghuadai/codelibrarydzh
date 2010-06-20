@@ -69,12 +69,13 @@ typedef struct ExceptionFrame_t{
 #define CATCH(type, ceh) \
         if(ceh_type == 0) ceh_stack = ceh_stack->prev;\
     }else if(ceh_type == EXCEPTION_TYPE(type)){\
+        type ceh = *(type*)&(ceh_stack->value);\
         ceh_stack = ceh_stack->prev;
 
 #define endtry }\
 }while(0);
 
-#define throw(type, x) {longjmp(ceh_stack->env, EXCEPTION_TYPE(type));}    
+#define throw(type, x) {*(type*)&(ceh_stack->value) = x; longjmp(ceh_stack->env, EXCEPTION_TYPE(type));}    
 
 //THREAD_LOCAL    ExceptionFrame_t* ceh_stack;
 #endif   /* ----- #ifndef CEXCEPTION__INC  ----- */
