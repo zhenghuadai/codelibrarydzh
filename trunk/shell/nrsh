@@ -1,6 +1,5 @@
 #!/bin/bash
 # Zhenghua Dai
-#(C) Copyright 2007-2010 All Rights Reserved 
 
 # nrsh -a cmd
 RSH=rsh
