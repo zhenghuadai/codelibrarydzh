@@ -51,6 +51,13 @@
 
 GLuint teapotList;
 static GLfloat spin = 0.0;
+static float eyeZ = 8.0;
+static float eyeX = 0.0;
+static float eyeY = 0.0;
+const double LEFT = 0.0;
+const double RIGHT= 16.0;
+const double TOP = 16.0;
+const double BOTTOM=16.0;
 
 void spinDisplay(void)
 {
@@ -147,17 +154,31 @@ void display(void)
    glutSwapBuffers();
 }
 
+
+void resetProject(int w, int h)
+{
+   glMatrixMode(GL_PROJECTION);
+   glLoadIdentity();
+   if (w <= h)
+//      glFrustum(0.0, 16.0, 0.0, 16.0*(GLfloat)h/(GLfloat)w, -10.0, 10.0);
+      glOrtho(0.0, 16.0, 0.0, 16.0*(GLfloat)h/(GLfloat)w, -10.0, 10.0);
+   else
+      glFrustum(0.0, 16.0*(GLfloat)w/(GLfloat)h, 0.0, 16.0, -10.0, 10.0);
+    gluLookAt(eyeX,eyeY,eyeZ,.0,.0,-100.0,.0,1.0,.0);
+   glMatrixMode(GL_MODELVIEW);
+}
+
 void reshape(int w, int h)
 {
    glViewport(0, 0, (GLsizei) w, (GLsizei) h);
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
    if (w <= h)
-      glOrtho(0.0, 16.0, 0.0, 16.0*(GLfloat)h/(GLfloat)w,
-              -10.0, 10.0);
+      glFrustum(0.0, 16.0, 0.0, 16.0*(GLfloat)h/(GLfloat)w, 5, 10.0);
+//      glOrtho(0.0, 16.0, 0.0, 16.0*(GLfloat)h/(GLfloat)w, -10.0, 10.0);
    else
-      glOrtho(0.0, 16.0*(GLfloat)w/(GLfloat)h, 0.0, 16.0,
-              -10.0, 10.0);
+      glFrustum(0.0, 16.0*(GLfloat)w/(GLfloat)h, 0.0, 16.0, -10.0, 10.0);
+    gluLookAt(eyeX,eyeY,eyeZ,.0,.0,-100.0,.0,1.0,.0);
    glMatrixMode(GL_MODELVIEW);
 }
 
@@ -183,7 +204,37 @@ void keyboard(unsigned char key, int x, int y)
       case 27:
          exit(0);
          break;
+      case 'a':
+         eyeX -= 0.2;
+         if(eyeX<LEFT) eyeX = LEFT;
+         break;
+      case 'd':
+         eyeX += 0.2;
+         if(eyeX>RIGHT) eyeX = RIGHT;
+         break;
+      case 'w':
+         eyeY +=0.2;
+         if(eyeY > TOP) eyeY = TOP;
+         break;
+      case 's':
+         eyeY -=0.2;
+         if(eyeY <BOTTOM) eyeY = BOTTOM ;
+         break;
+      case 'q':
+         eyeZ +=0.2;
+         if(eyeZ > TOP) eyeZ = TOP;
+         break;
+      case 'e':
+         eyeZ -=0.2;
+         if(eyeZ > TOP) eyeZ = TOP;
+         break;
+      case 'r':
+         eyeX =0.0;
+         eyeY =0.0;
+         break;
    }
+   resetProject( 600, 600);
+   glutPostRedisplay();
 }
 
 /*
@@ -193,7 +244,7 @@ int main(int argc, char **argv)
 {
    glutInit(&argc, argv);
    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-   glutInitWindowSize(500, 600);
+   glutInitWindowSize(600, 600);
    glutInitWindowPosition(50,50);
    glutCreateWindow(argv[0]);
    init();

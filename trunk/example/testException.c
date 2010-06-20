@@ -16,7 +16,7 @@
  */
 #include "cexception.h"
 THREAD_LOCAL    ExceptionFrame_t* ceh_stack;
-int main()
+int test1()
 {
     try {
         int i =0;
@@ -24,7 +24,52 @@ int main()
     } CATCH(int ,a){
         printf ("exception\n");
     } CATCH(char ,a){
-        printf ("exception char\n");
+        printf ("exception char %d\n", a);
+        throw(char, a+1);
+    }
+    endtry
+}
+
+int test2()
+{
+    try {
+        int i =0;
+        test1();
+    } CATCH(int ,a){
+        printf ("exception\n");
+    } CATCH(char ,a){
+        printf ("exception char %d\n", a);
+        throw(char, a+1);
+    }
+    endtry
+}
+
+
+int test()
+{
+  
+    try {
+        int i =0;
+        test2();
+    } CATCH(int ,a){
+        printf ("exception\n");
+    } CATCH(char ,a){
+        printf ("exception char %d\n", a);
+        throw(char, a+1);
+    }
+    endtry 
+}
+
+int main()
+{
+
+    try {
+        int i =0;
+        test();
+    } CATCH(int ,a){
+        printf ("exception\n");
+    } CATCH(char ,a){
+        printf ("exception char %d\n", a);
     }
     endtry
 }

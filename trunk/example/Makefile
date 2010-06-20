@@ -4,10 +4,12 @@ CXX=g++ -g
 GLUT = -lglut
 XLIBS = $(GLUT) -lGLU -lGL -lXext -lX11 -lm #-lXmu 
 %.o:%.c
-	$(CC) -c $< -I../include 
+	$(CC) -c $< -I../include ${XLIBS}
 %.exe:%.o
-	$(CC) -o $@ $< -lpthread
+	$(CC) -o $@ $< -lpthread ${XLIBS}
 %.xexe:%.cpp
+	$(CXX) -o $@ $< -lpthread ${XLIBS}
+%:%.cpp	
 	$(CXX) -o $@ $< -lpthread ${XLIBS}
 clean:
 	rm *.o *.exe
