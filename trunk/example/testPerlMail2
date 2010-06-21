@@ -1,0 +1,12 @@
+#!/usr/bin/perl -w
+use SendMail;
+
+my $mailFrom       = 'pubmail001@sina.cn';       #Send email address
+my $password       = 'test123';
+my $mailHost       = 'smtp.sina.com';
+my $mailUser       = 'pubmail001@sina.cn';
+my @mailTo         = ('djx.zhenghua@gmail.com','djx_zh@sina.com');  #The recipient list
+my $mailSubject    = "Test Perl SendMail";
+my $mailContent    = "The attachment is the $mailSubject!\n";
+my @mailAttachment = ('testPerlMail2');    
+SendMail($mailFrom,  \@mailTo, $mailSubject, $mailContent, \@mailAttachment, $password, $mailHost, $mailUser);
