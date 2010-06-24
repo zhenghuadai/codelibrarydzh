@@ -1,49 +1,4 @@
 /*
- * Copyright (c) 1993-2003, Silicon Graphics, Inc.
- * All Rights Reserved
- *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose and without fee is hereby granted, provided that the above
- * copyright notice appear in all copies and that both the copyright
- * notice and this permission notice appear in supporting documentation,
- * and that the name of Silicon Graphics, Inc. not be used in
- * advertising or publicity pertaining to distribution of the software
- * without specific, written prior permission.
- *
- * THE MATERIAL EMBODIED ON THIS SOFTWARE IS PROVIDED TO YOU "AS-IS" AND
- * WITHOUT WARRANTY OF ANY KIND, EXPRESS, IMPLIED OR OTHERWISE,
- * INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY OR
- * FITNESS FOR A PARTICULAR PURPOSE.  IN NO EVENT SHALL SILICON
- * GRAPHICS, INC.  BE LIABLE TO YOU OR ANYONE ELSE FOR ANY DIRECT,
- * SPECIAL, INCIDENTAL, INDIRECT OR CONSEQUENTIAL DAMAGES OF ANY KIND,
- * OR ANY DAMAGES WHATSOEVER, INCLUDING WITHOUT LIMITATION, LOSS OF
- * PROFIT, LOSS OF USE, SAVINGS OR REVENUE, OR THE CLAIMS OF THIRD
- * PARTIES, WHETHER OR NOT SILICON GRAPHICS, INC.  HAS BEEN ADVISED OF
- * THE POSSIBILITY OF SUCH LOSS, HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, ARISING OUT OF OR IN CONNECTION WITH THE POSSESSION, USE
- * OR PERFORMANCE OF THIS SOFTWARE.
- *
- * US Government Users Restricted Rights 
- * Use, duplication, or disclosure by the Government is subject to
- * restrictions set forth in FAR 52.227.19(c)(2) or subparagraph
- * (c)(1)(ii) of the Rights in Technical Data and Computer Software
- * clause at DFARS 252.227-7013 and/or in similar or successor clauses
- * in the FAR or the DOD or NASA FAR Supplement.  Unpublished - rights
- * reserved under the copyright laws of the United States.
- *
- * Contractor/manufacturer is:
- *	Silicon Graphics, Inc.
- *	1500 Crittenden Lane
- *	Mountain View, CA  94043
- *	United State of America
- *
- * OpenGL(R) is a registered trademark of Silicon Graphics, Inc.
- */
-
-/*
- *  teapots.c
- *  This program demonstrates lots of material properties.
- *  A single light source illuminates the objects.
  */
 #include <stdlib.h>
 #include <stdio.h>
@@ -57,7 +12,9 @@ static float eyeY = 0.0;
 const double LEFT = 0.0;
 const double RIGHT= 16.0;
 const double TOP = 16.0;
-const double BOTTOM=16.0;
+const double BOTTOM=0.0;
+const double NEAR = 5.0;
+const double FAR = 10.0;
 
 void spinDisplay(void)
 {
@@ -161,9 +118,9 @@ void resetProject(int w, int h)
    glLoadIdentity();
    if (w <= h)
 //      glFrustum(0.0, 16.0, 0.0, 16.0*(GLfloat)h/(GLfloat)w, -10.0, 10.0);
-      glOrtho(0.0, 16.0, 0.0, 16.0*(GLfloat)h/(GLfloat)w, -10.0, 10.0);
+      glOrtho(LEFT, RIGHT, BOTTOM, (TOP-BOTTOM)*(GLfloat)h/(GLfloat)w, -10.0, 10.0);
    else
-      glFrustum(0.0, 16.0*(GLfloat)w/(GLfloat)h, 0.0, 16.0, -10.0, 10.0);
+      glFrustum(LEFT, (RIGHT-LEFT)*(GLfloat)w/(GLfloat)h, BOTTOM, TOP, -10.0, 10.0);
     gluLookAt(eyeX,eyeY,eyeZ,.0,.0,-100.0,.0,1.0,.0);
    glMatrixMode(GL_MODELVIEW);
 }

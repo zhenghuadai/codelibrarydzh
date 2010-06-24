@@ -10,3 +10,12 @@ my $mailSubject    = "Test Perl SendMail";
 my $mailContent    = "The attachment is the $mailSubject!\n";
 my @mailAttachment = ('testPerlMail2');    
 SendMail($mailFrom,  \@mailTo, $mailSubject, $mailContent, \@mailAttachment, $password, $mailHost, $mailUser);
+
+#SendMail(From  => $mailFrom, 
+#    To         => \@mailTo, 
+#    Subject    => $mailSubject, 
+#    Content    => $mailContent,
+#    AttachmentRef => \@mailAttachment, 
+#    Passwd     => $password, 
+#    Host       => $mailHost, 
+#    User       => $mailUser); 
