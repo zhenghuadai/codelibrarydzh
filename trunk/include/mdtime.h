@@ -2,7 +2,9 @@
 #define __MDTIME_HEADER__
 typedef unsigned long long U64;
 U64 cpu_freqency=0;
-#ifdef WIN32
+	 
+#if defined(_MSC_VER)	 
+ 
 #include "windows.h"
 const int MICRO = 1000;
 
@@ -14,22 +16,21 @@ U64 getClock(){
 
 static double mdtime(int id)
 {
-    static double startT,stopT;
-    static LARGE_INTEGER time_1;
-    LARGE_INTEGER time_fre;
+    static double startT,stopT; 
+    static LARGE_INTEGER time_fre;
     if(id==0)
     {
-        QueryPerformanceFrequency(&time_1);
-        startT = (double)getClock() * MICRO / (double)time_fre.QuadPart;
+        QueryPerformanceFrequency(&time_fre);
+        startT = (double)getClock() * MICRO / (double)(unsigned long long)time_fre.QuadPart;
         return 0.0;
     }
     else 
     {
-        stopT = (double)getClock()* MICRO / (double)time_fre.QuadPart;
+        stopT = (double)getClock()* MICRO / (double)(unsigned long long)time_fre.QuadPart;
         return (stopT - startT);
     }
 }
-#else
+#elif defined(__GNUC__)
 #include <sys/time.h>
 #include <stdio.h>
 U64 getClock(){
