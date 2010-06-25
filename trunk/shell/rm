@@ -97,6 +97,12 @@ for i in "$@" ;do
 			#echo $i is file
 		#fi
 
+        #if the $i is "   "
+        tmpfn=`echo $i`
+		if [ "$tmpfn" = "" ]; then
+            continue
+        fi
+
 		if [ "/" != "${i:0:1}" ]; then
 			mvsf=$PWD/$i
 		else
@@ -104,10 +110,13 @@ for i in "$@" ;do
 		fi
 		basedf=$(echo $mvsf |tr "/" "*" )
 		#basedf=$(basename $i)
+		if [ 0 -ne $? ]; then
+            continue
+        fi
 		mvdf=$trashfolder/$basedf
 		if [ -e "$mvsf" ]; then
 			if [ -e "$mvdf" ];then
-				/bin/rm "$mvdf"
+				${RM} -rf "$mvdf"
 				mv -f "$mvsf" "$mvdf"
 			else
 				mv "$mvsf" "$mvdf"
@@ -131,3 +140,4 @@ done
 #	$RM $cmdclean
 #	$RM $mvlogf
 #}
+echo 0 >/dev/null
