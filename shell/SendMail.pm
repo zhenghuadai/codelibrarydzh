@@ -35,8 +35,8 @@ use Net::SMTP;
 use MIME::Lite;
 sub SendMail # ($$\@$$\@)
 {
-    my ($From, $ToRef, $Subject, $Content, $AttachmentRef, $Passwd, $Host, $User)=@_;
-    my @To = @$ToRef;   
+    my ($From, $To, $Subject, $Content, $AttachmentRef, $Passwd, $Host, $User)=@_;
+    my @To = @$To;   
     my @attachment = @$AttachmentRef;  
 
     my $helloPara = $Host;
@@ -45,6 +45,8 @@ sub SendMail # ($$\@$$\@)
         ($User, $Host) = split("/\@/", $From);
         $Host="smtp.".$Host;
     }
+
+    print join("   ",@_);
 
     ##################################################################################
     #                 Create smtp and ahth                                           #
