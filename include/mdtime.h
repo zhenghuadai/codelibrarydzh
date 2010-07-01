@@ -1,45 +1,85 @@
 #ifndef __MDTIME_HEADER__
 #define __MDTIME_HEADER__
+
+#ifdef _cplusplus
+#define DEFAULT(x) =x
+#else
+#define DEFAULT(x) 
+#endif
+
+#ifndef CLOCK_NUM
+#define CLOCK_NUM 10
+#endif
+
+#define diffTime(start,end) ((end)-(start))
 typedef unsigned long long U64;
-U64 cpu_freqency=0;
-	 
-#if defined(_MSC_VER)	 
- 
-#include "windows.h"
-const int MICRO = 1000;
+static U64 cpu_freqency=0;
+static U64 start_mSeconds[CLOCK_NUM], stop_mSeconds[CLOCK_NUM];
 
-U64 getClock(){
-    LARGE_INTEGER time_1;
-    QueryPerformanceCounter(&time_1);
-    return time_1.QuadPart;
-}
-
-static double mdtime(int id)
-{
-    static double startT,stopT; 
-    static LARGE_INTEGER time_fre;
-    if(id==0)
-    {
-        QueryPerformanceFrequency(&time_fre);
-        startT = (double)getClock() * MICRO / (double)(unsigned long long)time_fre.QuadPart;
-        return 0.0;
-    }
-    else 
-    {
-        stopT = (double)getClock()* MICRO / (double)(unsigned long long)time_fre.QuadPart;
-        return (stopT - startT);
-    }
-}
-#elif defined(__GNUC__)
+#ifdef __GNUC__ 
 #include <sys/time.h>
 #include <stdio.h>
-U64 getClock(){
-    static struct timeval _t;
+inline U64 getClock(){
+    struct timeval _t;
     struct timezone tz;
     gettimeofday(&_t, &tz);
     return (((U64) _t.tv_sec)*1000 + ((U64) _t.tv_usec)/1000);
 }
+#elif defined(_MSC_VER)
+#include "windows.h"
+inline U64 getClock(){
+    LARGE_INTEGER time_1;
+    QueryPerformanceCounter(&time_1);
+    if(cpu_freqency == 0){
+        LARGE_INTEGER freq_1;
+        QueryPerformanceFrequency(&freq_1);
+        cpu_frequency = freq_1.QuadPart;
+    }
+    return time_1.QuadPart * 1000 / cpu_freqency;
+}
+#endif
+static inline U64 startTime(int cid  DEFAULT(0)){
+		start_mSeconds[cid] = getClock();
+		return start_mSeconds[cid];
+}
 
+static inline U64 stopTime(int cid DEFAULT(0)){
+		stop_mSeconds[cid] = getClock();
+		return (U64) diffTime(start_mSeconds[cid],stop_mSeconds[cid]);
+}
+
+static inline U64 getTime(int cid DEFAULT(0)){
+	return (U64) diffTime(start_mSeconds[cid],stop_mSeconds[cid]);
+}
+
+static inline U64 pTime(int cid DEFAULT(0)){
+    U64 t = diffTime(start_mSeconds[cid], stop_mSeconds[cid]);
+    printf("time:%d\n", t);
+	return t;
+}
+
+
+
+#if defined(_MSC_VER) 
+const int MICRO = 1000;
+static double mdtime(int id)
+{
+    static double start_mSeconds,stop_mSeconds;
+    static LARGE_INTEGER time_1;
+    LARGE_INTEGER time_fre;
+    if(id==0)
+    {
+        QueryPerformanceFrequency(&time_1);
+        start_mSeconds = (double)getClock() * MICRO / (double)time_fre.QuadPart;
+        return 0.0;
+    }
+    else 
+    {
+        stop_mSeconds = (double)getClock()* MICRO / (double)time_fre.QuadPart;
+        return (stop_mSeconds - start_mSeconds);
+    }
+}
+#elif defined(__GNUC__) 
 static double mdtime(int id)
 {
     static struct timeval _tstart ,_tend;
