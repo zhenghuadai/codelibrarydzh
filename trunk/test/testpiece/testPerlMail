@@ -1,0 +1,20 @@
+#!/usr/bin/perl -w
+
+use Net::SMTP_auth;
+
+$smtp = Net::SMTP_auth->new('smtp.sina.com.cn',Debug=>1);
+
+$smtp->auth('LOGIN', 'pubmail001@sina.cn', 'test123');
+
+$smtp->mail('pubmail001@sina.cn');
+$smtp->to('djx.zhenghua@gmail.com');
+
+$smtp->data();
+$smtp->datasend("From: pubmail001\@sina.cn\n");
+$smtp->datasend("To: \@.com \n");
+$smtp->datasend("Subject: perl mail\n");
+$smtp->datasend("\n");
+$smtp->datasend("mail by perl \n");
+$smtp->dataend();
+
+$smtp->quit;

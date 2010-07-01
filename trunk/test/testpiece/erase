@@ -1,0 +1,14 @@
+#! /bin/bash
+(($#==0)) && { echo "No paraments!";exit 1; }
+for i in $*
+do
+if test -e $i
+then
+#cd $(dirname $i)
+#echo $(find $(pwd) -maxdepth 1 -name $(basename $i) | tr "/" "=")
+mv -f $(basename $i) ~/.temp/$(find $(pwd) -maxdepth 1 -name $(basename $i) | tr "/" "=")
+#cd -
+else
+	echo "$i:No such file or directory!"
+fi
+done

@@ -15,17 +15,19 @@
  * =====================================================================================
  */
 #include "cexception.h"
+#include <stdio.h>
+
 THREAD_LOCAL    ExceptionFrame_t* ceh_stack;
 int test1()
 {
     try {
         int i =0;
-        throw (char, 2);
+        Throw (char, 2);
     } CATCH(int ,a){
         printf ("exception\n");
     } CATCH(char ,a){
         printf ("exception char %d\n", a);
-        throw(char, a+1);
+        Throw(char, a+1);
     }
     endtry
 }
@@ -39,7 +41,7 @@ int test2()
         printf ("exception\n");
     } CATCH(char ,a){
         printf ("exception char %d\n", a);
-        throw(char, a+1);
+        Throw(char, a+1);
     }
     endtry
 }
@@ -55,7 +57,7 @@ int test()
         printf ("exception\n");
     } CATCH(char ,a){
         printf ("exception char %d\n", a);
-        throw(char, a+1);
+        Throw(char, a+1);
     }
     endtry 
 }

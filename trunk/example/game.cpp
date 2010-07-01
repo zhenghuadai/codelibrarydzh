@@ -78,6 +78,7 @@ void renderTeapot(GLfloat x, GLfloat y, GLfloat z,
    glPushMatrix();
    glTranslatef(x, y, z);
    glRotatef(spin, 0.0, 0.0, 1.0);
+#if 0
    mat[0] = ambr; mat[1] = ambg; mat[2] = ambb; mat[3] = 1.0;
    glMaterialfv(GL_FRONT, GL_AMBIENT, mat);
    mat[0] = difr; mat[1] = difg; mat[2] = difb;
@@ -85,6 +86,7 @@ void renderTeapot(GLfloat x, GLfloat y, GLfloat z,
    mat[0] = specr; mat[1] = specg; mat[2] = specb;
    glMaterialfv(GL_FRONT, GL_SPECULAR, mat);
    glMaterialf(GL_FRONT, GL_SHININESS, shine * 128.0);
+#endif
    glCallList(teapotList);
    glPopMatrix();
 }
