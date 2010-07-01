@@ -1,7 +1,20 @@
-#ifndef RDTSC_HEADER
-#define RDTSC_HEADER
+#ifndef __MDTIME_HEADER__
+#define __MDTIME_HEADER__
+
+#ifndef CLOCK_NUM
+#define CLOCK_NUM 10
+#endif
+
+#ifdef _cplusplus
+#define DEFAULT(x) =x
+#else
+#define DEFAULT(x) 
+#endif
 
 #if defined(__GNUC__)
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #define rdtsc(low,high) \
 __asm__ __volatile__("rdtsc" : "=a" (low), "=d" (high));
@@ -26,7 +39,7 @@ __asm mov t+4, edx
 #endif
 
 typedef unsigned long long U64;
-#define diffTime(start,end) (end)-(start)
+#define diffTime(start,end) ((end)-(start))
 #define cast2u64(x) x
 
 #define timens(x) timenamespace ## x
@@ -35,28 +48,32 @@ static inline U64  getrdtsc(){
 	nasm0(rdtsc);
 }
 
-static U64 startT, endT;
-static inline U64 startTime(){
-		//rdtsc1(startT);
-		startT = getrdtsc();
-		return startT;
+static U64 startT[CLOCK_NUM], stopT[CLOCK_NUM];
+static inline U64 startTime(int cid  DEFAULT(0)){
+		startT[cid] = getrdtsc();
+		return startT[cid];
 }
 
-static inline U64 endTime(){
-		//rdtsc1(endT);
-		endT = getrdtsc();
-		return (U64) diffTime(startT,endT);
+static inline U64 stopTime(int cid DEFAULT(0)){
+		stopT[cid] = getrdtsc();
+		return (U64) diffTime(startT[cid],stopT[cid]);
 }
 
-static inline U64 getTime(){
-	return (U64) diffTime(startT,endT);
+static inline U64 getTime(int cid DEFAULT(0)){
+	return (U64) diffTime(startT[cid],stopT[cid]);
+}
+
+static inline U64 pTime(int cid DEFAULT(0)){
+    U64 t = diffTime(startT[cid], stopT[cid]);
+    printf("time:%d\n", t);
+	return t;
 }
 
 static inline double mdtime(int id){
-	static U64 startT, endT;
+	static U64 startT, stopT;
 	if(id){
-		rdtsc1(endT);
-		return (double)(diffTime(startT,endT));
+		rdtsc1(stopT);
+		return (double)(diffTime(startT,stopT));
 	}else{
 		rdtsc1(startT);
 		return (double) cast2u64(startT);
@@ -64,11 +81,11 @@ static inline double mdtime(int id){
 }
 
 static inline double pdtime(int id){
-	static U64 startT, endT;
+	static U64 startT, stopT;
 	if(id){
-		rdtsc1(endT);
-		printf("time:%f\n",diffTime(startT,endT));
-		return (double)(diffTime(startT,endT));
+		rdtsc1(stopT);
+		printf("time:%ld\n",diffTime(startT,stopT));
+		return (double)(diffTime(startT,stopT));
 	}else{
 		rdtsc1(startT);
 		return (double) cast2u64(startT);
@@ -79,11 +96,11 @@ static inline double pdtime(int id){
 static double getFrequency()
 {
 	double t3;
-	U64 startT, endT;
+	U64 startT, stopT;
 	rdtsc1(startT);
 	sleep(1);
-	rdtsc1(endT);
-	t3=  (double)(diffTime(startT,endT));
+	rdtsc1(stopT);
+	t3=  (double)(diffTime(startT,stopT));
 	return t3;
 }
 #else
@@ -95,10 +112,15 @@ static double getFrequency()
 }
 #endif
 static double RDTSC_CORE_FREQ = 0;
-static inline double mdgetSeconds(double c)
+static inline double getSeconds(double c)
 {
     if (RDTSC_CORE_FREQ ==0) RDTSC_CORE_FREQ = getFrequency();
     return c/ RDTSC_CORE_FREQ;
+}
+
+static inline U64 getmSeconds(int cid DEFAULT(=0)){
+    if (RDTSC_CORE_FREQ ==0) RDTSC_CORE_FREQ = getFrequency();
+	return (U64) diffTime(startT[cid],stopT[cid]) * 1000 / RDTSC_CORE_FREQ;
 }
 
 #endif
