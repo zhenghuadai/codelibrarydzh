@@ -1,0 +1,11 @@
+#!/bin/bash
+cd ~/.temp
+list=$(for i in $*; do ls |grep "\<$i\>"; done)
+(($#==0)) && { list=$(ls|grep ""); }
+for j in $list
+do
+  file=$(echo $j | tr "=" "/")
+  mv $j ${file%/*}/${file##*/}
+  echo $file
+  echo mv $j ${file%/*}/${file##*/}
+done

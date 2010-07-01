@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+
+my @a=('a', 'bc', 'def');
+my $a=join(',',@a);
+print "$a\n";
+print "@ARGV[0] \n";
+sub ff
+{
+    my ($arg1) =@_;
+    if ($arg1 eq "")
+    {
+        print " it is 0\n";
+    }
+    print "$arg1\n";
+}
+
+ff($a);
+ff();

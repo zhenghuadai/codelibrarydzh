@@ -1,0 +1,4 @@
+PROJECT(testnew)
+SET(SRC_LIST testnew.cpp)
+MESSAGE(STATUS "THIS is " ${HELLO_BINARY_DIR})
+ADD_EXECUTABLE(testnew ${SRC_LIST})

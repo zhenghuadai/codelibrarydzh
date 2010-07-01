@@ -1,0 +1,1 @@
+testtypedef.c
