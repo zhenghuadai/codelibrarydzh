@@ -18,7 +18,7 @@ sub doFolders
 	opendir dir, $dir or die "Cannot open $dir : $!";
 	foreach $next (readdir dir) {
 		next if "$next" eq "." or "$next" eq ".." or "$next" eq ".svn";
-		if (( -f "$dir/$next" ) and ( ( $next =~ "$\.[ch]") or ($next =~ "$\.cpp") )){
+		if (( -f "$dir/$next" ) and ( ( $next =~ /\.[ch]$/) or ($next =~ /\.cpp$/) )){
 		#if (( -f "$dir/$next" ) and ( ( $next =~ /$\.[ch]/) or ($next =~ /$\.cpp/) )){
 			doFile("$dir/$next");
 		}
