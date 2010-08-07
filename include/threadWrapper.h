@@ -69,7 +69,7 @@ typedef pthread_barrier_t barrier_t;
 #define declare_barrier(x) pthread_barrier_t x
 
 #define create_thread(pfunc, arg) \
-{unsigned int tid = tNum; int ret = pthread_create(&tTable[tNum++], NULL, (void *(*)(void *))pfunc, arg);}
+({unsigned int tid = tNum; pthread_t localt; int ret = pthread_create(&localt, NULL, (void *(*)(void *))pfunc, arg); tTable[tNum++]=localt; localt;})
 
 #define create_threads(pfunc, arg) {\
 	for(;tNum<THREAD_NUM;tNum++){\

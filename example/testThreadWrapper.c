@@ -43,6 +43,27 @@ kernel_ret sfunc0( int x0, int y, int z )
 	//v();
 }
 
+kernel_ret sfunc2( int x0, int y)
+{
+	int i;
+	//poptArg(int, x0, int, y, int, z);
+    printf("thread sfunc2\n");
+	printf("threadX %0x\n", &threadX);
+	printf("thread %d\n", x0);
+	printf("thread loop %d\n", y);
+	for(i=0;i<100000 ;i++)
+	{
+	P(tMutex);
+	
+	x ++;
+	mV(tMutex);
+	}
+	return (void*) x;
+	//v();
+}
+
+
+
 
 /*
  func_ret pfunc0(void*p)
@@ -151,6 +172,8 @@ int main()
 	//printf("%d\n",x);
 	
 	slaunch3(sfunc0)((int)1,(int) 2,(int) 3);
+	waitall_threads();
+	slaunch2(sfunc2)((int)1,(int) 2);
 	waitall_threads();
 
 	printf("ret %d\n", retTable[0]);

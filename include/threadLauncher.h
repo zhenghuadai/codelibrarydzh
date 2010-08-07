@@ -2,6 +2,11 @@
 #ifndef  THREADLAUNCHER_HEADER__INC
 #define  THREADLAUNCHER_HEADER__INC
 
+#if defined(_MSC_VER)
+#       define THREAD_LOCAL __declspec(thread)
+#elif defined(__GNUC__)
+#       define THREAD_LOCAL __thread
+#endif
 /************************************************************************************
  *
  *the Launcher
@@ -255,7 +260,7 @@ typedef struct{
 	int argSize;
 	char esp[128];
 }funcInfo_t;
-static funcInfo_t global_funcInfo;
+static THREAD_LOCAL funcInfo_t global_funcInfo;
 
 #ifdef _PTHREAD
 #define push2stack(v) (*(typeof(v)*)pcur)=v 
@@ -272,15 +277,15 @@ static funcInfo_t global_funcInfo;
  */
 static void* thread_func_g(void*p){
 	funcInfo_t* ft = (funcInfo_t*)p;
-    printf("%0x - %0x = %d\n", (unsigned int) pthread_self(), &ft, (unsigned int) pthread_self() -(unsigned int) &ft);
+    __asm__("subl %0, %%esp\n"::"r"(ft->argSize));
 	__asm__(
-	"subl %%ecx, %%esp\n"
 	"movl %%esp, %%edi\n"
 	"rep movsb\n"
 	"call *%%eax\n"
 	:
 	:"a"(ft->f),"c"(ft->argSize), "S"(ft->esp)
 	:"%edi");
+    __asm__("addl %0, %%esp\n"::"r"(ft->argSize));
 }
 
 
@@ -328,7 +333,7 @@ kernel_ret thread_func_g(void*p){
 #endif     /* -----  not _PTHREAD  ----- */
 
 #define launchTemplateThread() \
-create_thread(thread_func_g, &global_funcInfo);// /*thread_func_g(&global_funcInfo);*/
+create_thread(thread_func_g, &global_funcInfo)// /*thread_func_g(&global_funcInfo);*/
 	
 ///////////////////// 0 args ////////////////////////////////////////////
 #define slaunchArg0( ) {char* pcur= global_funcInfo.esp; \
@@ -352,10 +357,10 @@ launchTemplateThread();
 	push2stack(a00); pcur += _INTSIZEOF(typeof(a00));\
 	push2stack(a01); pcur += _INTSIZEOF(typeof(a01));\
 	global_funcInfo.argSize = pcur - global_funcInfo.esp;\
-}\
-launchTemplateThread();
+}}),\
+launchTemplateThread());
 
-#define slaunch2(sfunc) global_funcInfo.f = (void*) sfunc; slaunchArg2
+#define slaunch2(sfunc) (({global_funcInfo.f = (void*) sfunc; slaunchArg2
 
 ///////////////////// 3 args ///////////////////////////////////////////
 
