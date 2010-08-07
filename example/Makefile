@@ -1,6 +1,6 @@
 all:testThreadWrapper.exe
-CC=gcc -g
-CXX=g++ -g
+CC=gcc -g -O0
+CXX=g++ -g -O0
 GLUT = -lglut
 XLIBS = $(GLUT) -lGLU -lGL -lXext -lX11 -lm #-lXmu 
 %.o:%.c

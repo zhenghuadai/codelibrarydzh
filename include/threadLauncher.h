@@ -1,7 +1,8 @@
 
 #ifndef  THREADLAUNCHER_HEADER__INC
 #define  THREADLAUNCHER_HEADER__INC
-
+#include "stdio.h"
+#include "stdlib.h"
 #if defined(_MSC_VER)
 #       define THREAD_LOCAL __declspec(thread)
 #elif defined(__GNUC__)
@@ -276,16 +277,20 @@ static THREAD_LOCAL funcInfo_t global_funcInfo;
  * =====================================================================================
  */
 static void* thread_func_g(void*p){
-	funcInfo_t* ft = (funcInfo_t*)p;
-    __asm__("subl %0, %%esp\n"::"r"(ft->argSize));
-	__asm__(
-	"movl %%esp, %%edi\n"
-	"rep movsb\n"
-	"call *%%eax\n"
-	:
-	:"a"(ft->f),"c"(ft->argSize), "S"(ft->esp)
-	:"%edi");
-    __asm__("addl %0, %%esp\n"::"r"(ft->argSize));
+    funcInfo_t* ft = (funcInfo_t*)p;
+    __asm__(
+            "subl %%ecx, %%esp\n"
+            "movl %%esp, %%edi\n"
+            "rep movsb\n"
+            "call *%%eax\n"
+            :
+            :"a"(ft->f),"c"(ft->argSize), "S"(ft->esp)
+            :"%edi");
+    //   __asm__("addl %0, %%esp\n"::"r"(ft->argSize)); /* if not stdcall, do this*/
+    if((size_t)p < (size_t)&ft){// p is on the heap 
+        printf("heap\n");
+        free(p);
+    }
 }
 
 
@@ -333,6 +338,9 @@ kernel_ret thread_func_g(void*p){
 #endif     /* -----  not _PTHREAD  ----- */
 
 #define launchTemplateThread() \
+create_thread(thread_func_g, global_funcInfo)// /*thread_func_g(&global_funcInfo);*/
+	
+#define launchTemplateThreadStack() \
 create_thread(thread_func_g, &global_funcInfo)// /*thread_func_g(&global_funcInfo);*/
 	
 ///////////////////// 0 args ////////////////////////////////////////////
@@ -344,23 +352,25 @@ launchTemplateThread();
 #define slaunch0(sfunc) global_funcInfo.f = (void*) sfunc; slaunchArg0
 
 ///////////////////// 1 args ////////////////////////////////////////////
-#define slaunchArg1( a00) {char* pcur= global_funcInfo.esp; \
+#define slaunchArg1( a00) {char* pcur= global_funcInfo->esp; \
 	push2stack(a00); pcur += _INTSIZEOF(typeof(a00));\
-	global_funcInfo.argSize = pcur - global_funcInfo.esp;\
-}\
-launchTemplateThread();
+	global_funcInfo->argSize = pcur - global_funcInfo->esp;\
+}}),\
+launchTemplateThread()); });
 
-#define slaunch1(sfunc) global_funcInfo.f = (void*) sfunc; slaunchArg1
+#define slaunch1(sfunc) ({ funcInfo_t* global_funcInfo= (funcInfo_t*)malloc(sizeof(funcInfo_t));\
+        (({global_funcInfo->f = (void*) sfunc; slaunchArg1
 
 ///////////////////// 2 args ////////////////////////////////////////////
-#define slaunchArg2( a00, a01) {char* pcur= global_funcInfo.esp; \
+#define slaunchArg2( a00, a01) {char* pcur= global_funcInfo->esp; \
 	push2stack(a00); pcur += _INTSIZEOF(typeof(a00));\
 	push2stack(a01); pcur += _INTSIZEOF(typeof(a01));\
-	global_funcInfo.argSize = pcur - global_funcInfo.esp;\
+	global_funcInfo->argSize = pcur - global_funcInfo->esp;\
 }}),\
-launchTemplateThread());
+launchTemplateThread()); });
 
-#define slaunch2(sfunc) (({global_funcInfo.f = (void*) sfunc; slaunchArg2
+#define slaunch2(sfunc) ({ funcInfo_t* global_funcInfo= (funcInfo_t*)malloc(sizeof(funcInfo_t));\
+        (({global_funcInfo->f = (void*) sfunc; slaunchArg2
 
 ///////////////////// 3 args ///////////////////////////////////////////
 
@@ -369,8 +379,8 @@ launchTemplateThread());
 	push2stack(a01); pcur += _INTSIZEOF(typeof(a01));\
 	push2stack(a02); pcur += _INTSIZEOF(typeof(a02));\
 	global_funcInfo.argSize = pcur - global_funcInfo.esp;\
-}\
-launchTemplateThread();
+};\
+launchTemplateThreadStack();
 
 #define slaunch3(sfunc) global_funcInfo.f = (void*) sfunc; slaunchArg3
 	
