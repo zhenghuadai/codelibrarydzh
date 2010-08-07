@@ -67,6 +67,7 @@ typedef struct ThreadContext{
 	void *arg;
 	void *ret;
 	int groupID;
+    int argSize;
 	char kArg[128];
 }ThreadContext, *pThreadContext;
 
@@ -98,6 +99,7 @@ static tfunc_ret  thread_func(void *v){
 		START_TASK(c->groupID); //sP(groupCtx->work_sem); 
 		if ((!c->func  )|| (groupCtx->running == 0))	break;		 
 		   c->ret= c->func((void*)c->arg); 
+//        call_stdfunc(c->func, c->arg, 12);
 		FINISH_TASK(c->groupID);//sV(groupCtx->done_sem );
 	}
 	return 0;
