@@ -68,8 +68,16 @@ typedef pthread_barrier_t barrier_t;
 #define declare_thread(x)  pthread_t x
 #define declare_barrier(x) pthread_barrier_t x
 
-#define create_thread(pfunc, arg) \
-({unsigned int tid = tNum; pthread_t localt; int ret = pthread_create(&localt, NULL, (void *(*)(void *))pfunc, arg); tTable[tNum++]=localt; localt;})
+#define create_thread(pfunc, arg) ({\
+        unsigned int tid = tNum; pthread_t localt;\
+        /*  printf("create thread %0x\n", arg);*/\
+        funcInfo_t* ft = (funcInfo_t*)arg;\
+        /*  printf("\t.%0x launch %d %d\n", arg,  ((unsigned int**)(ft->esp))[0] -header, ((unsigned int**)(ft->esp))[1] - header );*/\
+        int ret = pthread_create(&localt, NULL, (void *(*)(void *))pfunc, arg); \
+        tTable[tNum++]=localt;\
+        if(ret)printf("create thread error\n");\
+        localt;\
+        })
 
 #define create_threads(pfunc, arg) {\
 	for(;tNum<THREAD_NUM;tNum++){\

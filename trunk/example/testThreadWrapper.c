@@ -168,13 +168,13 @@ int main()
 	//system("pause");
 	printf("%d\n",x);
 #endif
-	testPool();
+//	testPool();
 	//printf("%d\n",x);
 	
 	slaunch3(sfunc0)((int)1,(int) 2,(int) 3);
 	waitall_threads();
-	slaunch2(sfunc2)((int)1,(int) 2);
-	waitall_threads();
+//	slaunch2(sfunc2)((int)1,(int) 2);
+//	waitall_threads();
 
 	printf("ret %d\n", retTable[0]);
 	printf("%d\n",x);
