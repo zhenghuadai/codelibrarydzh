@@ -255,7 +255,11 @@
 #define launchfunc16( pfuncKernel) c[tid].func = pfuncKernel; {\
 	fArgTypename(pfuncKernel)* pArg = (fArgTypename(pfuncKernel)*)c[tid].kArg;  c[tid].arg= (void*)pArg; pushtArg16 
 #define launch16(tid0) { int tid = tid0; launchfunc16  
-////////////////////////***** launch a single function **////////////////////////////
+/*******************************************************************************************************************
+ *                                                                                                                 *
+ ***************************** launch a single function ************************************************************
+ *                                                                                                                 *
+ *******************************************************************************************************************/
 typedef struct{
 	void* f;
 	int argSize;
@@ -264,8 +268,28 @@ typedef struct{
 static THREAD_LOCAL funcInfo_t global_funcInfo;
 
 #ifdef _PTHREAD
-#define push2stack(v) (*(typeof(v)*)pcur)=v 
+#define push2stack(v) {(*(typeof(v)*)pcur)=v; pcur += _INTSIZEOF(typeof(v));}
 
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  call_stdfunc
+ *  Description:
+ *  	  Input:  
+ *       Output:
+ *      Example:  call_stdfunc
+ * =====================================================================================
+ */
+inline void call_stdfunc(void* func, void* arg, int argSize)
+{
+    __asm__(
+            "subl %%ecx, %%esp\n"
+            "movl %%esp, %%edi\n"
+            "rep movsb\n"
+            "call *%%eax\n"
+            :
+            :"a"(func),"c"(argSize), "S"(arg)
+            :"%edi");
+}
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  thread_func_g
@@ -301,7 +325,9 @@ case 1: *(char*)(pcur) = v; break; \
 case 2: *(short*)(pcur) = v; break; \
 case 4: *(int*)(pcur) = v; break; \
 case 8: *(long long*)(pcur) = v; break; \
-}}
+}\
+pcur += _INTSIZEOF(typeof(v));\
+}
 
 /* 
  * ===  FUNCTION  ======================================================================
@@ -353,7 +379,7 @@ launchTemplateThread();
 
 ///////////////////// 1 args ////////////////////////////////////////////
 #define slaunchArg1( a00) {char* pcur= global_funcInfo->esp; \
-	push2stack(a00); pcur += _INTSIZEOF(typeof(a00));\
+	push2stack(a00);\
 	global_funcInfo->argSize = pcur - global_funcInfo->esp;\
 }}),\
 launchTemplateThread()); });
@@ -363,8 +389,8 @@ launchTemplateThread()); });
 
 ///////////////////// 2 args ////////////////////////////////////////////
 #define slaunchArg2( a00, a01) {char* pcur= global_funcInfo->esp; \
-	push2stack(a00); pcur += _INTSIZEOF(typeof(a00));\
-	push2stack(a01); pcur += _INTSIZEOF(typeof(a01));\
+	push2stack(a00); \
+	push2stack(a01); \
 	global_funcInfo->argSize = pcur - global_funcInfo->esp;\
 }}),\
 launchTemplateThread()); });
@@ -375,9 +401,9 @@ launchTemplateThread()); });
 ///////////////////// 3 args ///////////////////////////////////////////
 
 #define slaunchArg3( a00, a01, a02) {char* pcur= global_funcInfo.esp; \
-	push2stack(a00); pcur += _INTSIZEOF(typeof(a00));\
-	push2stack(a01); pcur += _INTSIZEOF(typeof(a01));\
-	push2stack(a02); pcur += _INTSIZEOF(typeof(a02));\
+	push2stack(a00); \
+	push2stack(a01); \
+	push2stack(a02); \
 	global_funcInfo.argSize = pcur - global_funcInfo.esp;\
 };\
 launchTemplateThreadStack();

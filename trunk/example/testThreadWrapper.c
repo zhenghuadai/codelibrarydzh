@@ -138,14 +138,14 @@ void testPool()
 
 	for(i=0;i<10;i++){
 		int j=0;
-
+#if 0
 		for(j=0;j<THREAD_NUM;j++){
 			launch3(j)(pfunc3_0)(&i,i,'a');
 		}
 
 		START_GROUP(0);
 		FINISH_GROUP(0);
-
+#endif
 		for(j=0;j<THREAD_NUM;j++){
 			launch3(j)(pfunc0)(i*THREAD_NUM+j,i,'a');
 		}
@@ -168,7 +168,7 @@ int main()
 	//system("pause");
 	printf("%d\n",x);
 #endif
-//	testPool();
+	testPool();
 	//printf("%d\n",x);
 	
 	slaunch3(sfunc0)((int)1,(int) 2,(int) 3);
