@@ -19,8 +19,6 @@
 #include "threadWrapper.h"
 #include "threadPool.h"
 //#include "launch.h"
-defineArg3(int , int , int );
-defineArg3(pu32, int , int );
 THREAD_VAR ;
 
 long long x = 0;
@@ -69,13 +67,15 @@ kernel_ret sfunc2( int x0, int y)
  func_ret pfunc0(void*p)
 //defineThreadFunc2(pfunc0,( int, x0, int, y, int, z))
  */
-defineThreadFunc3(pfunc0,( int(x0), int(y), int(z)))
+//defineThreadFunc3(pfunc0,( int(x0), int(y), int(z)))
+void __attribute__((stdcall)) pfunc0( int x0, int y, int z)
 {
-	poptArg3(int( x0), int( y), int( z));
+//	poptArg3(int( x0), int( y), int( z));
 	int i;
 	//poptArg(int, x0, int, y, int, z);
 	printf("thread %d\n", x0);
 	printf("thread loop %d\n", y);
+    printf("pfunc0\n");
 	for(i=0;i<100000 ;i++)
 	{
 	P(tMutex);
@@ -86,6 +86,7 @@ defineThreadFunc3(pfunc0,( int(x0), int(y), int(z)))
 	//v();
 }
 
+#if 0
 defineThreadFunc3(pfunc3_0,( pu32(x0), int(y), int(z)))
 {
 	poptArg3(pu32( x0), int( y), int( z));
@@ -103,7 +104,7 @@ defineThreadFunc3(pfunc3_0,( pu32(x0), int(y), int(z)))
 	}
 	//v();
 }
-
+#endif
 
 tfunc_ret pfunc1(void*p){
 	int i;
@@ -147,7 +148,7 @@ void testPool()
 		FINISH_GROUP(0);
 #endif
 		for(j=0;j<THREAD_NUM;j++){
-			launch3(j)(pfunc0)(i*THREAD_NUM+j,i,'a');
+			launch3(j)(pfunc0)((int)(i*THREAD_NUM+j), (int)i, (int)'a');
 		}
 
 		START_GROUP(0);
