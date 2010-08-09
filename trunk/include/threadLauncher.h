@@ -26,6 +26,8 @@
 
 #define AAA(a) AAA##a
 #define BBB(a) BBB##a  // BBB(int(a))
+#define launchfunc( pfuncKernel, argNum) c[tid].func = pfuncKernel; {\
+        char* pcur=(char*)c[tid].kArg;  c[tid].arg= (void*)pcur; pushtArg##argNum
 
 //////////////////// 0 args ////////////////////////////////////////////////////
 #define pushtArg0()\
@@ -57,8 +59,7 @@
 }\
 }
 
-#define launchfunc3( pfuncKernel) c[tid].func = pfuncKernel; {\
-	char* pcur=(char*)c[tid].kArg;  c[tid].arg= (void*)pcur; pushtArg3 
+#define launchfunc3( pfuncKernel) launchfunc( pfuncKernel, 3)
 #define launch3(tid0) { int tid = tid0; launchfunc3  
 	
 //////////////////// 5 args ////////////////////////////////////////////
@@ -74,8 +75,7 @@
 }\
 }
 
-#define launchfunc6( pfuncKernel) c[tid].func = pfuncKernel; {\
-	fArgTypename(pfuncKernel)* pArg = (fArgTypename(pfuncKernel)*)c[tid].kArg;  c[tid].arg= (void*)pArg; pushtArg6 
+#define launchfunc6( pfuncKernel) launchfunc( pfuncKernel, 6)
 #define launch6(tid0) { int tid = tid0; launchfunc6  
 
 //////////////////// 16 args ////////////////////////////////////////////////////
