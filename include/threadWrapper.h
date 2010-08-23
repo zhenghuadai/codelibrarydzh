@@ -139,6 +139,7 @@ pthread_barrier_init(&tBarrier, NULL, THREAD_NUM);
 
 #define tfunc_ret void* 
 #define kernel_ret 	void* __attribute__((stdcall)) 
+#define STDCALL  __attribute__((stdcall))
 /****************************************************************************************/
 /**************************pthread*******************************************************/
 /****************************************************************************************/
@@ -233,6 +234,7 @@ tMutex= /*CreateSemaphore(NULL, 1, 1, NULL); */CreateMutex(NULL,FALSE , 0);
 
 #define tfunc_ret unsigned WINAPI
 #define kernel_ret unsigned WINAPI	
+#define STDCALL WINAPI
 //typedef  unsigned WINAPI tfunc_ret ;
 #endif   /* ----- #ifndef _PTHREAD  ----- */
 
