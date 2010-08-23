@@ -58,7 +58,8 @@ fi
 
 fi # if[ 0 ]
 
-svn export svn://orangoo.com/vim/vimrc
+#svn export svn://orangoo.com/vim/vimrc
+svn export https://codelibrarydzh.googlecode.com/svn/trunk/tool/vimrc ~/.vimrc
 
 #.wgetrc
 #http-proxy=ip:port
