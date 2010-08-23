@@ -1,0 +1,2 @@
+#!/bin/bash
+vim +"normal gg=G" +"wq" $1 

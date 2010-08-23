@@ -86,10 +86,8 @@ void __attribute__((stdcall)) pfunc0( int x0, int y, int z)
 	//v();
 }
 
-#if 0
-defineThreadFunc3(pfunc3_0,( pu32(x0), int(y), int(z)))
+void __attribute__((stdcall)) pfunc3_0( pu32 x0, int y, int z)
 {
-	poptArg3(pu32( x0), int( y), int( z));
 	int i;
 	printf("threadX %0x\n", &threadX);
 	//poptArg(int, x0, int, y, int, z);
@@ -104,7 +102,6 @@ defineThreadFunc3(pfunc3_0,( pu32(x0), int(y), int(z)))
 	}
 	//v();
 }
-#endif
 
 tfunc_ret pfunc1(void*p){
 	int i;
@@ -139,7 +136,7 @@ void testPool()
 
 	for(i=0;i<10;i++){
 		int j=0;
-#if 0
+#if 1 
 		for(j=0;j<THREAD_NUM;j++){
 			launch3(j)(pfunc3_0)(&i,i,'a');
 		}
