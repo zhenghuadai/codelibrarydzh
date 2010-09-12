@@ -160,8 +160,8 @@ static void* thread_func_g(void*p){
             :"%edi");
     //   __asm__("addl %0, %%esp\n"::"r"(ft->argSize)); /* if not stdcall, do this*/
     if((size_t)p < (size_t)&ft){// p is on the heap 
-        printf("heap\n");
-        free(p);
+//        printf("heap\n");
+//        free(p); //! error with O2/3, 
     }
 }
 
