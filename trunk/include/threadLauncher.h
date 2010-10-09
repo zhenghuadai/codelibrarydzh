@@ -109,10 +109,17 @@
  *                                                                                                                 *
  *******************************************************************************************************************/
 typedef struct{
-	void* f;
+    union{
+        void* f;
+        void* func;
+    };
 	int argSize;
-	char esp[128];
+    union{
+        char esp[128];
+        char arg[128];
+    };
 }funcInfo_t;
+typedef funcInfo_t task_t;
 static THREAD_LOCAL funcInfo_t global_funcInfo;
 
 #ifdef _PTHREAD
@@ -258,6 +265,13 @@ launchTemplateThreadStack();
 
 #define slaunch3(sfunc) global_funcInfo.f = (void*) sfunc; slaunchArg3
 	
+///////////////////// 0 args ////////////////////////////////////////////
+//dlaunch
+//
+///////////////////// 2 args ///////////////////////////////////////////
+#define dlaunchArg2(a00, a01) 
+#define dlaunch2(sfunc) { int tid = getIdleThread(); launch2(tid)(sfunc) //if tid == -1 ,do it directly 
+
 /***************************************************************************************
  *
  *the Launcher end
