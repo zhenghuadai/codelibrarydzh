@@ -62,12 +62,18 @@ typedef pthread_mutex_t   mutex_t;
 typedef pthread_t         thread_t;
 typedef pthread_barrier_t barrier_t;
 
+//! declare
 #define declare_sem(x)     sem_t x
 #define declare_cond(x)	   pthread_cond_t x= PTHREAD_COND_INITIALIZER
 #define declare_mutex(x)   pthread_mutex_t x=PTHREAD_MUTEX_INITIALIZER
 #define declare_thread(x)  pthread_t x
 #define declare_barrier(x) pthread_barrier_t x
+//! declare end
+#define sInit(x, n) sem_init(x, 0, n)
 
+//! create
+#define create_sem(m_sem, initCount, maxCount) { sem_init(m_sem, 0, initCount);}
+#define create_semp(sem_handler, initCount, maxCount) {if(sem_handler == NULL) sem_handler = (sem_t*)malloc(sizeof(sem_t)); sem_init(sem_handler, 0, initCount);}
 #define create_thread(pfunc, arg) ({\
         unsigned int tid = tNum; pthread_t localt;\
         /*  printf("create thread %0x\n", arg);*/\
@@ -119,7 +125,7 @@ pthread_barrier_init(&tBarrier, NULL, THREAD_NUM);
 
 #define FREE_THREAD_VAR() {\
 }
-
+//! p & v
 #define P(s) pthread_mutex_lock(&s)
 #define V(s) pthread_mutex_unlock(&s)
 
@@ -161,6 +167,8 @@ typedef HANDLE barrier_t;
 #define declare_mutex(x)   mutex_t x=0
 #define declare_thread(x)  thread_t x=0
 #define declare_barrier(x) barrier_t x=0
+
+#define sInit(x, n) x= CreateSemaphore(NULL, n, 10, NULL);
 
 #define create_thread(pfunc, arg) \
         {unsigned int tid = tNum; tTable[tNum++] = (HANDLE)_beginthreadex(NULL, 0, pfunc, arg, 0, NULL);}

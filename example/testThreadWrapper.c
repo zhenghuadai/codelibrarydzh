@@ -130,7 +130,7 @@ void testPool()
 	int i=0;
 	ThreadContext* c;
 
-	initGroup(0,2);
+	initGroup(0,THREAD_NUM);
 
 	c = threadGroupContext[0].c;
 
@@ -155,6 +155,37 @@ void testPool()
 	closeGroup(0);
 }
 
+
+void testPool2()
+{
+	int i=0;
+    int gid = 1;
+	ThreadContext* c;
+
+	initGroup2(gid,THREAD_NUM);
+
+	c = threadGroupContext[gid].c;
+
+	for(i=0;i<10;i++){
+		int j=0;
+#if 0 
+		for(j=0;j<THREAD_NUM;j++){
+			launch3(j)(pfunc3_0)(&i,i,'a');
+		}
+
+		START_GROUP(0);
+		FINISH_GROUP(0);
+#endif
+		for(j=0;j<THREAD_NUM;j++){
+			launch3(j)(pfunc0)((int)(i*THREAD_NUM+j), (int)i, (int)'a');
+		}
+		START_GROUP2(gid);
+		FINISH_GROUP2(gid);
+		printf("\n");
+	}
+	closeGroup2(gid);
+}
+
 int main()
 {
 	void *ret;
@@ -167,8 +198,8 @@ int main()
 	printf("%d\n",x);
 #endif
 	testPool();
+	testPool2();
 	//printf("%d\n",x);
-	
 	slaunch3(sfunc0)((int)1,(int) 2,(int) 3);
 	waitall_threads();
 //	slaunch2(sfunc2)((int)1,(int) 2);
