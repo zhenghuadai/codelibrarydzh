@@ -39,6 +39,10 @@ typedef char *pi8;
 typedef short *pi16;
 typedef int *pi32;
 typedef long long *pi64;
+typedef struct {unsigned short tid; unsigned short gid;} threadid_t;
+#define GID(threadid) ((*(threadid_t*)&threadid).gid)
+#define TID(threadid) ((*(threadid_t*)&threadid).tid)
+#define WARNING(x) printf(x)
 #ifndef THREAD_NUM
 #define THREAD_NUM 2
 #endif

@@ -22,6 +22,7 @@
 #include "threadWrapper.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #ifdef  _PTHREAD
 
@@ -32,11 +33,6 @@ typedef void*  (*tkernel_t )(void *arg);
 
 #define START_GROUP(gid)  pthread_barrier_wait(&(threadGroupContext[gid].work_barrier));
 #define FINISH_GROUP(gid) pthread_barrier_wait(&(threadGroupContext[gid].done_barrier));
-
-#define START_TASK(gid, tid)  sV((threadGroupContext[gid].c[tid].work_sem));
-#define FINISH_TASK(gid, tid) sP((threadGroupContext[gid].c[tid].done_sem));
-#define START_GROUP2(gid)  {int tid_i; for(tid_i=0;tid_i<threadGroupContext[gid].group_size; tid_i++) START_TASK(gid, tid_i);} 
-#define FINISH_GROUP2(gid) {int tid_i; for(tid_i=0;tid_i<threadGroupContext[gid].group_size; tid_i++) FINISH_TASK(gid, tid_i);} 
 
 /****************************************************************************************/
 /**************************pthread*******************************************************/
@@ -53,14 +49,15 @@ typedef unsigned  (__stdcall *tkernel_t )(void *arg);
 for(j=0; j<threadGroupContext[gid].group_size; j++)\
 			sP(threadGroupContext[0].done_barrier);\
 }
-
-#define START_TASK(c)  sP(threadGroupContext[gid].work_sem)
-#define FINISH_TASK(c) sV(threadGroupContext[gid].done_sem );
-
 #define creatBarrier(tBarrier) tBarrier= CreateSemaphore(NULL, 0, INT_MAX, NULL)
 
 #endif   /* ----- #ifndef _PTHREAD  ----- */
 
+#define START_TASK(gid, tid)  sV((threadGroupContext[gid].c[tid].work_sem));
+#define FINISH_TASK(gid, tid) sP((threadGroupContext[gid].c[tid].done_sem));
+#define START_GROUP2(gid)  {int tid_i; for(tid_i=0;tid_i<threadGroupContext[gid].group_size; tid_i++) START_TASK(gid, tid_i);} 
+#define FINISH_GROUP2(gid) {int tid_i; for(tid_i=0;tid_i<threadGroupContext[gid].group_size; tid_i++) FINISH_TASK(gid, tid_i);} 
+#define dsync(my_current_thread ) if(my_current_thread != -1) FINISH_TASK(GID(my_current_thread ),TID(my_current_thread ))
 enum {thread_exit = 0, thread_busy = -1, thread_idle = 1};
 enum {group_exit = 0,  group_busy = -1,  group_idle = 1};
 
@@ -91,7 +88,9 @@ typedef struct ThreadGroupContext{
     int status;
 }ThreadGroupContext;
 
-static ThreadGroupContext threadGroupContext[32]={0};
+#define THREAD_POOL_VAR ThreadGroupContext threadGroupContext[32]={0}
+THREAD_POOL_VAR;
+extern ThreadGroupContext threadGroupContext[32];
 
 /*################################################################################################  */
 /*################################################################################################  */
@@ -114,7 +113,7 @@ static tfunc_ret  thread_func(void *v){
         START_GROUP(c->groupID); //sP(groupCtx->work_sem); 
         if ((!c->func  )|| (groupCtx->status == group_exit))	break;		 
         //		   c->ret= c->func((void*)c->arg); 
-        call_stdfunc(c->func, c->arg, c->argSize);
+        call_stdfunc((void*)(c->func), c->arg, c->argSize);
         FINISH_GROUP(c->groupID);//sV(groupCtx->done_sem );
     }
     return 0;
@@ -131,7 +130,7 @@ static tfunc_ret  thread_func(void *v){
  *      Example:  initGroup(0, 2)
  * =====================================================================================
  */
-static int initGroup( int gid, int thread_num)
+inline int initGroup( int gid, int thread_num)
 {
     ThreadGroupContext* groupCtx=threadGroupContext;
     ThreadContext* c= (ThreadContext* )malloc(sizeof(ThreadContext)*THREAD_NUM);
@@ -165,7 +164,7 @@ static int initGroup( int gid, int thread_num)
  *      Example:  closeGroup(0)
  * =====================================================================================
  */
-void closeGroup(int gid) {
+inline void closeGroup(int gid) {
     int i;
     threadGroupContext[gid].status=0;
     START_GROUP(gid);
@@ -197,9 +196,13 @@ static tfunc_ret  thread_func2(void *v){
         if(c->status == thread_exit || groupCtx->status == group_exit) break;
         if ((c->func  )){		 
             c->status = thread_busy;
-            call_stdfunc(c->func, c->arg, c->argSize);
+            call_stdfunc((void*)(c->func), c->arg, c->argSize); //! It is very funny: wrong if using c->kArg, the c->kArg will be addressed wrongly.
+            //task_t * t= &c->task;
+            //call_stdfunc((void*)(t->func), (void*)(((char*)t)+8), t->argSize); //! It is very funny: wrong if using c->kArg
             c->func = NULL;
             c->status = thread_idle;
+        }else{
+            WARNING("warning\n");
         }
         sV(c->done_sem);
     }
@@ -215,7 +218,7 @@ static tfunc_ret  thread_func2(void *v){
  *      Example:  initGroup(0, 2)
  * =====================================================================================
  */
-static int initGroup2( int gid, int thread_num)
+inline int initGroup2( int gid, int thread_num)
 {
     ThreadGroupContext* groupCtx=threadGroupContext;
     ThreadContext* c= (ThreadContext* )malloc(sizeof(ThreadContext)*THREAD_NUM);
@@ -235,6 +238,7 @@ static int initGroup2( int gid, int thread_num)
         for(i=0;i<thread_num;i++){ // init thread context
             c[i].groupID = gid; 
             c[i].status = thread_idle;
+            c[i].arg = c[i].kArg;
             create_sem(&c[i].work_sem, 0, 1);
             create_sem(&c[i].done_sem, 0, 1);
         }
@@ -253,7 +257,7 @@ static int initGroup2( int gid, int thread_num)
  *      Example:  closeGroup(0)
  * =====================================================================================
  */
-void closeGroup2(int gid) {
+inline void closeGroup2(int gid) {
     int i;
     threadGroupContext[gid].status=group_exit;
     START_GROUP2(gid);
@@ -265,15 +269,13 @@ void closeGroup2(int gid) {
     free(threadGroupContext[gid].c);
 }
 
-
-
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  getIdleThread
  *  Description:  
  * =====================================================================================
  */
-int getIdleThread(int gid){
+inline int getIdleThread(int gid){
     int i;
     ThreadGroupContext* groupCtx=threadGroupContext;
     for(i =0;i<groupCtx[gid].group_size ;i++){
@@ -282,4 +284,35 @@ int getIdleThread(int gid){
     return -1;
 }
 
+
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  getIdleThread
+ *  Description:  
+ * =====================================================================================
+ */
+inline int getIdleThreadDefault(){
+    int gid = 0;
+    int tid = getIdleThread(gid);
+    if(tid == -1) 
+        return -1;
+    else 
+        return ((gid << 16 ) | tid);
+}
+
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  appandTask
+ *  Description:  
+ * =====================================================================================
+ */
+inline void appandTask(task_t* task, int gid, int tid)
+{
+    ThreadContext* c = &threadGroupContext[gid].c[tid];   
+    c->status = thread_busy;
+    c->task = *task;
+    START_TASK(gid, tid);
+}
 #endif   /* ----- #ifndef THREAD_POOL_HEADER__INC  ----- */
