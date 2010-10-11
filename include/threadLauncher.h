@@ -269,8 +269,33 @@ launchTemplateThreadStack();
 //dlaunch
 //
 ///////////////////// 2 args ///////////////////////////////////////////
-#define dlaunchArg2(a00, a01) 
-#define dlaunch2(sfunc) { int tid = getIdleThread(); launch2(tid)(sfunc) //if tid == -1 ,do it directly 
+int getIdleThreadDefault();
+#define GID_MASK 0xffff0000
+#define TID_MASK 0x0000ffff
+inline void appandTask(task_t* task, int gid, int tid);
+inline int launch_task(funcInfo_t* task)
+{
+    int gtid = getIdleThreadDefault();
+    int gid = GID(gtid);
+    if (gtid ==-1 ){// None idle thread exists.
+        call_stdfunc(task->f, task->esp, task->argSize);
+        //free(task);
+    }else{
+        appandTask(task, gid,gtid&TID_MASK);        
+    }
+    return gtid;
+}
+#define dlaunchTemplateThread() launch_task(global_funcInfo)
+#define dlaunchArg2( a00, a01) {char* pcur= global_funcInfo->esp; \
+	push2stack(a00); \
+	push2stack(a01); \
+	global_funcInfo->argSize = pcur - global_funcInfo->esp;\
+}}),\
+dlaunchTemplateThread()); });
+
+#define dlaunch2(sfunc)  ({ funcInfo_t* global_funcInfo= (funcInfo_t*)malloc(sizeof(funcInfo_t));\
+        (({global_funcInfo->f = (void*) sfunc; dlaunchArg2
+
 
 /***************************************************************************************
  *
