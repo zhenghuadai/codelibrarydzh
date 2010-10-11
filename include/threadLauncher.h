@@ -118,8 +118,15 @@ typedef struct{
         char esp[128];
         char arg[128];
     };
+    int flag;
 }funcInfo_t;
 typedef funcInfo_t task_t;
+enum{mem_stack=0 ,mem_heap=1};
+inline task_t* create_task(){
+    task_t* t = (task_t*)calloc(sizeof(task_t),1);
+    t->flag=mem_heap;
+    return t;
+}
 static THREAD_LOCAL funcInfo_t global_funcInfo;
 
 #ifdef _PTHREAD
@@ -167,8 +174,11 @@ static void* thread_func_g(void*p){
             :"%edi");
     //   __asm__("addl %0, %%esp\n"::"r"(ft->argSize)); /* if not stdcall, do this*/
     if((size_t)p < (size_t)&ft){// p is on the heap 
-//        printf("heap\n");
-//        free(p); //! error with O2/3, 
+        //printf("heap\n");
+        //free(p); //! error with O2/3, 
+    }
+    if(ft->flag == mem_heap){
+        //free(p);
     }
 }
 
@@ -230,7 +240,7 @@ create_thread(thread_func_g, &global_funcInfo)// /*thread_func_g(&global_funcInf
 }\
 launchTemplateThread();
 
-#define slaunch0(sfunc) global_funcInfo.f = (void*) sfunc; slaunchArg0
+#define slaunch0(sfunc) global_funcInfo.flag=mem_stack; global_funcInfo.f = (void*) sfunc; slaunchArg0
 
 ///////////////////// 1 args ////////////////////////////////////////////
 #define slaunchArg1( a00) {char* pcur= global_funcInfo->esp; \
@@ -239,7 +249,7 @@ launchTemplateThread();
 }}),\
 launchTemplateThread()); });
 
-#define slaunch1(sfunc) ({ funcInfo_t* global_funcInfo= (funcInfo_t*)malloc(sizeof(funcInfo_t));\
+#define slaunch1(sfunc) ({ funcInfo_t* global_funcInfo= create_task();\
         (({global_funcInfo->f = (void*) sfunc; slaunchArg1
 
 ///////////////////// 2 args ////////////////////////////////////////////
@@ -250,7 +260,7 @@ launchTemplateThread()); });
 }}),\
 launchTemplateThread()); });
 
-#define slaunch2(sfunc) ({ funcInfo_t* global_funcInfo= (funcInfo_t*)malloc(sizeof(funcInfo_t));\
+#define slaunch2(sfunc) ({ funcInfo_t* global_funcInfo= create_task();\
         (({global_funcInfo->f = (void*) sfunc; slaunchArg2
 
 ///////////////////// 3 args ///////////////////////////////////////////
@@ -263,7 +273,7 @@ launchTemplateThread()); });
 };\
 launchTemplateThreadStack();
 
-#define slaunch3(sfunc) global_funcInfo.f = (void*) sfunc; slaunchArg3
+#define slaunch3(sfunc) global_funcInfo.flag=mem_stack; global_funcInfo.f = (void*) sfunc; slaunchArg3
 	
 ///////////////////// 0 args ////////////////////////////////////////////
 //dlaunch
@@ -279,21 +289,22 @@ inline int launch_task(funcInfo_t* task)
     int gid = GID(gtid);
     if (gtid ==-1 ){// None idle thread exists.
         call_stdfunc(task->f, task->esp, task->argSize);
-        //free(task);
     }else{
         appandTask(task, gid,gtid&TID_MASK);        
     }
+    if(task->flag == mem_heap)
+        free(task);
     return gtid;
 }
 #define dlaunchTemplateThread() launch_task(global_funcInfo)
 #define dlaunchArg2( a00, a01) {char* pcur= global_funcInfo->esp; \
-	push2stack(a00); \
-	push2stack(a01); \
-	global_funcInfo->argSize = pcur - global_funcInfo->esp;\
+    push2stack(a00); \
+    push2stack(a01); \
+    global_funcInfo->argSize = pcur - global_funcInfo->esp;\
 }}),\
 dlaunchTemplateThread()); });
 
-#define dlaunch2(sfunc)  ({ funcInfo_t* global_funcInfo= (funcInfo_t*)malloc(sizeof(funcInfo_t));\
+#define dlaunch2(sfunc)  ({ funcInfo_t* global_funcInfo= create_task();\
         (({global_funcInfo->f = (void*) sfunc; dlaunchArg2
 
 
