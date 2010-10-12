@@ -228,26 +228,36 @@ kernel_ret thread_func_g(void*p){
 }
 #endif     /* -----  not _PTHREAD  ----- */
 
-#define launchTemplateThread() \
-create_thread(thread_func_g, global_funcInfo)// /*thread_func_g(&global_funcInfo);*/
+/////////////////////////////////////////////////////////////////////////
+///////////////////////////slaunch & dlaunch/////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+#define pushArgtoStack1( a00)	push2stack(a00); 
+#define pushArgtoStack2( a00, a01)	pushArgtoStack1(a00) push2stack(a01); 
+#define pushArgtoStack3( a00, a01, a02)	pushArgtoStack2(a00,a01) push2stack(a02); 
+//#define pushArgtoStack3( a00, a01, a02) push2stack(a00); push2stack(a01); push2stack(a02); 
+////////////////////////////////////////////////////////////////////
+///////////////////////////slaunch//////////////////////////////////
+////////////////////////////////////////////////////////////////////
+#define slaunchTemplateThread() create_thread(thread_func_g, global_funcInfo)// /*thread_func_g(&global_funcInfo);*/
+#define launchTemplateThreadStack() create_thread(thread_func_g, &global_funcInfo)// /*thread_func_g(&global_funcInfo);*/
 	
-#define launchTemplateThreadStack() \
-create_thread(thread_func_g, &global_funcInfo)// /*thread_func_g(&global_funcInfo);*/
-	
-///////////////////// 0 args ////////////////////////////////////////////
-#define slaunchArg0( ) {char* pcur= global_funcInfo.esp; \
-	global_funcInfo.argSize =0;\
-}\
-launchTemplateThread();
+#define slauncher_header(sfunc, argnum)  ({ funcInfo_t* global_funcInfo= create_task();\
+        (({global_funcInfo->f = (void*) sfunc; slaunchArg ## argnum
+#define slaunchArg_part0 {char* pcur= global_funcInfo->esp; 
+#define slaunchArg_part2  global_funcInfo->argSize = pcur - global_funcInfo->esp;\
+}}),\
+slaunchTemplateThread()); });
 
-#define slaunch0(sfunc) global_funcInfo.flag=mem_stack; global_funcInfo.f = (void*) sfunc; slaunchArg0
+///////////////////// 0 args ////////////////////////////////////////////
+#define slaunchArg0( ) slaunchArg_part0 slaunchArg_part2
+#define slaunch0(sfunc) slauncher_header(sfunc,0) 
 
 ///////////////////// 1 args ////////////////////////////////////////////
 #define slaunchArg1( a00) {char* pcur= global_funcInfo->esp; \
 	push2stack(a00);\
 	global_funcInfo->argSize = pcur - global_funcInfo->esp;\
 }}),\
-launchTemplateThread()); });
+slaunchTemplateThread()); });
 
 #define slaunch1(sfunc) ({ funcInfo_t* global_funcInfo= create_task();\
         (({global_funcInfo->f = (void*) sfunc; slaunchArg1
@@ -258,27 +268,41 @@ launchTemplateThread()); });
 	push2stack(a01); \
 	global_funcInfo->argSize = pcur - global_funcInfo->esp;\
 }}),\
-launchTemplateThread()); });
+slaunchTemplateThread()); });
 
 #define slaunch2(sfunc) ({ funcInfo_t* global_funcInfo= create_task();\
         (({global_funcInfo->f = (void*) sfunc; slaunchArg2
 
 ///////////////////// 3 args ///////////////////////////////////////////
-
+#if 0
 #define slaunchArg3( a00, a01, a02) {char* pcur= global_funcInfo.esp; \
 	push2stack(a00); \
 	push2stack(a01); \
 	push2stack(a02); \
 	global_funcInfo.argSize = pcur - global_funcInfo.esp;\
 };\
-launchTemplateThreadStack();
+slaunchTemplateThread();
 
-#define slaunch3(sfunc) global_funcInfo.flag=mem_stack; global_funcInfo.f = (void*) sfunc; slaunchArg3
-	
-///////////////////// 0 args ////////////////////////////////////////////
-//dlaunch
-//
-///////////////////// 2 args ///////////////////////////////////////////
+#define slaunch3(sfunc) global_funcInfo.flag=mem_stack; global_funcInfo.f = (void*) sfunc; slaunchArg0  
+#endif	
+
+#define slaunchArg3(a00,a01,a02) slaunchArg_part0 pushArgtoStack3(a00,a01,a02) slaunchArg_part2
+#define slaunch3(sfunc) slauncher_header(sfunc,3) 
+///////////////////// 4 args ///////////////////////////////////////////
+#define slaunchArg4(a00,a01,a02,a03) slaunchArg_part0 pushArgtoStack4(a00,a01,a02,a03) slaunchArg_part2
+#define slaunch4(sfunc) slauncher_header(sfunc,4) 
+////////////////////////////////////////////////////////////////////
+///////////////////////////dlaunch//////////////////////////////////
+////////////////////////////////////////////////////////////////////
+#define dlaunchTemplateThread() launch_task(global_funcInfo)
+
+#define dlauncher_header(sfunc, argnum)  ({ funcInfo_t* global_funcInfo= create_task();\
+        (({global_funcInfo->f = (void*) sfunc; dlaunchArg ## argnum
+#define dlaunchArg_part0 {char* pcur= global_funcInfo->esp; 
+#define dlaunchArg_part2  global_funcInfo->argSize = pcur - global_funcInfo->esp;\
+}}),\
+dlaunchTemplateThread()); });
+
 int getIdleThreadDefault();
 #define GID_MASK 0xffff0000
 #define TID_MASK 0x0000ffff
@@ -296,7 +320,13 @@ inline int launch_task(funcInfo_t* task)
         free(task);
     return gtid;
 }
-#define dlaunchTemplateThread() launch_task(global_funcInfo)
+///////////////////// 0 args ////////////////////////////////////////////
+#define dlaunchArg0( ) dlaunchArg_part0 dlaunchArg_part2
+#define dlaunch0(sfunc) dlauncher_header(sfunc,0) 
+///////////////////// 1 args ////////////////////////////////////////////
+#define dlaunchArg1(a00 ) dlaunchArg_part0 pushArgtoStack1(a00) dlaunchArg_part2
+#define dlaunch1(sfunc) dlauncher_header(sfunc,1) 
+///////////////////// 2 args ///////////////////////////////////////////
 #define dlaunchArg2( a00, a01) {char* pcur= global_funcInfo->esp; \
     push2stack(a00); \
     push2stack(a01); \
@@ -307,7 +337,12 @@ dlaunchTemplateThread()); });
 #define dlaunch2(sfunc)  ({ funcInfo_t* global_funcInfo= create_task();\
         (({global_funcInfo->f = (void*) sfunc; dlaunchArg2
 
-
+///////////////////// 3 args ///////////////////////////////////////////
+#define dlaunchArg3(a00,a01,a02 ) dlaunchArg_part0 pushArgtoStack3(a00,a01,a02) dlaunchArg_part2
+#define dlaunch3(sfunc) dlauncher_header(sfunc,3) 
+///////////////////// 4 args ///////////////////////////////////////////
+#define dlaunchArg4(a00,a01,a02,a03 ) dlaunchArg_part0 pushArgtoStack4(a00,a01,a02,a03) dlaunchArg_part2
+#define dlaunch4(sfunc) dlauncher_header(sfunc,4) 
 /***************************************************************************************
  *
  *the Launcher end
