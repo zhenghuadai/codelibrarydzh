@@ -12,7 +12,11 @@ XLIBS= -lglut -lGLU -lGL -lXext -lX11 -lm #-lXmu
 ifeq ($(debug),yes)
 CFLAGS:=-g 
 else
+ifeq ($(debug),go2)
+CFLAGS:=-g -O2
+else
 CFLAGS:=-O2
+endif
 endif
 
 all: ${TARGET}
