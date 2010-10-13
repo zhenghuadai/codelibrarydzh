@@ -113,7 +113,7 @@ static tfunc_ret  thread_func(void *v){
         START_GROUP(c->groupID); //sP(groupCtx->work_sem); 
         if ((!c->func  )|| (groupCtx->status == group_exit))	break;		 
         //		   c->ret= c->func((void*)c->arg); 
-        call_stdfunc((void*)(c->func), c->arg, c->argSize);
+        call_stdfunc((void*)(c->func), c->argSize, c->arg);
         FINISH_GROUP(c->groupID);//sV(groupCtx->done_sem );
     }
     return 0;
@@ -197,9 +197,9 @@ static tfunc_ret  thread_func2(void *v){
         if(c->status == thread_exit || groupCtx->status == group_exit) break;
         if ((c->func  )){		 
             c->status = thread_busy;
-            call_stdfunc((void*)(c->func), c->arg, c->argSize); //! It is very funny: wrong if using c->kArg, the c->kArg will be addressed wrongly.
+            call_stdfunc((void*)(c->func), c->argSize, c->arg); //! It is very funny: wrong if using c->kArg, the c->kArg will be addressed wrongly.
             //task_t * t= &c->task;
-            //call_stdfunc((void*)(t->func), (void*)(((char*)t)+8), t->argSize); //! It is very funny: wrong if using c->kArg
+            //call_stdfunc((void*)(t->func), t->argSize, (void*)(((char*)t)+8)); //! It is very funny: wrong if using c->kArg
             c->func = NULL;
             c->status = thread_idle;
         }else{
