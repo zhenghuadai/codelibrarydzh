@@ -23,7 +23,7 @@ THREAD_VAR ;
 
 long long x = 0;
 __thread threadX;
-kernel_ret sfunc0( int x0, int y, int z )
+tfunc_ret sfunc0( int x0, int y, int z )
 {
 	int i;
 	//poptArg(int, x0, int, y, int, z);
@@ -41,7 +41,7 @@ kernel_ret sfunc0( int x0, int y, int z )
 	//v();
 }
 
-kernel_ret sfunc2( int x0, int y)
+tfunc_ret sfunc2( int x0, int y)
 {
 	int i;
 	//poptArg(int, x0, int, y, int, z);
