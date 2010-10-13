@@ -67,10 +67,10 @@ typedef struct ThreadContext{
 	int groupID;
 	sem_t work_sem;
 	sem_t done_sem;
-	void *ret;
 	void *arg;
     union{
         struct{
+            void *ret;
             tkernel_t func;
             int argSize;
             char kArg[128];
