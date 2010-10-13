@@ -171,6 +171,7 @@ inline void closeGroup(int gid) {
     for(i=0;i<threadGroupContext[gid].group_size;i++){
         close_thread(threadGroupContext[gid].tTable[i]);
     }
+    free(threadGroupContext[gid].tTable);
     free(threadGroupContext[gid].c);
 }
 
@@ -266,6 +267,7 @@ inline void closeGroup2(int gid) {
         sem_destroy(&threadGroupContext[gid].c[i].work_sem);
         sem_destroy(&threadGroupContext[gid].c[i].done_sem);
     }
+    free(threadGroupContext[gid].tTable);
     free(threadGroupContext[gid].c);
 }
 
