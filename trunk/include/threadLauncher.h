@@ -173,12 +173,16 @@ static void* thread_func_g(void*p){
             :"a"(ft->f),"c"(ft->argSize), "S"(ft->esp)
             :"%edi");
     //   __asm__("addl %0, %%esp\n"::"r"(ft->argSize)); /* if not stdcall, do this*/
+    /* 
+     * judge if the p is on the heap
     if((size_t)p < (size_t)&ft){// p is on the heap 
         //printf("heap\n");
         //free(p); //! error with O2/3, 
     }
-    if(ft->flag == mem_heap){
-        //free(p);
+    */
+    if(((task_t*)p)->flag == mem_heap){
+        printf("");
+        free(p);
     }
 }
 
@@ -238,8 +242,8 @@ kernel_ret thread_func_g(void*p){
 ////////////////////////////////////////////////////////////////////
 ///////////////////////////slaunch//////////////////////////////////
 ////////////////////////////////////////////////////////////////////
-#define slaunchTemplateThread() create_thread(thread_func_g, global_funcInfo)// /*thread_func_g(&global_funcInfo);*/
-#define launchTemplateThreadStack() create_thread(thread_func_g, &global_funcInfo)// /*thread_func_g(&global_funcInfo);*/
+#define slaunchTemplateThread()      create_thread(thread_func_g, global_funcInfo)// /*thread_func_g(&global_funcInfo);*/
+#define slaunchTemplateThreadStack() create_thread(thread_func_g, &global_funcInfo)// /*thread_func_g(&global_funcInfo);*/
 	
 #define slauncher_header(sfunc, argnum)  ({ funcInfo_t* global_funcInfo= create_task();\
         (({global_funcInfo->f = (void*) sfunc; slaunchArg ## argnum
