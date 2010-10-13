@@ -154,7 +154,9 @@ inline void call_stdfunc(void* func, int argSize, void* arg)
             :
             :"a"(func),"c"(argSize), "S"(arg)
             :"%edi");
-    //   __asm__("addl %0, %%esp\n"::"r"(ft->argSize)); /* if not stdcall, do this*/
+    //   __asm__("addl %0, %%esp\n"::"r"(ft->argSize)); /* if not stdcall, do this.
+    //   Beacause, the stdcall will clean up the stack itself.
+    //             the cdecl will not. So we have to clean the stack after cdecl call.*/
 }
 
 #else      /* -----  not _PTHREAD  ----- */
@@ -211,7 +213,7 @@ inline void call_stdfunc(void* func, int argSize, void* arg)
  *      Example:  thread_func_g
  * =====================================================================================
  */
-static kernel_ret thread_func_g(void* p){
+static tfunc_ret thread_func_g(void* p){
     funcInfo_t* ft = (funcInfo_t*)p;
     if(p == NULL) return NULL;
     call_stdfunc(ft->f,ft->argSize,ft->esp);
