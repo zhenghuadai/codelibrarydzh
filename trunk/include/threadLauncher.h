@@ -110,6 +110,10 @@
  *******************************************************************************************************************/
 typedef struct{
     union{
+        int flag;
+        void* ret;
+    };
+    union{
         void* f;
         void* func;
     };
@@ -118,7 +122,6 @@ typedef struct{
         char esp[128];
         char arg[128];
     };
-    int flag;
 }funcInfo_t;
 typedef funcInfo_t task_t;
 enum{mem_stack=0 ,mem_heap=1};
@@ -162,8 +165,9 @@ inline void call_stdfunc(void* func, void* arg, int argSize)
  *      Example:  thread_func_g
  * =====================================================================================
  */
-static void* thread_func_g(void*p){
+static void* thread_func_g(void* p){
     funcInfo_t* ft = (funcInfo_t*)p;
+    if(p == NULL) return NULL;
     __asm__(
             "subl %%ecx, %%esp\n"
             "movl %%esp, %%edi\n"
@@ -184,6 +188,7 @@ static void* thread_func_g(void*p){
         printf("");
         free(p);
     }
+    return NULL;
 }
 
 
