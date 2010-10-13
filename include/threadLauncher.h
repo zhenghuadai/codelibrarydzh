@@ -144,7 +144,7 @@ static THREAD_LOCAL funcInfo_t global_funcInfo;
  *      Example:  call_stdfunc
  * =====================================================================================
  */
-inline void call_stdfunc(void* func, void* arg, int argSize)
+inline void call_stdfunc(void* func, int argSize, void* arg)
 {
     __asm__(
             "subl %%ecx, %%esp\n"
@@ -154,43 +154,8 @@ inline void call_stdfunc(void* func, void* arg, int argSize)
             :
             :"a"(func),"c"(argSize), "S"(arg)
             :"%edi");
-}
-/* 
- * ===  FUNCTION  ======================================================================
- *         Name:  thread_func_g
- *  Description:  the thread template for launching simple function,
- *                it copy the arguments from p->esp to the stack, then call the p->f;
- *  	  Input:  
- *       Output:
- *      Example:  thread_func_g
- * =====================================================================================
- */
-static void* thread_func_g(void* p){
-    funcInfo_t* ft = (funcInfo_t*)p;
-    if(p == NULL) return NULL;
-    __asm__(
-            "subl %%ecx, %%esp\n"
-            "movl %%esp, %%edi\n"
-            "rep movsb\n"
-            "call *%%eax\n"
-            :
-            :"a"(ft->f),"c"(ft->argSize), "S"(ft->esp)
-            :"%edi");
     //   __asm__("addl %0, %%esp\n"::"r"(ft->argSize)); /* if not stdcall, do this*/
-    /* 
-     * judge if the p is on the heap
-    if((size_t)p < (size_t)&ft){// p is on the heap 
-        //printf("heap\n");
-        //free(p); //! error with O2/3, 
-    }
-    */
-    if(((task_t*)p)->flag == mem_heap){
-        printf("");
-        free(p);
-    }
-    return NULL;
 }
-
 
 #else      /* -----  not _PTHREAD  ----- */
 #define typeof(x) x
@@ -205,19 +170,18 @@ pcur += _INTSIZEOF(typeof(v));\
 
 /* 
  * ===  FUNCTION  ======================================================================
- *         Name:  thread_func_g
- *  Description:  the thread template for launching simple function,
- *                it copy the arguments from p->esp to the stack, then call the p->f;
+ *         Name:  call_stdfunc
+ *  Description:
  *  	  Input:  
  *       Output:
- *      Example:  thread_func_g
+ *      Example:  call_stdfunc
  * =====================================================================================
  */
-kernel_ret thread_func_g(void*p){
+inline void call_stdfunc(void* func, int argSize, void* arg)
 	funcInfo_t* ft = (funcInfo_t*)p;
-	unsigned int f = (unsigned int)ft->f;
-	unsigned int argSize = (unsigned int)ft->argSize;
-	unsigned int stack = (unsigned int)ft->esp;
+	unsigned int f = (unsigned int)func;
+	unsigned int argSize = (unsigned int)argSize;
+	unsigned int stack = (unsigned int)arg;
 	__asm{ 
 			__asm push esi
 			__asm push edi
@@ -234,8 +198,37 @@ kernel_ret thread_func_g(void*p){
 			__asm pop esi
  
 	}
+    //   __asm add esp,argSize/* if not stdcall, do this*/
 }
 #endif     /* -----  not _PTHREAD  ----- */
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  thread_func_g
+ *  Description:  the thread template for launching simple function,
+ *                it copy the arguments from p->esp to the stack, then call the p->f;
+ *  	  Input:  
+ *       Output:
+ *      Example:  thread_func_g
+ * =====================================================================================
+ */
+static kernel_ret thread_func_g(void* p){
+    funcInfo_t* ft = (funcInfo_t*)p;
+    if(p == NULL) return NULL;
+    call_stdfunc(ft->f,ft->argSize,ft->esp);
+    /* 
+     * judge if the p is on the heap
+    if((size_t)p < (size_t)&ft){// p is on the heap 
+        //printf("heap\n");
+        //free(p); //! error with O2/3, 
+    }
+    */
+    if(((task_t*)p)->flag == mem_heap){
+        printf("");
+        free(p);
+    }
+    return NULL;
+}
+
 
 /////////////////////////////////////////////////////////////////////////
 ///////////////////////////slaunch & dlaunch/////////////////////////////
@@ -321,7 +314,7 @@ inline int launch_task(funcInfo_t* task)
     int gtid = getIdleThreadDefault();
     int gid = GID(gtid);
     if (gtid ==-1 ){// None idle thread exists.
-        call_stdfunc(task->f, task->esp, task->argSize);
+        call_stdfunc(task->f, task->argSize, task->esp);
     }else{
         appandTask(task, gid,gtid&TID_MASK);        
     }
