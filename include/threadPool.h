@@ -60,6 +60,7 @@ for(j=0; j<threadGroupContext[gid].group_size; j++)\
 #define dsync(my_current_thread ) if(my_current_thread != -1) FINISH_TASK(GID(my_current_thread ),TID(my_current_thread ))
 enum {thread_exit = 0, thread_busy = -1, thread_idle = 1};
 enum {group_exit = 0,  group_busy = -1,  group_idle = 1};
+enum {group_type_default = 0, group_type_1 = 1, group_type_2 = 2};
 
 typedef struct ThreadContext{
 	//thread_t thread;
@@ -86,10 +87,11 @@ typedef struct ThreadGroupContext{
     thread_t* tTable;
     ThreadContext* c;
     int status;
+    int group_type;
 }ThreadGroupContext;
 
 #define THREAD_POOL_VAR ThreadGroupContext threadGroupContext[32]={0}
-THREAD_POOL_VAR;
+//THREAD_POOL_VAR;
 extern ThreadGroupContext threadGroupContext[32];
 
 /*################################################################################################  */
@@ -144,6 +146,7 @@ inline int initGroup( int gid, int thread_num)
     groupCtx[gid].group_size = thread_num;
     groupCtx[gid].c=c;
     groupCtx[gid].status = 1;
+    groupCtx[gid].group_type= group_type_1;
 
     {
         int i;
@@ -233,6 +236,7 @@ inline int initGroup2( int gid, int thread_num)
     groupCtx[gid].group_size = thread_num;
     groupCtx[gid].c=c;
     groupCtx[gid].status = 1;
+    groupCtx[gid].group_type= group_type_2;
 
     {
         int i;
@@ -295,8 +299,16 @@ inline int getIdleThread(int gid){
  * =====================================================================================
  */
 inline int getIdleThreadDefault(){
+    int i;
     int gid = 0;
-    int tid = getIdleThread(gid);
+    int tid ;
+    for(i=0;i<32;i++){
+        if(threadGroupContext[gid].group_type== group_type_2){
+            gid = i;
+            break;
+        };
+    }
+    tid = getIdleThread(gid);
     if(tid == -1) 
         return -1;
     else 

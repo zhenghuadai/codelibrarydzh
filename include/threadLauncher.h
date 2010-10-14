@@ -238,6 +238,7 @@ static tfunc_ret thread_func_g(void* p){
 #define pushArgtoStack1( a00)	push2stack(a00); 
 #define pushArgtoStack2( a00, a01)	pushArgtoStack1(a00) push2stack(a01); 
 #define pushArgtoStack3( a00, a01, a02)	pushArgtoStack2(a00,a01) push2stack(a02); 
+#define pushArgtoStack4( a00, a01, a02, a03)	pushArgtoStack3(a00,a01,a02) push2stack(a03); 
 //#define pushArgtoStack3( a00, a01, a02) push2stack(a00); push2stack(a01); push2stack(a02); 
 ////////////////////////////////////////////////////////////////////
 ///////////////////////////slaunch//////////////////////////////////
