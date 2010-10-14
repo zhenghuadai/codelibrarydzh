@@ -20,6 +20,7 @@
 #include "threadPool.h"
 //#include "launch.h"
 THREAD_VAR ;
+THREAD_POOL_VAR;
 
 long long x = 0;
 __thread threadX;
