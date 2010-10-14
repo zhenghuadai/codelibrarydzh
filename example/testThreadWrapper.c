@@ -161,11 +161,9 @@ void testPool2()
 {
 	int i=0;
     int gid = 1;
-	ThreadContext* c;
 
 	initGroup2(gid,THREAD_NUM);
-
-	c = threadGroupContext[gid].c;
+	selectGroup(gid);
 
 	for(i=0;i<10;i++){
 		int j=0;
