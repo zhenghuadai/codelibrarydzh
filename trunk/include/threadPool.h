@@ -58,6 +58,7 @@ for(j=0; j<threadGroupContext[gid].group_size; j++)\
 #define START_GROUP2(gid)  {int tid_i; for(tid_i=0;tid_i<threadGroupContext[gid].group_size; tid_i++) START_TASK(gid, tid_i);} 
 #define FINISH_GROUP2(gid) {int tid_i; for(tid_i=0;tid_i<threadGroupContext[gid].group_size; tid_i++) FINISH_TASK(gid, tid_i);} 
 #define dsync(my_current_thread ) if(my_current_thread != -1) FINISH_TASK(GID(my_current_thread ),TID(my_current_thread ))
+#define selectGroup(gid) ({int old=active_gid; active_gid=gid;old;}) 
 enum {thread_exit = 0, thread_busy = -1, thread_idle = 1};
 enum {group_exit = 0,  group_busy = -1,  group_idle = 1};
 enum {group_type_default = 0, group_type_1 = 1, group_type_2 = 2};
@@ -108,14 +109,14 @@ extern ThreadGroupContext threadGroupContext[32];
  *      Example:  
  * =====================================================================================
  */
-static tfunc_ret  thread_func(void *v){
+static __thread_ret  thread_func(void *v){
     ThreadContext *c= (ThreadContext *)v;
     ThreadGroupContext* groupCtx = & threadGroupContext[c->groupID ];
     for(;;){
         START_GROUP(c->groupID); //sP(groupCtx->work_sem); 
         if ((!c->func  )|| (groupCtx->status == group_exit))	break;		 
         //		   c->ret= c->func((void*)c->arg); 
-        call_stdfunc((void*)(c->func), c->argSize, c->arg);
+        call_func((void*)(c->func), c->argSize, c->arg);
         FINISH_GROUP(c->groupID);//sV(groupCtx->done_sem );
     }
     return 0;
@@ -192,7 +193,7 @@ inline void closeGroup(int gid) {
  *      Example:  
  * =====================================================================================
  */
-static tfunc_ret  thread_func2(void *v){
+static __thread_ret  thread_func2(void *v){
     ThreadContext *c= (ThreadContext *)v;
     ThreadGroupContext* groupCtx = & threadGroupContext[c->groupID ];
     for(;;){
@@ -200,9 +201,9 @@ static tfunc_ret  thread_func2(void *v){
         if(c->status == thread_exit || groupCtx->status == group_exit) break;
         if ((c->func  )){		 
             c->status = thread_busy;
-            call_stdfunc((void*)(c->func), c->argSize, c->arg); //! It is very funny: wrong if using c->kArg, the c->kArg will be addressed wrongly.
+            call_func((void*)(c->func), c->argSize, c->arg); //! It is very funny: wrong if using c->kArg, the c->kArg will be addressed wrongly.
             //task_t * t= &c->task;
-            //call_stdfunc((void*)(t->func), t->argSize, (void*)(((char*)t)+8)); //! It is very funny: wrong if using c->kArg
+            //call_func((void*)(t->func), t->argSize, (void*)(((char*)t)+8)); //! It is very funny: wrong if using c->kArg
             c->func = NULL;
             c->status = thread_idle;
         }else{
