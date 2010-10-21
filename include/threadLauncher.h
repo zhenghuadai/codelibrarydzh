@@ -3,32 +3,22 @@
 #define  THREADLAUNCHER_HEADER__INC
 #include "stdio.h"
 #include "stdlib.h"
-#if defined(_MSC_VER)
-#       define THREAD_LOCAL __declspec(thread)
-#elif defined(__GNUC__)
-#       define THREAD_LOCAL __thread
-#endif
-/************************************************************************************
- *
- *the Launcher
- *
- ***********************************************************************************/
 ///////////////// public ////////////////////////////////////////
-#define fArgTypename(f) f##Arg_t
-
-#define AAAint(x) int
-#define BBBint(x) x 
-#define AAApu8(x) pu8
-#define BBBpu8(x) x 
-#define AAApu32(x) pu32
-#define BBBpu32(x) x 
-
-
-#define AAA(a) AAA##a
-#define BBB(a) BBB##a  // BBB(int(a))
-#define launchfunc( pfuncKernel, argNum) c[tid].func = pfuncKernel; {\
+#define pushArgtoStack1( a00)	push2stack(a00); 
+#define pushArgtoStack2( a00, a01)	pushArgtoStack1(a00) push2stack(a01); 
+#define pushArgtoStack3( a00, a01, a02)	pushArgtoStack2(a00,a01) push2stack(a02); 
+#define pushArgtoStack4( a00, a01, a02, a03)	pushArgtoStack3(a00,a01,a02) push2stack(a03); 
+#define pushArgtoStack5( a00, a01, a02, a03,a04)	pushArgtoStack4(a00,a01,a02,a03) push2stack(a03); 
+#define pushArgtoStack6( a00, a01, a02, a03,a04,a05)	pushArgtoStack5(a00,a01,a02,a03,a04) push2stack(a03); 
+/******************************************************************************
+ *                                                                            *
+ ***************************** launch(launch) ****************************    *
+ * Function: copy the task to thread.                                         *
+ ******************************************************************************/
+#define launchfunc( pfuncKernel, argNum) c[tid].func = (tkernel_t) pfuncKernel; {\
         char* pcur=(char*)c[tid].kArg;  c[tid].arg= (void*)pcur; pushtArg##argNum
-
+#define launchheader { ThreadContext*c = threadGroupContext[active_gid].c;int tid = tid0;
+#define launchtailer 	c[tid].argSize = pcur - (char*) c[tid].arg;}}
 //////////////////// 0 args ////////////////////////////////////////////////////
 #define pushtArg0()\
 }\
@@ -36,7 +26,7 @@
 
 #define launchfunc0( pfuncKernel) c[tid].func = pfuncKernel; {\
 	char* pcur=(char*)c[tid].kArg;  c[tid].arg= (void*)pcur; pushtArg0 
-#define launch0(tid0) { int tid = tid0; launchfunc0  
+#define launch0(tid0) { ThreadContext*c = threadGroupContext[active_gid].c;int tid = tid0; launchfunc0  
 	
 //////////////////// 2 args ////////////////////////////////////////////////////
 #define pushtArg2(a00,a01)\
@@ -48,7 +38,7 @@
 
 #define launchfunc2( pfuncKernel) c[tid].func = pfuncKernel; {\
 	char* pcur=(char*)c[tid].kArg;  c[tid].arg= (void*)pcur; pushtArg2 
-#define launch2(tid0) { int tid = tid0; launchfunc2  
+#define launch2(tid0) {ThreadContext*c = threadGroupContext[active_gid].c; int tid = tid0; launchfunc2  
 	
 //////////////////// 3 args ////////////////////////////////////////////////////
 #define pushtArg3(a00,a01,a02)\
@@ -60,23 +50,15 @@
 }
 
 #define launchfunc3( pfuncKernel) launchfunc( pfuncKernel, 3)
-#define launch3(tid0) { int tid = tid0; launchfunc3  
+#define launch3(tid0) {ThreadContext*c = threadGroupContext[active_gid].c; int tid = tid0; launchfunc3  
 	
 //////////////////// 5 args ////////////////////////////////////////////
 /////////////////// 6 args ////////////////////////////////////////////////////
 #define pushtArg6(a00,a01,a02,a03,a04,a05)\
-	push2stack(a00); \
-	push2stack(a01); \
-	push2stack(a02); \
-	push2stack(a03); \
-	push2stack(a04); \
-	push2stack(a05); \
-	c[tid].argSize = pcur - (char*) c[tid].arg;\
-}\
-}
+    pushArgtoStack6(a00,a01,a02,a03,a04,a05)    launchtailer
 
 #define launchfunc6( pfuncKernel) launchfunc( pfuncKernel, 6)
-#define launch6(tid0) { int tid = tid0; launchfunc6  
+#define launch6(tid0) { launchheader launchfunc6  
 
 //////////////////// 16 args ////////////////////////////////////////////////////
 #define pushtArg16(a00,a01,a02,a03,a04,a05,a06,a07,a08,a09,a10,a11,a12,a13,a14,a15)\
@@ -102,12 +84,12 @@
 
 #define launchfunc16( pfuncKernel) c[tid].func = pfuncKernel; {\
 	char* pcur=(char*)c[tid].kArg;  c[tid].arg= (void*)pcur; pushtArg16 
-#define launch16(tid0) { int tid = tid0; launchfunc16  
-/*******************************************************************************************************************
- *                                                                                                                 *
- ***************************** launch a single function ************************************************************
- *                                                                                                                 *
- *******************************************************************************************************************/
+#define launch16(tid0) {ThreadContext*c = threadGroupContext[active_gid].c; int tid = tid0; launchfunc16  
+/******************************************************************************
+ *                                                                            *
+ ***************************** launch a single function (slaunch) *************
+ * Function: create a new thread and execute the task                         *
+ ******************************************************************************/
 typedef struct{
     union{
         int flag;
@@ -159,6 +141,20 @@ inline void call_stdfunc(void* func, int argSize, void* arg)
     //             the cdecl will not. So we have to clean the stack after cdecl call.*/
 }
 
+inline void call_cdeclfunc(void* func, int argSize, void* arg)
+{
+    __asm__ __volatile__ (
+            "subl %%ecx, %%esp\n"
+            "movl %%esp, %%edi\n"
+            "rep movsb\n"
+            "call *%%eax\n"
+            :
+            :"a"(func),"r"(argSize), "S"(arg)
+            :"%edi", "%edx");
+       __asm__("addl %0, %%esp\n"::"m"(argSize)); /* if not stdcall, do this.
+    //   Beacause, the stdcall will clean up the stack itself.
+    //             the cdecl will not. So we have to clean the stack after cdecl call.*/
+}
 #else      /* -----  not _PTHREAD  ----- */
 #define typeof(x) x
 #define push2stack(v){ switch(_INTSIZEOF(typeof(v))) {\
@@ -202,7 +198,43 @@ inline void call_stdfunc(void* func, int argSize, void* arg)
 	}
     //   __asm add esp,argSize/* if not stdcall, do this*/
 }
+
+inline void call_cdeclfunc(void* func, int argSize, void* arg)
+	funcInfo_t* ft = (funcInfo_t*)p;
+	unsigned int f = (unsigned int)func;
+	unsigned int argSize = (unsigned int)argSize;
+	unsigned int stack = (unsigned int)arg;
+	__asm{ 
+			__asm push esi
+			__asm push edi
+			__asm mov eax, f
+			__asm mov ecx,  argSize
+			__asm mov esi, stack
+
+			__asm sub esp, ecx
+			__asm mov edi, esp
+			__asm rep movsb
+			__asm call eax
+
+			__asm pop edi
+			__asm pop esi
+ 
+	}
+       __asm add esp,argSize/* if not stdcall, do this*/
+}
+
 #endif     /* -----  not _PTHREAD  ----- */
+
+inline void call_func(void* func, int argSize, void* arg)
+{
+#ifdef DEFAULT_STDCALL
+    call_stdfunc(func, argSize, arg);
+#else
+    call_cdeclfunc(func, argSize, arg);
+#endif
+}
+
+
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  thread_func_g
@@ -213,10 +245,10 @@ inline void call_stdfunc(void* func, int argSize, void* arg)
  *      Example:  thread_func_g
  * =====================================================================================
  */
-static tfunc_ret thread_func_g(void* p){
+static __thread_ret thread_func_g(void* p){
     funcInfo_t* ft = (funcInfo_t*)p;
     if(p == NULL) return NULL;
-    call_stdfunc(ft->f,ft->argSize,ft->esp);
+    call_func(ft->f,ft->argSize,ft->esp);
     /* 
      * judge if the p is on the heap
     if((size_t)p < (size_t)&ft){// p is on the heap 
@@ -231,18 +263,6 @@ static tfunc_ret thread_func_g(void* p){
     return NULL;
 }
 
-
-/////////////////////////////////////////////////////////////////////////
-///////////////////////////slaunch & dlaunch/////////////////////////////
-/////////////////////////////////////////////////////////////////////////
-#define pushArgtoStack1( a00)	push2stack(a00); 
-#define pushArgtoStack2( a00, a01)	pushArgtoStack1(a00) push2stack(a01); 
-#define pushArgtoStack3( a00, a01, a02)	pushArgtoStack2(a00,a01) push2stack(a02); 
-#define pushArgtoStack4( a00, a01, a02, a03)	pushArgtoStack3(a00,a01,a02) push2stack(a03); 
-//#define pushArgtoStack3( a00, a01, a02) push2stack(a00); push2stack(a01); push2stack(a02); 
-////////////////////////////////////////////////////////////////////
-///////////////////////////slaunch//////////////////////////////////
-////////////////////////////////////////////////////////////////////
 #define slaunchTemplateThread()      create_thread(thread_func_g, global_funcInfo)// /*thread_func_g(&global_funcInfo);*/
 #define slaunchTemplateThreadStack() create_thread(thread_func_g, &global_funcInfo)// /*thread_func_g(&global_funcInfo);*/
 	
@@ -296,9 +316,13 @@ slaunchTemplateThread();
 ///////////////////// 4 args ///////////////////////////////////////////
 #define slaunchArg4(a00,a01,a02,a03) slaunchArg_part0 pushArgtoStack4(a00,a01,a02,a03) slaunchArg_part2
 #define slaunch4(sfunc) slauncher_header(sfunc,4) 
-////////////////////////////////////////////////////////////////////
-///////////////////////////dlaunch//////////////////////////////////
-////////////////////////////////////////////////////////////////////
+/******************************************************************************
+ *                                                                            *
+ ***************************** launch task to an idle thread (dlaunch) ********
+ * Function: find an idle thread and disptch task to the thread               *
+ ******************************************************************************/
+#define GID_MASK 0xffff0000
+#define TID_MASK 0x0000ffff
 #define dlaunchTemplateThread() launch_task(global_funcInfo)
 
 #define dlauncher_header(sfunc, argnum)  ({ funcInfo_t* global_funcInfo= create_task();\
@@ -308,16 +332,14 @@ slaunchTemplateThread();
 }}),\
 dlaunchTemplateThread()); });
 
-int getIdleThreadDefault();
-#define GID_MASK 0xffff0000
-#define TID_MASK 0x0000ffff
 inline void appandTask(task_t* task, int gid, int tid);
+int getIdleThreadDefault();
 inline int launch_task(funcInfo_t* task)
 {
     int gtid = getIdleThreadDefault();
     int gid = GID(gtid);
     if (gtid ==-1 ){// None idle thread exists.
-        call_stdfunc(task->f, task->argSize, task->esp);
+        call_func(task->f, task->argSize, task->esp);
     }else{
         appandTask(task, gid,gtid&TID_MASK);        
     }

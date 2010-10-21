@@ -56,10 +56,16 @@ typedef struct {unsigned short tid; unsigned short gid;} threadid_t;
 	#endif
 #endif
 
+#if defined(_MSC_VER)
+#       define THREAD_LOCAL __declspec(thread)
+#elif defined(__GNUC__)
+#       define THREAD_LOCAL __thread
+#endif
 
 #ifdef  _PTHREAD
 #include <pthread.h>
 #include <semaphore.h>
+#define DEFAULT_CDECL
 //typedef sem_t           sem_t;
 typedef pthread_cond_t    cond_t;
 typedef pthread_mutex_t   mutex_t;
@@ -123,6 +129,7 @@ declare_barrier(tBarrier);\
 declare_mutex(tMutex);\
 declare_cond(tCond);\
 static int tNum=0;\
+THREAD_LOCAL int active_gid=0;
 	
 #define INIT_THREAD_VAR()\
 pthread_barrier_init(&tBarrier, NULL, THREAD_NUM);
@@ -147,8 +154,12 @@ pthread_barrier_init(&tBarrier, NULL, THREAD_NUM);
 #define condV(cond_s) pthread_cond_signal(&cond_s);
 #define Barrier() pthread_barrier_wait(&tBarrier);
 
-#define tfunc_ret void* 
-#define kernel_ret 	void* __attribute__((stdcall)) 
+#define __thread_ret void* 
+#ifdef DEFAULT_STDCALL
+#define __kernel 	void __attribute__((stdcall)) 
+#else
+#define __kernel 	void 
+#endif
 #define STDCALL  __attribute__((stdcall))
 /****************************************************************************************/
 /**************************pthread*******************************************************/
@@ -160,6 +171,7 @@ pthread_barrier_init(&tBarrier, NULL, THREAD_NUM);
 #include <windows.h>
 #include <process.h>
 
+#define DEFAULT_STDCALL
 typedef HANDLE sem_t;
 typedef HANDLE cond_t;
 typedef HANDLE mutex_t;
@@ -213,7 +225,8 @@ unsigned int  retTable[THREAD_NUM*2]; \
 barrier_t tBarrier;\
 mutex_t tMutex;\
 declare_cond(tCond);\
-static int tNum=0;
+static int tNum=0;\
+THREAD_LOCAL active_gid=0;
 
 #define INIT_THREAD_VAR()\
 tBarrier= CreateEvent(NULL, TRUE, FALSE, NULL);\
@@ -244,10 +257,10 @@ tMutex= /*CreateSemaphore(NULL, 1, 1, NULL); */CreateMutex(NULL,FALSE , 0);
 #define condV(cond_s) 
 #define Barrier()  //WaitForSingleObject(tBarrier, INFINITE);
 
-#define tfunc_ret unsigned WINAPI
-#define kernel_ret unsigned WINAPI	
+#define __thread_ret unsigned WINAPI
+#define __kernel unsigned WINAPI	
 #define STDCALL WINAPI
-//typedef  unsigned WINAPI tfunc_ret ;
+//typedef  unsigned WINAPI __thread_ret ;
 #endif   /* ----- #ifndef _PTHREAD  ----- */
 
 #ifndef _INTSIZEOF 
