@@ -24,9 +24,12 @@ class A
     public:
         int a;
         int b;
+        const int c;
+        static int d;
+        static const int e;
     public:
-        A(){printf("default constructor\n");}  
-        A(const A& o){printf("copy constructor\n");}  
+        A():c(100){printf("default constructor\n");}  
+        A(const A& o):c(100){printf("copy constructor\n");}  
     public:
         A operator*(const A& o){
             A c;
@@ -37,7 +40,14 @@ class A
         A operator=(const A& o){
             printf("set\n");
         }
+        void vcc()const{ printf("c:%d\n", c);}
+        void vc(){ printf("c:%d\n", c);}
+        void vd(){ printf("d:%d\n", d);}
+        void ve(){ printf("e:%d\n", e);}
+
 };
+int A::d;
+const int A::e=400;
 
 const A operator*(const A& lhs, const A& rhs){ 
     A c;
@@ -49,4 +59,8 @@ int main()
 {
     A a, b,c;
     c = a * b;
+    a.vcc();
+    a.vc();
+    a.vd();
+    a.ve();
 }

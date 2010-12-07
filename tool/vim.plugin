@@ -25,17 +25,29 @@ fi
 if [ -z "`sed -n '/^273 /p' ./GetLatest/GetLatestVimScripts.dat`" ]; then
 	echo "273 1 :AutoInstall: taglist_45.zip" >> ./GetLatest/GetLatestVimScripts.dat
 fi
+
 if [ -z "`sed -n '/^642 /p' ./GetLatest/GetLatestVimScripts.dat`" ]; then
 	echo "642 1 :AutoInstall: GetLatestVimScripts.vim" >> ./GetLatest/GetLatestVimScripts.dat
 fi
+
 if [ -z "`sed -n '/^1643 /p' ./GetLatest/GetLatestVimScripts.dat`" ]; then
 	echo "1643 1 :AutoInstall: supertab.vba" >> ./GetLatest/GetLatestVimScripts.dat
 fi
+
 if [ -z "`sed -n '/^52 /p' ./GetLatest/GetLatestVimScripts.dat`" ]; then
 	echo "52 1 :AutoInstall: calendar.vim" >> ./GetLatest/GetLatestVimScripts.dat
 fi
+
 if [ -z "`sed -n '/^1735 /p' ./GetLatest/GetLatestVimScripts.dat`" ]; then
 	echo "1735 1 :AutoInstall: calendar.vim" >> ./GetLatest/GetLatestVimScripts.dat
+fi
+
+if [ -z "`sed -n '/^159 /p' ./GetLatest/GetLatestVimScripts.dat`" ]; then
+	echo "159 1 :AutoInstall: MiniBufExplorer.vim" >> ./GetLatest/GetLatestVimScripts.dat
+fi
+
+if [ -z "`sed -n '/^31 /p' ./GetLatest/GetLatestVimScripts.dat`" ]; then
+	echo "31 1 :AutoInstall: a.vim" >> ./GetLatest/GetLatestVimScripts.dat
 fi
 vim +":let g:GetLatestVimScripts_allowautoinstall=1" +":GLVS" +":q!" /tmp/xxxxxxxx
 
