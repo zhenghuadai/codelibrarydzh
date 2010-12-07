@@ -23,8 +23,8 @@ THREAD_VAR ;
 THREAD_POOL_VAR;
 
 long long x = 0;
-__thread threadX;
-tfunc_ret sfunc0( int x0, int y, int z )
+__thread int threadX;
+__kernel sfunc0( int x0, int y, int z )
 {
 	int i;
 	//poptArg(int, x0, int, y, int, z);
@@ -42,7 +42,9 @@ tfunc_ret sfunc0( int x0, int y, int z )
 	//v();
 }
 
-tfunc_ret sfunc2( int x0, int y)
+//tfunc_ret 
+__kernel 
+sfunc2( int x0, int y)
 {
 	int i;
 	//poptArg(int, x0, int, y, int, z);
@@ -69,7 +71,9 @@ tfunc_ret sfunc2( int x0, int y)
 //defineThreadFunc2(pfunc0,( int, x0, int, y, int, z))
  */
 //defineThreadFunc3(pfunc0,( int(x0), int(y), int(z)))
-void __attribute__((stdcall)) pfunc0( int x0, int y, int z)
+//void __attribute__((stdcall)) 
+__kernel
+pfunc0( int x0, int y, int z)
 {
 //	poptArg3(int( x0), int( y), int( z));
 	int i;
@@ -87,7 +91,9 @@ void __attribute__((stdcall)) pfunc0( int x0, int y, int z)
 	//v();
 }
 
-void __attribute__((stdcall)) pfunc3_0( pu32 x0, int y, int z)
+//void __attribute__((stdcall)) 
+__kernel
+pfunc3_0( pu32 x0, int y, int z)
 {
 	int i;
 	printf("threadX %0x\n", &threadX);
@@ -104,7 +110,9 @@ void __attribute__((stdcall)) pfunc3_0( pu32 x0, int y, int z)
 	//v();
 }
 
-tfunc_ret pfunc1(void*p){
+//tfunc_ret 
+__kernel
+pfunc1(void*p){
 	int i;
 	printf("thread %d\n", p);
 	for(i=0;i<100000 ;i++)
@@ -117,7 +125,9 @@ tfunc_ret pfunc1(void*p){
 	//v();
 }
 
-tfunc_ret pfunc(void*p){
+//tfunc_ret 
+__kernel
+pfunc(void*p){
 	Barrier();
 	printf("threads %d\n", p);
 	P(tMutex);
@@ -145,6 +155,7 @@ void testPool()
 		START_GROUP(0);
 		FINISH_GROUP(0);
 #endif
+#if 0
 		for(j=0;j<THREAD_NUM;j++){
 			launch3(j)(pfunc0)((int)(i*THREAD_NUM+j), (int)i, (int)'a');
 		}
@@ -152,6 +163,7 @@ void testPool()
 		START_GROUP(0);
 		FINISH_GROUP(0);
 		printf("\n");
+#endif
 	}
 	closeGroup(0);
 }

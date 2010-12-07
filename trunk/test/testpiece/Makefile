@@ -1,4 +1,4 @@
-flags=-I../../include
+flags= -O2 -g  -I../../include
 %.exe:%.c
 	gcc -o $@ -msse2 ${flags}  $<
 %.exe:%.cpp
