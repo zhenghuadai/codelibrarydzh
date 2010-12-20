@@ -4,6 +4,7 @@ args=$@
 ioption=0
 roption=0
 foption=0
+listoption=0
 optargs=""
 trashfolder=${TRASHFOLDER:-/tmp/$USER-trash/}
 mvlogf=$trashfolder/.log
@@ -15,6 +16,7 @@ rmhelp(){
 	echo "    -c empty the trash bin"
 	echo "    -d delete the file forever"
 	echo "    -u recover the file (unrm)"
+    echo "    -l list the file in trash bin"
 	echo "  example"
 	echo "     rm file0 file1      : move the file file0 file1 to trash bin"
 	echo "     rm -u file0 file1   : recover the file file0 file1"
@@ -51,6 +53,14 @@ recover(){
 		fi
 	done	
 }
+
+listBin(){
+    cd $trashfolder
+    for i in * ; do
+        fn=$(echo $i | tr "*" "/" )
+        echo $fn
+    done
+}
 ########################### define function end  #############################
 
 for i in "$@" ;do
@@ -59,7 +69,7 @@ for i in "$@" ;do
 	fi
 done
 
-while getopts 'hiIfrvcud' OPT $optargs ;do
+while getopts 'hiIfrvlcud' OPT $optargs ;do
 	case $OPT in
 	f)
 		foption=1;;
@@ -68,6 +78,10 @@ while getopts 'hiIfrvcud' OPT $optargs ;do
 		exit 0;;
 	v)
 		voption=1;;
+    l)
+        loption=1;
+        listBin;
+        exit 0;;
 	r)
 		roption=1;;
 	i)
