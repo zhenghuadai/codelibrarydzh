@@ -7,7 +7,7 @@ close(LOG);
 my $lineNum =0;
 sub doFile{
 	my ($fn) = @_;
-	open SRC, "<$fn" or die "can not open $fn" ; 
+#	open SRC, "<$fn" or die "can not open $fn" ; 
     $lineNum += `wc -l $fn`;
 }
 
