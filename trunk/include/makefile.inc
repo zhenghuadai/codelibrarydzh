@@ -1,7 +1,7 @@
 MPICC=mpic++ #/usr/bin/mpic++
 CC=gcc
 CXX=g++
-LD=gcc
+LD?=gcc
 ROOT_PATH=${HOME}
 INC_PATH=${ROOT_PATH}/include
 LIB_PATH=${ROOT_PATH}/lib
@@ -21,7 +21,7 @@ endif
 
 all: ${TARGET}
 %.exe:%.o  
-	${CC} ${CFLAGS} -I${INC_PATH} -L${LIB_PATH} ${LIBS} -o $@ $^ 
+	${LD} ${CFLAGS} -I${INC_PATH} -L${LIB_PATH} ${LIBS} -o $@ $^ 
 %.o:%.c
 	${CC} ${CFLAGS} ${INCS} -I${INC_PATH} -c $< -o $@ -MMD 
 %.o:%.cpp
