@@ -568,3 +568,8 @@ function! g:FormatC()
 endfunction
 
 nnoremap <silent> <leader>ff :call g:FormatC()<cr>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+au BufNewFile,BufRead *.chpl setf chpl

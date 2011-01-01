@@ -49,6 +49,11 @@ fi
 if [ -z "`sed -n '/^31 /p' ./GetLatest/GetLatestVimScripts.dat`" ]; then
 	echo "31 1 :AutoInstall: a.vim" >> ./GetLatest/GetLatestVimScripts.dat
 fi
+
+if [ -z "`sed -n '/^987 /p' ./GetLatest/GetLatestVimScripts.dat`" ]; then
+	echo "987 1 :AutoInstall: DoxygenToolkit.vim" >> ./GetLatest/GetLatestVimScripts.dat
+fi
+
 vim +":let g:GetLatestVimScripts_allowautoinstall=1" +":GLVS" +":q!" /tmp/xxxxxxxx
 
 if [ 0 ]; then
@@ -71,7 +76,11 @@ fi
 fi # if[ 0 ]
 
 #svn export svn://orangoo.com/vim/vimrc
-svn export https://codelibrarydzh.googlecode.com/svn/trunk/tool/vimrc ~/.vimrc
+svn export https://codelibrarydzh.googlecode.com/svn/trunk/tool/vimrc ~/.vimrc.txt
+if [ -z "`sed -n '/source ~\/.vimrc.txt/p' ~/.vimrc`" ]; then
+	echo "source ~/.vimrc.txt" >> ~/.vimrc
+fi
+
 
 #.wgetrc
 #http-proxy=ip:port
