@@ -63,6 +63,13 @@ typedef struct{
 
 funcInfo_t global_funcInfo;
 
+/**
+ * @brief 
+ *
+ * @param p
+ *
+ * @return 
+ */
 void* thread_func_g(void*p){
 	funcInfo_t* ft = (funcInfo_t*)p;
 	__asm__(

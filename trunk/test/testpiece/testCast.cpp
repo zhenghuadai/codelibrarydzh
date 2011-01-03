@@ -18,6 +18,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 void f(unsigned char c);
+/**
+ * @brief 
+ *
+ * @param argc
+ * @param argv
+ *
+ * @return 
+ */
 int main(int argc, char** argv)
 {
 	unsigned short us = 257;
