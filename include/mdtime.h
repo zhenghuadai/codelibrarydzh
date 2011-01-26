@@ -1,3 +1,18 @@
+/**
+ * =====================================================================================
+ *       @file    mdtime.h
+ *
+ *       @brief   
+ *
+ *       @author  DAI ZHENGHUA (), djx.zhenghua@gmail.com
+ *       @version 1.0
+ *       @date    01/19/2011 08:15:42 PM
+ *
+ *       Revision none
+ *       Compiler gcc
+ *       Company  
+ * =====================================================================================
+ */
 #ifndef __MDTIME_HEADER__
 #define __MDTIME_HEADER__
 
