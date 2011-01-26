@@ -1,7 +1,9 @@
 MPICC=mpic++ #/usr/bin/mpic++
 CC=gcc
 CXX=g++
-LD?=gcc
+LD=$(if $(compiler), $(compiler), gcc)
+LD++=$(if $(compiler), $(compiler), g++)
+#LD++?=g++
 ROOT_PATH=${HOME}
 INC_PATH=${ROOT_PATH}/include
 LIB_PATH=${ROOT_PATH}/lib
@@ -19,12 +21,27 @@ CFLAGS:=-O2
 endif
 endif
 
-all: ${TARGET}
-%.exe:%.o  
+define linktemplate
 	${LD} ${CFLAGS} -I${INC_PATH} -L${LIB_PATH} ${LIBS} -o $@ $^ 
-%.o:%.c
+endef    
+LINK=$(call linktemplate)
+define linktemplate++
+	${LD++} ${CFLAGS} -I${INC_PATH} -L${LIB_PATH} ${LIBS} -o $@ $^ 
+endef    
+LINK++=$(call linktemplate++)
+
+all: ${TARGET}
+
+all: ${TARGET}
+%.exe:%.c.o  
+	${LINK} 
+    #${LD} ${CFLAGS} -I${INC_PATH} -L${LIB_PATH} ${LIBS} -o $@ $^ 
+%.exe:%.cpp.o  
+	${LINK++} 
+    #${LD} ${CFLAGS} -I${INC_PATH} -L${LIB_PATH} ${LIBS} -o $@ $^ 
+%.c.o %.o:%.c
 	${CC} ${CFLAGS} ${INCS} -I${INC_PATH} -c $< -o $@ -MMD 
-%.o:%.cpp
+%.cpp.o %.o:%.cpp
 	${CXX} ${CFLAGS} ${INCS} -I${INC_PATH} -c $< -o $@ -MMD 
 %.xexe:%.cpp
 	$(CXX) -o $@ $< -lpthread ${XLIBS}
