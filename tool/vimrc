@@ -573,3 +573,11 @@ nnoremap <silent> <leader>ff :call g:FormatC()<cr>
 "
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 au BufNewFile,BufRead *.chpl setf chpl
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+map ,a :DoxAuthor<cr>
+map ,f :Dox<cr>
+map ,b :DoxBlock<cr>
+map ,c O/** */<Left><Left><cr>

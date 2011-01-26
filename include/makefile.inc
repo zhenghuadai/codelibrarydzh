@@ -2,7 +2,7 @@ MPICC=mpic++ #/usr/bin/mpic++
 CC=gcc
 CXX=g++
 LD=$(if $(compiler), $(compiler), gcc)
-LD++=$(if $(compiler), $(compiler), g++)
+LD++ =$(if $(compiler), $(compiler), g++)
 #LD++?=g++
 ROOT_PATH=${HOME}
 INC_PATH=-I${ROOT_PATH}/include 
@@ -11,7 +11,7 @@ LIBS+=$(foreach i, ${ext_lib},-l$(i))
 INC_PATH+=$(foreach i, ${ext_inc},-I$(i))
 LIB_PATH+=$(foreach i, ${ext_libpath},-L$(i))
 XLIBS= -lglut -lGLU -lGL -lXext -lX11 -lm #-lXmu 
-
+CLEAN_OBJ+=${clean_obj}
 ifeq ($(debug),yes)
 CFLAGS:=-g 
 else
@@ -23,13 +23,13 @@ endif
 endif
 
 define linktemplate
-	${LD} ${CFLAGS}  ${LIB_PATH} ${LIBS} -o $@ $^ 
+	${LD}   ${CFLAGS} ${INC_PATH} ${LIB_PATH} ${LIBS} -o $@ $^ 
 endef    
 LINK=$(call linktemplate)
 define linktemplate++
-	${LD++} ${CFLAGS}  ${LIB_PATH} ${LIBS} -o $@ $^ 
+	${LD++} ${CFLAGS} ${INC_PATH} ${LIB_PATH} ${LIBS} -o $@ $^ 
 endef    
-LINK++=$(call linktemplate++)
+LINK++ =$(call linktemplate++)
 
 all: ${TARGET}
 
@@ -49,5 +49,5 @@ all: ${TARGET}
 depfile=$(wildcard *.d)	
 -include ${depfile}
 clean:
-	rm -f *.o *.exe *.d
+	rm -f *.o *.exe *.d ${CLEAN_OBJ}
 	

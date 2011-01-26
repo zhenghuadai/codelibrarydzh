@@ -18,6 +18,12 @@
 
 #include <stdio.h>
 
+/**
+ * @brief test the predefined string 
+ *
+ * @return 
+ *  p == q 
+ */
 int main()
 {
 	char *  p = "you can't do it !";
