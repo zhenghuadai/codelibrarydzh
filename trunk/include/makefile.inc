@@ -5,10 +5,11 @@ LD=$(if $(compiler), $(compiler), gcc)
 LD++=$(if $(compiler), $(compiler), g++)
 #LD++?=g++
 ROOT_PATH=${HOME}
-INC_PATH=${ROOT_PATH}/include
-LIB_PATH=${ROOT_PATH}/lib
+INC_PATH=-I${ROOT_PATH}/include 
+LIB_PATH=-L${ROOT_PATH}/lib
 LIBS+=$(foreach i, ${ext_lib},-l$(i))
-INCS+=$(foreach i, ${ext_inc},-I$(i))
+INC_PATH+=$(foreach i, ${ext_inc},-I$(i))
+LIB_PATH+=$(foreach i, ${ext_libpath},-L$(i))
 XLIBS= -lglut -lGLU -lGL -lXext -lX11 -lm #-lXmu 
 
 ifeq ($(debug),yes)
@@ -22,11 +23,11 @@ endif
 endif
 
 define linktemplate
-	${LD} ${CFLAGS} -I${INC_PATH} -L${LIB_PATH} ${LIBS} -o $@ $^ 
+	${LD} ${CFLAGS}  ${LIB_PATH} ${LIBS} -o $@ $^ 
 endef    
 LINK=$(call linktemplate)
 define linktemplate++
-	${LD++} ${CFLAGS} -I${INC_PATH} -L${LIB_PATH} ${LIBS} -o $@ $^ 
+	${LD++} ${CFLAGS}  ${LIB_PATH} ${LIBS} -o $@ $^ 
 endef    
 LINK++=$(call linktemplate++)
 
@@ -35,14 +36,14 @@ all: ${TARGET}
 all: ${TARGET}
 %.exe:%.c.o  
 	${LINK} 
-    #${LD} ${CFLAGS} -I${INC_PATH} -L${LIB_PATH} ${LIBS} -o $@ $^ 
+    #${LD} ${CFLAGS} -I${INC_PATH} ${LIB_PATH} ${LIBS} -o $@ $^ 
 %.exe:%.cpp.o  
 	${LINK++} 
-    #${LD} ${CFLAGS} -I${INC_PATH} -L${LIB_PATH} ${LIBS} -o $@ $^ 
+    #${LD} ${CFLAGS} -I${INC_PATH} ${LIB_PATH} ${LIBS} -o $@ $^ 
 %.c.o %.o:%.c
-	${CC} ${CFLAGS} ${INCS} -I${INC_PATH} -c $< -o $@ -MMD 
+	${CC} ${CFLAGS}  ${INC_PATH} -c $< -o $@ -MMD 
 %.cpp.o %.o:%.cpp
-	${CXX} ${CFLAGS} ${INCS} -I${INC_PATH} -c $< -o $@ -MMD 
+	${CXX} ${CFLAGS}  ${INC_PATH} -c $< -o $@ -MMD 
 %.xexe:%.cpp
 	$(CXX) -o $@ $< -lpthread ${XLIBS}
 depfile=$(wildcard *.d)	
