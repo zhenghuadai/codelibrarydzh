@@ -55,11 +55,13 @@ recover(){
 }
 
 listBin(){
+	if [ -e "$trashfolder" ]; then
     cd $trashfolder
     for i in * ; do
         fn=$(echo $i | tr "*" "/" )
         echo $fn
     done
+    fi
 }
 ########################### define function end  #############################
 
