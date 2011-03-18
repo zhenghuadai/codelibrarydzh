@@ -34,4 +34,22 @@
 #define in ,
 #define for_each2(a, x) _for_each2(a, x)
 /**  @} */
+#define MAX_LINE_SIZE 4096
+#define _file_foreach(a, fn, x) {\
+    char* a;\
+    FILE* infp;\
+    infp=fopen(fn, "r");\
+    a= (char*) malloc(MAX_LINE_SIZE);\
+    if(infp ==NULL){\
+        printf("can not open %s\n",fn);\
+    }else{\
+        while( fgets(a,MAX_LINE_SIZE,infp)!=NULL){\
+            x;\
+        }\
+        fclose(infp);\
+        free(a);\
+    };\
+}
+#define file_foreach(a, x) _file_foreach(a, x)
+
 

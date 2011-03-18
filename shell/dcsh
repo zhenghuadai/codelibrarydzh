@@ -1,0 +1,48 @@
+#!/bin/bash
+#################################################################
+#\brief help run c/c++ file
+#\example dcsh hello.cpp "hello world"
+#         do: 1. compile hello.cpp 
+#             2. launch hello.exe "hello world"
+#
+################################################################
+shellfile=$1               #/home/ab/cd/ec.cpp
+#echo "$shellfile"
+shift
+args=$@
+#echo $args
+
+if [ ! -e ${DCSH_PATH}/makefile.inc ]; then
+DCSH_PATH=/home/zhdai/googlecode/codelibrarydzh/include
+fi
+
+shellpath=$(dirname $shellfile)        #/home/ab/cd/
+#echo "shellpath: $shellpath"
+shellbase=$(basename $shellfile)       #ec.cpp 
+#echo "$shellbase"
+
+shellbaseprefix=${shellbase%.*}        #ec
+#echo "$shellbaseprefix"
+
+exebase=${shellbaseprefix}.exe         #ec.exe
+#echo $exebase
+
+exefile=${shellpath}/release/${exebase} #/home/ab/cd/release/ec.exe
+#echo $exefile
+
+logfile=${shellpath}/release/log
+
+make -C  $shellpath -f ${DCSH_PATH}/makefile.inc ext_inc=${DCSH_PATH} $exebase  &> $logfile
+buildres=`grep "make: .*Error " $logfile`
+if [ ! -z "$buildres" ]; then
+    colormakeexist=`which colormake.pl`
+    if [ -z "$colormakeexist" ]; then
+        cat $logfile
+    else
+        cat $logfile | colormake.pl 
+    fi
+    exit 1
+fi
+
+$exefile $args
+
