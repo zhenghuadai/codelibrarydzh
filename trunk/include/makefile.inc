@@ -3,6 +3,11 @@ CC=gcc
 CXX=g++
 LD=$(if $(compiler), $(compiler), gcc)
 LD++ =$(if $(compiler), $(compiler), g++)
+LEX++ :=flex
+YACC++ :=bison
+LEX=flex
+YACC=bison
+
 #LD++?=g++
 ROOT_PATH=${HOME}
 INC_PATH=-I${ROOT_PATH}/include 
@@ -24,6 +29,8 @@ CFLAGS:=-O2
 OBJ_DIR =release/
 endif
 endif
+
+CPPFLAGS:=${CFLAGS}
 
 $(shell mkdir -p $(OBJ_DIR))
 
@@ -49,12 +56,16 @@ COMPILE++ =$(call compiletemplate++)
 
 
 define getobjs
-$(foreach i, $1, $(OBJ_DIR)$i.o)
+$(foreach i, $1, $(OBJ_DIR)$(if $(filter ../%,$i),$(subst ..,UP,$i),$i).o)
 endef
 
-all: ${TARGET}
+DEFAULT_OBJS=$(call getobjs, $(SOURCEFILE))
+
+TARGET?=${EXECUTABLE}
 
 all: ${TARGET}
+${EXECUTABLE}:${DEFAULT_OBJS} 
+	${LINK++} 
 %.exe:${OBJ_DIR}%.c.o  
 	${LINK} 
 %.exe:${OBJ_DIR}%.cpp.o  
@@ -65,9 +76,14 @@ all: ${TARGET}
 %.cpp.o %.o ${OBJ_DIR}%.cpp.o ${OBJ_DIR}%.o:%.cpp
 	${COMPILE++}
 
+${OBJ_DIR}UP/%.cpp.o:$(subst UP,..,UP/%.cpp) 
+	${COMPILE++}
+
 %.xexe:%.cpp
 	$(CXX) -o $@ $< -lpthread ${XLIBS}
-depfile=$(wildcard *.d)	
+
+    
+depfile=$(wildcard ${OBJ_DIR}*.d)	
 -include ${depfile}
 clean:
 	rm -f *.o *.exe *.d ${CLEAN_OBJ}
