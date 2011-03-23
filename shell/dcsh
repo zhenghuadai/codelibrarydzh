@@ -30,9 +30,10 @@ exebase=${shellbaseprefix}.exe         #ec.exe
 exefile=${shellpath}/release/${exebase} #/home/ab/cd/release/ec.exe
 #echo $exefile
 
-logfile=${shellpath}/release/log
+logfile=${shellpath}/.${shellbaseprefix}.log
 
-make -C  $shellpath -f ${DCSH_PATH}/makefile.inc ext_inc=${DCSH_PATH} $exebase  &> $logfile
+ext_lib=`awk -F "[\"<>]" '/\/\/!require/{printf("%s ", $2)}' $shellfile` 
+make -C  $shellpath -f ${DCSH_PATH}/makefile.inc ext_inc=${DCSH_PATH} ext_lib="${ext_lib}" $exebase  &> $logfile
 buildres=`grep "make: .*Error " $logfile`
 if [ ! -z "$buildres" ]; then
     colormakeexist=`which colormake.pl`
@@ -44,5 +45,6 @@ if [ ! -z "$buildres" ]; then
     exit 1
 fi
 
+rm -f $logfile
 $exefile $args
 

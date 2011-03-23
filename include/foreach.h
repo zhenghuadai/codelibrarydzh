@@ -13,6 +13,8 @@
  *       Company  
  * =====================================================================================
  */
+#define CAPI
+#define CSTATIC
 /**
 * @name 
   @example 
@@ -32,6 +34,7 @@
     }\
 }
 #define in ,
+CAPI
 #define for_each2(a, x) _for_each2(a, x)
 /**  @} */
 #define MAX_LINE_SIZE 4096
@@ -50,6 +53,8 @@
         free(a);\
     };\
 }
-#define file_foreach(a, x) _file_foreach(a, x)
+
+CAPI
+#define file_eachline(a, x) _file_foreach(a, x)
 
 

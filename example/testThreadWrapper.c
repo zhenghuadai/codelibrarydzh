@@ -15,6 +15,8 @@
 *
 * =====================================================================================
 */
+//!require "pthread"
+//!require <m>
 #define THREAD_NUM 2
 #include "threadWrapper.h"
 #include "threadPool.h"
