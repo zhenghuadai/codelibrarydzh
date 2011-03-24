@@ -1,6 +1,6 @@
 MPICC=mpic++ #/usr/bin/mpic++
-CC=gcc
-CXX=g++
+CC=$(if $(compiler), $(compiler), gcc)
+CXX=$(if $(compiler), $(compiler), g++)
 LD=$(if $(compiler), $(compiler), gcc)
 LD++ =$(if $(compiler), $(compiler), g++)
 LEX++ :=flex
@@ -33,7 +33,7 @@ endif
 CPPFLAGS:=${CFLAGS}
 
 $(shell mkdir -p $(OBJ_DIR))
-
+##############define template###########################################
 define linktemplate
 	${LD}   ${CFLAGS} ${INC_PATH} ${LIB_PATH} ${LIBS} -o ${OBJ_DIR}$@ $^ 
 endef    
@@ -58,14 +58,16 @@ COMPILE++ =$(call compiletemplate++)
 define getobjs
 $(foreach i, $1, $(OBJ_DIR)$(if $(filter ../%,$i),$(subst ..,UP,$i),$i).o)
 endef
+##############define template###########################################
 
 DEFAULT_OBJS=$(call getobjs, $(SOURCEFILE))
+DEFAULT_LINK=$(if $(filter %.cpp, $(SOURCEFILE)),${LINK++}, ${LINK})
 
 TARGET?=${EXECUTABLE}
 
 all: ${TARGET}
 ${EXECUTABLE}:${DEFAULT_OBJS} 
-	${LINK++} 
+	${DEFAULT_LINK} 
 %.exe:${OBJ_DIR}%.c.o  
 	${LINK} 
 %.exe:${OBJ_DIR}%.cpp.o  

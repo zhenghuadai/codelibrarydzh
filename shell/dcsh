@@ -13,7 +13,7 @@ args=$@
 #echo $args
 
 if [ ! -e ${DCSH_PATH}/makefile.inc ]; then
-DCSH_PATH=/home/zhdai/googlecode/codelibrarydzh/include
+DCSH_PATH=~/googlecode/codelibrarydzh/include
 fi
 
 shellpath=$(dirname $shellfile)        #/home/ab/cd/
@@ -32,8 +32,12 @@ exefile=${shellpath}/release/${exebase} #/home/ab/cd/release/ec.exe
 
 logfile=${shellpath}/.${shellbaseprefix}.log
 
-ext_lib=`awk -F "[\"<>]" '/\/\/!require/{printf("%s ", $2)}' $shellfile` 
-make -C  $shellpath -f ${DCSH_PATH}/makefile.inc ext_inc=${DCSH_PATH} ext_lib="${ext_lib}" $exebase  &> $logfile
+requirelist=`awk -F "[\"<>]" '/\/\/!require/{printf("%s ", $2)}' $shellfile` 
+requiresrcfile=`echo $requirelist | awk '{for(i=1;i<=NF;i++) { if($i ~ /\.c(pp)?$/)printf("%s ", $i)}}'`  
+sourcefile="$requiresrcfile $shellbase"
+ext_lib=`echo $requirelist | awk '{for(i=1;i<=NF;i++) { if($i !~ /\.c(pp)?$/)printf("%s ", $i)}}'`
+
+make -C  $shellpath -f ${DCSH_PATH}/makefile.inc ext_inc=${DCSH_PATH} ext_lib="${ext_lib}" SOURCEFILE="${sourcefile}" EXECUTABLE="$exebase"  &> $logfile
 buildres=`grep "make: .*Error " $logfile`
 if [ ! -z "$buildres" ]; then
     colormakeexist=`which colormake.pl`
