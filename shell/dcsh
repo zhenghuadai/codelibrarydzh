@@ -35,9 +35,10 @@ logfile=${shellpath}/.${shellbaseprefix}.log
 requirelist=`awk -F "[\"<>]" '/\/\/!require/{printf("%s ", $2)}' $shellfile` 
 requiresrcfile=`echo $requirelist | awk '{for(i=1;i<=NF;i++) { if($i ~ /\.c(pp)?$/)printf("%s ", $i)}}'`  
 sourcefile="$requiresrcfile $shellbase"
-ext_lib=`echo $requirelist | awk '{for(i=1;i<=NF;i++) { if($i !~ /\.c(pp)?$/)printf("%s ", $i)}}'`
+inc_path=`echo $requirelist | awk '{for(i=1;i<=NF;i++) { if($i ~ /.*\/$/)printf("%s ", $i)}}'`
+ext_lib=`echo $requirelist | awk '{for(i=1;i<=NF;i++) { if(($i !~ /\.c(pp)?$/)&&($i !~ /.*\/$/))printf("%s ", $i)}}'`
 
-make -C  $shellpath -f ${DCSH_PATH}/makefile.inc ext_inc=${DCSH_PATH} ext_lib="${ext_lib}" SOURCEFILE="${sourcefile}" EXECUTABLE="$exebase"  &> $logfile
+make -C  $shellpath -f ${DCSH_PATH}/makefile.inc ext_inc="${DCSH_PATH} ${inc_path}" ext_lib="${ext_lib}" ext_libpath="${inc_path}" SOURCEFILE="${sourcefile}" EXECUTABLE="$exebase"  &> $logfile
 buildres=`grep "make: .*Error " $logfile`
 if [ ! -z "$buildres" ]; then
     colormakeexist=`which colormake.pl`
