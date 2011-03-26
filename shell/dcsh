@@ -6,8 +6,20 @@
 #             2. launch hello.exe "hello world"
 #
 ################################################################
+############# function ###################################################
+printhelp(){
+    echo "dcsh shell_file_name"
+    echo "for example:"
+    echo "  dcsh file.cpp"
+    echo "  dcsh file.c"
+}
+############# function ###################################################
 shellfile=$1               #/home/ab/cd/ec.cpp
 #echo "$shellfile"
+if [ $# = 0 ]; then
+    printhelp
+    exit 0 
+fi
 shift
 args=$@
 #echo $args
@@ -52,4 +64,3 @@ fi
 
 rm -f $logfile
 $exefile $args
-
