@@ -38,7 +38,7 @@ CAPI
 #define for_each2(a, x) _for_each2(a, x)
 /**  @} */
 #define MAX_LINE_SIZE 4096
-#define _file_foreach(a, fn, x) {\
+#define _file_foreach_line(a, fn, x) {\
     char* a;\
     FILE* infp;\
     infp=fopen(fn, "r");\
@@ -54,7 +54,23 @@ CAPI
     };\
 }
 
-CAPI
-#define file_eachline(a, x) _file_foreach(a, x)
+#define _file_foreach_byte(a, fn, x) {\
+    char a;\
+    FILE* infp;\
+    infp=fopen(fn, "r");\
+    if(infp ==NULL){\
+        printf("can not open %s\n",fn);\
+    }else{\
+            while(((a=fgetc(infp))!=EOF) ){\
+            x;\
+        }\
+        fclose(infp);\
+    };\
+}
+
+
+CAPI 
+#define file_eachline(a, x) _file_foreach_line(a, x)
+#define file_eachbyte(a, x) _file_foreach_byte(a, x)
 
 
