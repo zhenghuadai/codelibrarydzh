@@ -25,7 +25,12 @@ args=$@
 #echo $args
 
 if [ ! -e ${DCSH_PATH}/makefile.inc ]; then
-DCSH_PATH=~/googlecode/codelibrarydzh/include
+    DCSH_PATH=~/googlecode/codelibrarydzh/include
+fi
+
+if [ ! -e $shellfile ]; then
+    echo "$shellfile: No such file or directory"
+    exit 0
 fi
 
 shellpath=$(dirname $shellfile)        #/home/ab/cd/
@@ -35,6 +40,13 @@ shellbase=$(basename $shellfile)       #ec.cpp
 
 shellbaseprefix=${shellbase%.*}        #ec
 #echo "$shellbaseprefix"
+
+shellbasesuffix=${shellbase##*.}        #ec
+#echo "$shellbasesuffix"
+if [ "$shellbasesuffix" != "cpp" ] && [ "$shellbasesuffix" != "cpp" ]; then
+    echo "dcsh can only parse c source file"
+    exit 0
+fi
 
 exebase=${shellbaseprefix}.exe         #ec.exe
 #echo $exebase
