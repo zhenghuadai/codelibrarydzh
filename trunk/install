@@ -7,14 +7,16 @@ mkdir -p ${target_dir}/bin
 install -t ${target_dir}/include include/*.h include/*.hxx  include/*.hcc include/*.inc
 install -t ${target_dir}/bin shell/* 
 
-#DCSH_PATH_EXIST=`sed -n ":DCSH_PATH.*${target_dir}:p" ~/.bashrc`
-DCSH_PATH_EXIST=`grep "DCSH_PATH.*${target_dir}" ~/.bashrc`
-if [ -z "`grep 'DCSH_PATH.*${target_dir}/include' ~/.bashrc`" ]; then
+DCSH_PATH_EXIST=`grep "DCSH_PATH=${target_dir}/include" ~/.bashrc`
+if [ -z "$DCSH_PATH_EXIST" ]; then
     echo "export DCSH_PATH=$target_dir/include" >> ~/.bashrc 
 fi
-if [ -z "`grep 'PATH.*${target_dir}/bin' ~/.bashrc`" ]; then
+
+DCSH_BINPATH_EXIST=`grep "PATH.*${target_dir}/bin" ~/.bashrc`
+if [ -z "$DCSH_BINPATH_EXIST" ]; then
     echo "export PATH=\$PATH:$target_dir/bin" >> ~/.bashrc 
 fi
+
 if [ -z "`grep 'alias rm=' ~/.bashrc`" ]; then
     echo "alias rm=$target_dir/bin/rm" >> ~/.bashrc 
     echo "alias unrm=$target_dir/bin/rm -u" >> ~/.bashrc 
