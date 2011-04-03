@@ -15,7 +15,7 @@
  *
  * =====================================================================================
  */
-//!require "testfoo.c"
+//!require "dcsh.example.foo.c"
 extern void foo();
 int main()
 {
