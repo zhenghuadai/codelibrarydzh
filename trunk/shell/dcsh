@@ -43,7 +43,7 @@ shellbaseprefix=${shellbase%.*}        #ec
 
 shellbasesuffix=${shellbase##*.}        #ec
 #echo "$shellbasesuffix"
-if [ "$shellbasesuffix" != "cpp" ] && [ "$shellbasesuffix" != "cpp" ]; then
+if [ "$shellbasesuffix" != "cpp" ] && [ "$shellbasesuffix" != "c" ]; then
     echo "dcsh can only parse c source file"
     exit 0
 fi
@@ -63,7 +63,7 @@ inc_path=`echo $requirelist | awk '{for(i=1;i<=NF;i++) { if($i ~ /.*\/$/)printf(
 ext_lib=`echo $requirelist | awk '{for(i=1;i<=NF;i++) { if(($i !~ /\.c(pp)?$/)&&($i !~ /.*\/$/))printf("%s ", $i)}}'`
 
 make -C  $shellpath -f ${DCSH_PATH}/makefile.inc ext_inc="${DCSH_PATH} ${inc_path}" ext_lib="${ext_lib}" ext_libpath="${inc_path}" SOURCEFILE="${sourcefile}" EXECUTABLE="$exebase"  &> $logfile
-buildres=`grep "make: .*Error " $logfile`
+buildres=`grep -E "(make: .*Error |make: \*\*\* No rule to make target)" $logfile`
 if [ ! -z "$buildres" ]; then
     colormakeexist=`which colormake.pl`
     if [ -z "$colormakeexist" ]; then
@@ -74,5 +74,5 @@ if [ ! -z "$buildres" ]; then
     exit 1
 fi
 
-rm -f $logfile
+#rm -f $logfile
 $exefile $args
