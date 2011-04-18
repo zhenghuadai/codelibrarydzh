@@ -13,8 +13,58 @@
  *       Company  
  * =====================================================================================
  */
+#include <vector>
+#include <iostream>
+#include <algorithm>
 #define CAPI
 #define CSTATIC
+#define in ,
+template<class T>
+class typeadapter{
+    public: 
+        typedef typename T::iterator iterator;    
+        typedef typename T::value_type value_type ;    
+};
+
+template<class T>
+class typeadapter<T*>{
+    public: 
+        typedef T* iterator;    
+        typedef T value_type;    
+};
+
+
+template<class T, int N>
+class typeadapter<T[N]>{
+    public: 
+        typedef T* iterator;    
+        typedef T value_type;    
+};
+
+template<class T>
+size_t size(T& t, size_t _sizeofT)
+{
+    return t.size();
+}
+
+template<class T>
+size_t size(T* t, size_t sizeoft)
+{
+    return sizeoft/sizeof(T);
+}
+
+template<class T>
+typename typeadapter<T>::iterator start(T& t)
+{
+    return t.begin();
+}
+
+template<class T>
+T* start(T* t)
+{
+    return t;
+}
+
 /**
 * @name 
   @example 
@@ -26,17 +76,21 @@
    cout<< a << endl;
    ;}));
  * @{ */
+    //for(i=vec.begin(); i!=ivec.end();i++){\
+    
 #define _for_each2(a, vec, x) {\
-    typeadapter<typeof(vec)>::iterator i ;\
-    for(i=vec.begin(); i!=ivec.end();i++){\
-        typeadapter<typeof(vec)>::value_type &a = *i;\
+    typeadapter<typeof(vec)>::iterator _m_it ;\
+    int _m_i;\
+    for(_m_i=0, _m_it=start(vec)/*  vec.begin()*/; _m_i<size(vec, sizeof(vec));_m_i++, _m_it++){\
+        typeadapter<typeof(vec)>::value_type &a = *_m_it;\
         x;\
     }\
 }
-#define in ,
+
 CAPI
-#define for_each2(a, x) _for_each2(a, x)
+#define foreach(a, x) _for_each2(a, x)
 /**  @} */
+
 #define MAX_LINE_SIZE 4096
 #define _file_foreach_line(a, fn, x) {\
     char* a;\
