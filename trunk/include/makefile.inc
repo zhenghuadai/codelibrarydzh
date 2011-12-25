@@ -48,9 +48,19 @@ define compiletemplate
 	${CC} ${CFLAGS}  ${INC_PATH} -c $< -o $@ -MMD 
 endef    
 COMPILE=$(call compiletemplate)
+
+#define compiletemplate++
+#	@test -x ${dir $@} || mkdir -p ${dir $@} 
+#	${CXX} ${CFLAGS}  ${INC_PATH} -c $< -o $@ -MMD ;\
+#endef    
 define compiletemplate++
 	@test -x ${dir $@} || mkdir -p ${dir $@} 
-	${CXX} ${CFLAGS}  ${INC_PATH} -c $< -o $@ -MMD 
+	ch2=`head -c 2 $<`; if [ "$$ch2" != '#!' ]; then \
+	${CXX} ${CFLAGS}  ${INC_PATH} -c $< -o $@ -MMD ;\
+	else \
+	tail --lines=+2 $< > ${dir $@}/$<.cpp;\
+	${CXX} ${CFLAGS}  ${INC_PATH} -c ${dir $@}/$<.cpp -o $@ -MMD ;\
+	fi;
 endef    
 COMPILE++ =$(call compiletemplate++)
 
