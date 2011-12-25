@@ -91,6 +91,7 @@ set autoread
 " With a map leader it's possible to do extra key combinations
 " like <leader>w saves the current file
 let mapleader = ","
+let mapleader2 = "."
 let g:mapleader = ","
 
 " Fast saving
@@ -573,11 +574,47 @@ nnoremap <silent> <leader>ff :call g:FormatC()<cr>
 "
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 au BufNewFile,BufRead *.chpl setf chpl
+au BufNewFile *.html :call C_InsertTemplate("html.framework")
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-map ,a :DoxAuthor<cr>
-map ,f :Dox<cr>
-map ,b :DoxBlock<cr>
-map ,c O/** */<Left><Left><cr>
+function! g:makeself()
+exe ':!make %:t:r.exe 2&> /tmp/OpIeXKK.errlog'
+exe ':cfile /tmp/OpIeXKK.errlog'
+exe ':cw'
+endfunction
+
+function! Ruby_InsertClassComment()
+   " let s:C_Macro["CLASSNAME"] ="abc"
+    call C_InsertTemplate("ruby.comment.class")
+endfunction
+
+map <leader>da :DoxAuthor<cr>
+map <leader>df :Dox<cr>
+map <leader>db :DoxBlock<cr>
+map <leader>dc O/** */<Left><Left><cr>
+map <leader>dh :call C_InsertTemplate("doxygen.comment.file-description")<CR>
+map <leader>rf :call C_InsertTemplate("ruby.comment")<CR>
+"map <leader>rc :call C_InsertTemplate("ruby.comment.class")<CR>
+map <leader>rc :call Ruby_InsertClassComment()<CR>
+
+map <leader>mm :call g:makeself()<CR>
+nmap .s :cs find s <C-R>=expand("<cword>")<CR><CR>	
+nmap .g :cs find g <C-R>=expand("<cword>")<CR><CR>	
+nmap .c :cs find c <C-R>=expand("<cword>")<CR><CR>	
+nmap .t :cs find t <C-R>=expand("<cword>")<CR><CR>	
+nmap .e :cs find e <C-R>=expand("<cword>")<CR><CR>	
+nmap .f :cs find f <C-R>=expand("<cfile>")<CR><CR>	
+nmap .i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
+nmap .d :cs find d <C-R>=expand("<cword>")<CR><CR>	
+
+map <leader>, :previous<CR>
+map .. :next<CR>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set encoding=utf-8
+set fileencodings=utf-8,gb2312,gb18030,gbk,ucs-bom,cp936,latin1
+set termencoding=utf-8
