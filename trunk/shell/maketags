@@ -1,4 +1,8 @@
 #!/bin/bash
+if [ "$1" == "clean" ]; then
+    rm -f cscope.out cscope.in.out cscope.po.out tags
+    exit 0
+fi
 find . \( -name "*.h" -o -name "*.c" -o -name "*.cc" -o -name "*.cpp" -o -name "*.cxx" -o -name "*.hpp" -o -name "*.hxx" -o -name "*.cu" \) -a -type f > cscope.files
 cscope -bkq -i cscope.files
 rm cscope.files
