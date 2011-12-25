@@ -116,6 +116,21 @@ static THREAD_LOCAL funcInfo_t global_funcInfo;
 
 #ifdef _PTHREAD
 #define push2stack(v) {(*(typeof(v)*)pcur)=v; pcur += _INTSIZEOF(typeof(v));}
+/** 
+--- -----------  ---
+EBP UPPER EBP    ESP
+--- -----------  ---
+    RET ADDRESS
+    -----------
+    ARG0
+    -----------
+    ARG1
+    -----------
+    ...
+    -----------
+    ARGn
+    -----------
+*/
 
 /* 
  * ===  FUNCTION  ======================================================================

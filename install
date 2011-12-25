@@ -1,7 +1,6 @@
 #!/bin/bash
 
-target_dir_input=${1:-~/usr/}
-target_dir=${target_dir_input/~/$HOME/}
+target_dir=${1:-/$HOME/usr/}
 mkdir -p ${target_dir}/include
 mkdir -p ${target_dir}/bin
 install -t ${target_dir}/include include/*.h include/*.hxx  include/*.hcc include/*.inc
