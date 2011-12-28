@@ -132,6 +132,7 @@ EBP UPPER EBP    ESP
     -----------
 */
 
+#if __WORDSIZE == 32
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  call_stdfunc
@@ -164,12 +165,105 @@ inline void call_cdeclfunc(void* func, int argSize, void* arg)
             "rep movsb\n"
             "call *%%eax\n"
             :
-            :"a"(func),"r"(argSize), "S"(arg)
+            :"a"(func),"c"(argSize), "S"(arg)
             :"%edi", "%edx");
        __asm__("addl %0, %%esp\n"::"m"(argSize)); /* if not stdcall, do this.
     //   Beacause, the stdcall will clean up the stack itself.
     //             the cdecl will not. So we have to clean the stack after cdecl call.*/
 }
+#elif __WORDSIZE == 64
+//! x86_64 arguments :rdi, rsi, rdx, rcx, r8, r9
+inline void call_stdfunc(void* func, int argSize, void* arg)
+{
+    switch(argSize >> 3){
+        case 0:
+            __asm__(
+                    "call *%%rax\n"
+                    :
+                    :"a"(func), "b"(arg));
+            break;
+        case 1:
+            __asm__(
+                    "movq (%%rbx), %%rdi\n"
+                    "call *%%rax\n"
+                    :
+                    :"a"(func), "b"(arg));
+            break;
+        case 2:
+            __asm__(
+                    "movq (%%rbx), %%rdi\n"
+                    "movq 8(%%rbx), %%rsi\n"
+                    "call *%%rax\n"
+                    :
+                    :"a"(func), "b"(arg));
+            break;
+        case 3:
+            __asm__(
+                    "movq (%%rbx), %%rdi\n"
+                    "movq 8(%%rbx), %%rsi\n"
+                    "movq 16(%%rbx), %%rdx\n"
+                    "call *%%rax\n"
+                    :
+                    :"a"(func), "b"(arg));
+            break;
+        case 4:
+            __asm__(
+                    "movq (%%rbx), %%rdi\n"
+                    "movq 8(%%rbx), %%rsi\n"
+                    "movq 16(%%rbx), %%rdx\n"
+                    "movq 24(%%rbx), %%rcx\n"
+                    "call *%%rax\n"
+                    :
+                    :"a"(func), "b"(arg));
+            break;
+        case 5:
+            __asm__(
+                    "movq (%%rbx), %%rdi\n"
+                    "movq 8(%%rbx), %%rsi\n"
+                    "movq 16(%%rbx), %%rdx\n"
+                    "movq 24(%%rbx), %%rcx\n"
+                    "movq 32(%%rbx), %%r8\n"
+                    "call *%%rax\n"
+                    :
+                    :"a"(func), "b"(arg));
+            break;
+        case 6:
+            __asm__(
+                    "movq (%%rbx), %%rdi\n"
+                    "movq 8(%%rbx), %%rsi\n"
+                    "movq 16(%%rbx), %%rdx\n"
+                    "movq 24(%%rbx), %%rcx\n"
+                    "movq 32(%%rbx), %%r8\n"
+                    "movq 40(%%rbx), %%r9\n"
+                    "call *%%rax\n"
+                    :
+                    :"a"(func), "b"(arg));
+            break;
+        default:
+            __asm__ __volatile__ (
+                    "subq %%rcx, %%rsp\n"
+                    "movq %%rsp, %%rdi\n"
+                    "rep movsb\n"
+                    "movq %%rsp, %%rbx\n"
+                    "movq (%%rbx), %%rdi\n"
+                    "movq 8(%%rbx), %%rsi\n"
+                    "movq 16(%%rbx), %%rdx\n"
+                    "movq 24(%%rbx), %%rcx\n"
+                    "movq 32(%%rbx), %%r8\n"
+                    "movq 40(%%rbx), %%r9\n"
+                    "call *%%rax\n"
+                    :
+                    :"a"(func),"c"(argSize - 6 * sizeof(long)), "S"(arg)
+                    :"%rdi", "%rdx");
+            break;
+    }
+}
+
+inline void call_cdeclfunc(void* func, int argSize, void* arg)
+{
+    call_stdfunc(func,argSize,arg);
+}
+#endif
 #else      /* -----  not _PTHREAD  ----- */
 #define typeof(x) x
 #define push2stack(v){ switch(_INTSIZEOF(typeof(v))) {\
