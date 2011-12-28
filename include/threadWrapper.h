@@ -264,7 +264,7 @@ tMutex= /*CreateSemaphore(NULL, 1, 1, NULL); */CreateMutex(NULL,FALSE , 0);
 #endif   /* ----- #ifndef _PTHREAD  ----- */
 
 #ifndef _INTSIZEOF 
-#define _INTSIZEOF(n)  ((sizeof(n)+sizeof(int)-1)&~(sizeof(int) - 1) )
+#define _INTSIZEOF(n)  ((sizeof(n)+sizeof(long)-1)&~(sizeof(long) - 1) )
 #endif
 
 #include "threadLauncher.h"

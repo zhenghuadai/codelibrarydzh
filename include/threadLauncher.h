@@ -8,8 +8,11 @@
 #define pushArgtoStack2( a00, a01)	pushArgtoStack1(a00) push2stack(a01); 
 #define pushArgtoStack3( a00, a01, a02)	pushArgtoStack2(a00,a01) push2stack(a02); 
 #define pushArgtoStack4( a00, a01, a02, a03)	pushArgtoStack3(a00,a01,a02) push2stack(a03); 
-#define pushArgtoStack5( a00, a01, a02, a03,a04)	pushArgtoStack4(a00,a01,a02,a03) push2stack(a03); 
-#define pushArgtoStack6( a00, a01, a02, a03,a04,a05)	pushArgtoStack5(a00,a01,a02,a03,a04) push2stack(a03); 
+#define pushArgtoStack5( a00, a01, a02, a03,a04)	pushArgtoStack4(a00,a01,a02,a03) push2stack(a04); 
+#define pushArgtoStack6( a00, a01, a02, a03,a04,a05)	pushArgtoStack5(a00,a01,a02,a03,a04) push2stack(a05); 
+#define pushArgtoStack7( a00, a01, a02, a03,a04,a05,a06)	pushArgtoStack6(a00,a01,a02,a03,a04,a05) push2stack(a06); 
+#define pushArgtoStack8( a00, a01, a02, a03,a04,a05,a06,a07)	pushArgtoStack7(a00,a01,a02,a03,a04,a05,a06) push2stack(a07); 
+#define pushArgtoStack9( a00, a01, a02, a03,a04,a05,a06,a07,a08)	pushArgtoStack8(a00,a01,a02,a03,a04,a05,a06,a07) push2stack(a08); 
 /******************************************************************************
  *                                                                            *
  ***************************** launch(launch) ****************************    *
@@ -241,10 +244,12 @@ inline void call_stdfunc(void* func, int argSize, void* arg)
             break;
         default:
             __asm__ __volatile__ (
+                    "movq %%rsp, %%r10\n"
                     "subq %%rcx, %%rsp\n"
                     "movq %%rsp, %%rdi\n"
+                    "movq %%rbx, %%rsi\n"
+                    "addq $48, %%rsi\n"
                     "rep movsb\n"
-                    "movq %%rsp, %%rbx\n"
                     "movq (%%rbx), %%rdi\n"
                     "movq 8(%%rbx), %%rsi\n"
                     "movq 16(%%rbx), %%rdx\n"
@@ -252,9 +257,10 @@ inline void call_stdfunc(void* func, int argSize, void* arg)
                     "movq 32(%%rbx), %%r8\n"
                     "movq 40(%%rbx), %%r9\n"
                     "call *%%rax\n"
+                    "movq %%r10, %%rsp\n"
                     :
-                    :"a"(func),"c"(argSize - 6 * sizeof(long)), "S"(arg)
-                    :"%rdi", "%rdx");
+                    :"a"(func),"c"(argSize - 6 * sizeof(long)), "b"(arg)
+                    :"%rdi", "%rdx","%r10","%rsi");
             break;
     }
 }
@@ -425,6 +431,14 @@ slaunchTemplateThread();
 ///////////////////// 4 args ///////////////////////////////////////////
 #define slaunchArg4(a00,a01,a02,a03) slaunchArg_part0 pushArgtoStack4(a00,a01,a02,a03) slaunchArg_part2
 #define slaunch4(sfunc) slauncher_header(sfunc,4) 
+///////////////////// 5 args ///////////////////////////////////////////
+#define slaunchArg5(a00,a01,a02,a03,a04) slaunchArg_part0 pushArgtoStack5(a00,a01,a02,a03,a04) slaunchArg_part2
+#define slaunch5(sfunc) slauncher_header(sfunc,5) 
+///////////////////// 8 args ///////////////////////////////////////////
+#define slaunchArg8(a00,a01,a02,a03,a04,a05,a06,a07) slaunchArg_part0 pushArgtoStack8(a00,a01,a02,a03,a04,a05,a06,a07) slaunchArg_part2
+#define slaunch8(sfunc) slauncher_header(sfunc,8) 
+/******************************************************************************
+ *                                                                            *
 /******************************************************************************
  *                                                                            *
  ***************************** launch task to an idle thread (dlaunch) ********
