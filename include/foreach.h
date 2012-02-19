@@ -16,6 +16,7 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <string.h>
 #define CAPI
 #define CSTATIC
 #define in ,
@@ -53,6 +54,11 @@ size_t size(T* t, size_t sizeoft)
     return sizeoft/sizeof(T);
 }
 
+inline size_t size(char* t, size_t sizeoft)
+{
+    return strlen(t);
+}
+
 template<class T>
 typename typeadapter<T>::iterator start(T& t)
 {
@@ -81,7 +87,8 @@ T* start(T* t)
 #define _for_each2(a, vec, x) {\
     typeadapter<typeof(vec)>::iterator _m_it ;\
     int _m_i;\
-    for(_m_i=0, _m_it=start(vec)/*  vec.begin()*/; _m_i<size(vec, sizeof(vec));_m_i++, _m_it++){\
+    size_t _m_end = size(vec, sizeof(vec));\
+    for(_m_i=0, _m_it=start(vec)/*  vec.begin()*/; _m_i<_m_end;_m_i++, _m_it++){\
         typeadapter<typeof(vec)>::value_type &a = *_m_it;\
         x;\
     }\
@@ -89,6 +96,9 @@ T* start(T* t)
 
 CAPI
 #define foreach(a, x) _for_each2(a, x)
+
+#define $_ ({
+#define _$ ;})
 /**  @} */
 
 #define MAX_LINE_SIZE 4096

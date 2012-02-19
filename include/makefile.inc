@@ -85,7 +85,7 @@ ${EXECUTABLE}:${DEFAULT_OBJS}
 
 %.c.o %.o ${OBJ_DIR}%.c.o ${OBJ_DIR}%.o :%.c
 	${COMPILE}
-%.cpp.o %.o ${OBJ_DIR}%.cpp.o ${OBJ_DIR}%.o:%.cpp
+${OBJ_DIR}%.cpp.o ${OBJ_DIR}%.o %.cpp.o %.o :%.cpp
 	${COMPILE++}
 
 ${OBJ_DIR}UP/%.cpp.o:$(subst UP,..,UP/%.cpp) 
