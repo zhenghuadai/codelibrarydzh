@@ -21,7 +21,6 @@
 void printElem(int& elem) {
     std::cout << elem << std::endl;
 }
-
 #include <stdio.h>
 #include <stdlib.h>
 int test_file_each(int argc, char** argv)
@@ -60,9 +59,21 @@ int test_each(int argc, char** argv)
                 std::cout<< a << std::endl;
                 ;}));
 
-    foreach(a in s, ({
+    foreach(a in s, $_{ 
                 std::cout<< a<<std::endl;
-                ;}));
+                }_$);
+
+    char c[] = "hello world\n";
+    foreach(a in c, $_{ 
+                std::cout<< a;
+                }_$);
+    std::cout<<std::endl;
+
+    char* c1= "hello world\n";
+    foreach(a in c1, $_{ 
+                std::cout<< a;
+                }_$);
+    std::cout<<std::endl;
 }
 
 int main(int argc, char** argv)

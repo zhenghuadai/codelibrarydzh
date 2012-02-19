@@ -21,17 +21,27 @@ static void __ticket_spin_lock( int lock)
 			:
 			: "memory", "cc", "%eax");
 }
+int abc;
+void testasm1()
+{
+    __asm__(
+            "mov %0, %%ecx\n"
+            :
+            :"m"(abc)
+           );
+}
+
 int main(){
-	unsigned long long a,b;
-	int ia=0;
-	a = getrdtsc();
-	b = getrdtsc();
-	//	asm("addl $1, %a0"::"r"(ia));
-	//asm("addl $1, %w0"::"r"(ia));
-	//asm("addb $1, %a0"::"r"(ia));
-	//asm("addb $1, %b0"::"r"(ia));
-	//asm("addl $1, %b1"::"r"(ia));
-	//asm("addb $1, %h0"::"r"(ia));
-	printf("%ld\n", b -a);
-	//asm("addb $1, %b0"::"r"(ia));
+    unsigned long long a,b;
+    int ia=0;
+    a = getrdtsc();
+    b = getrdtsc();
+    //	asm("addl $1, %a0"::"r"(ia));
+    //asm("addl $1, %w0"::"r"(ia));
+    //asm("addb $1, %a0"::"r"(ia));
+    //asm("addb $1, %b0"::"r"(ia));
+    //asm("addl $1, %b1"::"r"(ia));
+    //asm("addb $1, %h0"::"r"(ia));
+    printf("%ld\n", b -a);
+    //asm("addb $1, %b0"::"r"(ia));
 }
