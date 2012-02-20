@@ -17,6 +17,7 @@
 #include <iostream>
 #include <algorithm>
 #include <string.h>
+#include <stdio.h>
 #define CAPI
 #define CSTATIC
 #define in ,
@@ -94,15 +95,36 @@ CAPI
 /**  @} */
 
 #define MAX_LINE_SIZE 4096
+static inline size_t fgetline(char*& a, size_t& buflen, FILE* infp)
+{
+    size_t n  = 0;
+    char* p = a;
+    char* s = p;
+    int l0 = buflen;
+    while(fgets(p,l0,infp)!=NULL){
+       while((*p != 0 )&&(*p != '\n'))p++;
+       if((p-a) == buflen -1) {
+           char* r = (char*) malloc( buflen + MAX_LINE_SIZE);
+           for( int i =0; i< buflen ;i++) r[i] = a[i];
+           p = r + buflen;
+           buflen += MAX_LINE_SIZE;
+           free(a);
+           a = r;
+           l0 = MAX_LINE_SIZE;
+       }
+    }
+    return (p -a);
+}
 #define _file_foreach_line(a, fn, x) {\
     char* a;\
+    size_t buf_size = MAX_LINE_SIZE;\
     FILE* infp;\
     infp=fopen(fn, "r");\
     a= (char*) malloc(MAX_LINE_SIZE);\
     if(infp ==NULL){\
         printf("can not open %s\n",fn);\
     }else{\
-        while( fgets(a,MAX_LINE_SIZE,infp)!=NULL){\
+        while( fgetline(a,buf_size,infp)!=0){\
             x;\
         }\
         fclose(infp);\
