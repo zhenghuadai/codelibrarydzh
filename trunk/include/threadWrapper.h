@@ -275,7 +275,7 @@ tMutex= /*CreateSemaphore(NULL, 1, 1, NULL); */CreateMutex(NULL,FALSE , 0);
 #ifdef __cplusplus
 #define ATOM(s)  for(int tmpvar(__LINE__)=0,t=(P(s),1); tmpvar(__LINE__)<1;tmpvar(__LINE__)++, (V(s))) 
 #else
-static tmp_index = 0;
+static THREAD_LOCAL tmp_index = 0;
 #define ATOM(s)  for(tmp_index=0,(P(s),1); tmp_index<1;tmp_index++, (V(s))) 
 #endif
 

@@ -110,7 +110,8 @@ typedef struct{
 }funcInfo_t;
 typedef funcInfo_t task_t;
 enum{mem_stack=0 ,mem_heap=1};
-inline task_t* create_task(){
+
+static inline task_t* create_task(){
     task_t* t = (task_t*)calloc(sizeof(task_t),1);
     t->flag=mem_heap;
     return t;
@@ -145,7 +146,7 @@ EBP UPPER EBP    ESP
  *      Example:  call_stdfunc
  * =====================================================================================
  */
-inline void call_stdfunc(void* func, int argSize, void* arg)
+static inline void call_stdfunc(void* func, int argSize, void* arg)
 {
     __asm__(
             "subl %%ecx, %%esp\n"
@@ -160,7 +161,7 @@ inline void call_stdfunc(void* func, int argSize, void* arg)
     //             the cdecl will not. So we have to clean the stack after cdecl call.*/
 }
 
-inline void call_cdeclfunc(void* func, int argSize, void* arg)
+static inline void call_cdeclfunc(void* func, int argSize, void* arg)
 {
     __asm__ __volatile__ (
             "subl %%ecx, %%esp\n"
@@ -176,7 +177,7 @@ inline void call_cdeclfunc(void* func, int argSize, void* arg)
 }
 #elif __WORDSIZE == 64
 //! x86_64 arguments :rdi, rsi, rdx, rcx, r8, r9
-inline void call_stdfunc(void* func, int argSize, void* arg)
+static inline void call_stdfunc(void* func, int argSize, void* arg)
 {
     switch(argSize >> 3){
         case 0:
@@ -265,7 +266,7 @@ inline void call_stdfunc(void* func, int argSize, void* arg)
     }
 }
 
-inline void call_cdeclfunc(void* func, int argSize, void* arg)
+static inline void call_cdeclfunc(void* func, int argSize, void* arg)
 {
     call_stdfunc(func,argSize,arg);
 }
@@ -290,7 +291,7 @@ pcur += _INTSIZEOF(typeof(v));\
  *      Example:  call_stdfunc
  * =====================================================================================
  */
-inline void call_stdfunc(void* func, int argSize, void* arg)
+static inline void call_stdfunc(void* func, int argSize, void* arg)
 	funcInfo_t* ft = (funcInfo_t*)p;
 	unsigned int f = (unsigned int)func;
 	unsigned int argSize = (unsigned int)argSize;
@@ -314,7 +315,7 @@ inline void call_stdfunc(void* func, int argSize, void* arg)
     //   __asm add esp,argSize/* if not stdcall, do this*/
 }
 
-inline void call_cdeclfunc(void* func, int argSize, void* arg)
+static inline void call_cdeclfunc(void* func, int argSize, void* arg)
 	funcInfo_t* ft = (funcInfo_t*)p;
 	unsigned int f = (unsigned int)func;
 	unsigned int argSize = (unsigned int)argSize;
@@ -340,7 +341,7 @@ inline void call_cdeclfunc(void* func, int argSize, void* arg)
 
 #endif     /* -----  not _PTHREAD  ----- */
 
-inline void call_func(void* func, int argSize, void* arg)
+static inline void call_func(void* func, int argSize, void* arg)
 {
 #ifdef DEFAULT_STDCALL
     call_stdfunc(func, argSize, arg);
@@ -457,7 +458,7 @@ dlaunchTemplateThread()); });
 
 inline void appandTask(task_t* task, int gid, int tid);
 int getIdleThreadDefault();
-inline int launch_task(funcInfo_t* task)
+static inline int launch_task(funcInfo_t* task)
 {
     int gtid = getIdleThreadDefault();
     int gid = GID(gtid);
