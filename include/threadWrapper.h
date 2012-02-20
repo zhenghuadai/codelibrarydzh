@@ -133,7 +133,6 @@ declare_mutex(tMutex);\
 declare_cond(tCond);\
 static int tNum=0;\
 THREAD_LOCAL int active_gid=0;\
-THREAD_LOCAL int tmp_index;
 	
 #define INIT_THREAD_VAR()\
 pthread_barrier_init(&tBarrier, NULL, THREAD_NUM);
@@ -276,8 +275,8 @@ tMutex= /*CreateSemaphore(NULL, 1, 1, NULL); */CreateMutex(NULL,FALSE , 0);
 #ifdef __cplusplus
 #define ATOM(s)  for(int tmpvar(__LINE__)=0,t=(P(s),1); tmpvar(__LINE__)<1;tmpvar(__LINE__)++, (V(s))) 
 #else
+static tmp_index = 0;
 #define ATOM(s)  for(tmp_index=0,(P(s),1); tmp_index<1;tmp_index++, (V(s))) 
-
 #endif
 
 #include "threadLauncher.h"
