@@ -69,6 +69,12 @@ int test_each(int argc, char** argv)
                 }_$);
     std::cout<<std::endl;
 
+    char* i3= c;
+    foreach(a in i3, $_{ 
+                std::cout<< a;
+                }_$);
+    std::cout<<std::endl;
+
     char* c1= "hello world\n";
     foreach(a in c1, $_{ 
                 std::cout<< a;

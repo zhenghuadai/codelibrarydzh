@@ -25,6 +25,9 @@ class typeadapter{
     public: 
         typedef typename T::iterator iterator;    
         typedef typename T::value_type value_type ;    
+
+        static size_t size(T& t, size_t _sizeofT){ return t.size(); }
+        static iterator start(T& t){    return t.begin();}
 };
 
 template<class T>
@@ -32,7 +35,21 @@ class typeadapter<T*>{
     public: 
         typedef T* iterator;    
         typedef T value_type;    
+
+        static size_t size(T* const t, size_t sizeoft){ return 1; }
+        static T* start(T* t){    return t;}
 };
+
+template<>
+class typeadapter<char*>{
+    public: 
+        typedef char* iterator;    
+        typedef char value_type;    
+
+        static size_t size(char* const t, size_t sizeoft){ return strlen(t); }
+        static char* start(char* t){    return t;}
+};
+
 
 
 template<class T, int N>
@@ -40,36 +57,11 @@ class typeadapter<T[N]>{
     public: 
         typedef T* iterator;    
         typedef T value_type;    
+
+        static size_t size(T* const t, size_t sizeoft){   return N;  }
+        static T* start(T* t){    return t;}
 };
 
-template<class T>
-size_t size(T& t, size_t _sizeofT)
-{
-    return t.size();
-}
-
-template<class T>
-size_t size(T* t, size_t sizeoft)
-{
-    return sizeoft/sizeof(T);
-}
-
-inline size_t size(char* t, size_t sizeoft)
-{
-    return strlen(t);
-}
-
-template<class T>
-typename typeadapter<T>::iterator start(T& t)
-{
-    return t.begin();
-}
-
-template<class T>
-T* start(T* t)
-{
-    return t;
-}
 
 /**
 * @name 
@@ -87,8 +79,8 @@ T* start(T* t)
 #define _for_each2(a, vec, x) {\
     typeadapter<typeof(vec)>::iterator _m_it ;\
     int _m_i;\
-    size_t _m_end = size(vec, sizeof(vec));\
-    for(_m_i=0, _m_it=start(vec)/*  vec.begin()*/; _m_i<_m_end;_m_i++, _m_it++){\
+    size_t _m_end = typeadapter<typeof(vec)>::size(vec, sizeof(vec));\
+    for(_m_i=0, _m_it=typeadapter<typeof(vec)>::start(vec)/*  vec.begin()*/; _m_i<_m_end;_m_i++, _m_it++){\
         typeadapter<typeof(vec)>::value_type &a = *_m_it;\
         x;\
     }\
