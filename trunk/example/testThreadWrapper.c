@@ -56,10 +56,10 @@ sfunc2( int x0, int y)
 	printf("thread loop %d\n", y);
 	for(i=0;i<100000 ;i++)
 	{
-	P(tMutex);
-	
-	x ++;
-	mV(tMutex);
+        ATOM(tMutex){
+
+            x ++;
+        }
 	}
 	return (void*) x;
 	//v();
