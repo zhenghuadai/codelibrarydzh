@@ -63,6 +63,9 @@ typedef struct {unsigned short tid; unsigned short gid;} threadid_t;
 #endif
 
 #ifdef  _PTHREAD
+/****************************************************************************************/
+/**************************pthread*******************************************************/
+/****************************************************************************************/
 #include <pthread.h>
 #include <semaphore.h>
 #define DEFAULT_CDECL
@@ -129,7 +132,8 @@ declare_barrier(tBarrier);\
 declare_mutex(tMutex);\
 declare_cond(tCond);\
 static int tNum=0;\
-THREAD_LOCAL int active_gid=0;
+THREAD_LOCAL int active_gid=0;\
+THREAD_LOCAL int tmp_index;
 	
 #define INIT_THREAD_VAR()\
 pthread_barrier_init(&tBarrier, NULL, THREAD_NUM);
@@ -156,9 +160,9 @@ pthread_barrier_init(&tBarrier, NULL, THREAD_NUM);
 
 #define __thread_ret void* 
 #ifdef DEFAULT_STDCALL
-#define __kernel 	void __attribute__((stdcall)) 
+#define __kernel 	void * __attribute__((stdcall)) 
 #else
-#define __kernel 	void 
+#define __kernel void* 
 #endif
 #define STDCALL  __attribute__((stdcall))
 /****************************************************************************************/
@@ -265,6 +269,15 @@ tMutex= /*CreateSemaphore(NULL, 1, 1, NULL); */CreateMutex(NULL,FALSE , 0);
 
 #ifndef _INTSIZEOF 
 #define _INTSIZEOF(n)  ((sizeof(n)+sizeof(long)-1)&~(sizeof(long) - 1) )
+#endif
+
+#define _tmpvar(x) tmp_ ## x 
+#define tmpvar(x) _tmpvar(x)
+#ifdef __cplusplus
+#define ATOM(s)  for(int tmpvar(__LINE__)=0,t=(P(s),1); tmpvar(__LINE__)<1;tmpvar(__LINE__)++, (V(s))) 
+#else
+#define ATOM(s)  for(tmp_index=0,(P(s),1); tmp_index<1;tmp_index++, (V(s))) 
+
 #endif
 
 #include "threadLauncher.h"
