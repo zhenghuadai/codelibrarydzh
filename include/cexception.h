@@ -22,10 +22,6 @@
 #ifndef  CEXCEPTION__INC
 #define  CEXCEPTION__INC
 
-#ifndef  __CPLUSPLUS
-/*****************************************************************************
- *                         C                                                 *
- * **************************************************************************/
 #include <setjmp.h>
 #if defined(_MSC_VER)
 #       define THREAD_LOCAL __declspec(thread)
@@ -62,6 +58,10 @@ typedef struct ExceptionFrame_t{
     U64 value;
 } ExceptionFrame_t;
 
+#ifndef  __cplusplus
+/*****************************************************************************
+ *                         C                                                 *
+ * **************************************************************************/
 #define try do{                           \
     volatile int ceh_type;                \
     ExceptionFrame_t cur_ceh_frame;       \
@@ -76,6 +76,12 @@ typedef struct ExceptionFrame_t{
         type ceh = *(type*)&(ceh_stack->value);\
         ceh_stack = ceh_stack->prev;
 
+#define CATCHALL(...) \
+        if(ceh_type == 0) ceh_stack = ceh_stack->prev;\
+    }else {\
+        ceh_stack = ceh_stack->prev;
+
+
 #define endtry }\
 }while(0);
 
@@ -86,8 +92,12 @@ typedef struct ExceptionFrame_t{
 /*****************************************************************************
  *                         C++                                                 *
  * **************************************************************************/
+#include <exception>
+#include <iostream>
 #define Throw(type, x) throw x;
-#define CATCH(type, x) catch(x) 
+#define CATCH(type, x) catch(type x) 
+#define CATCHALL catch
+#define endtry
 #endif     /* -----  not __CPLUSPLUS  ----- */
 
 #endif   /* ----- #ifndef CEXCEPTION__INC  ----- */

@@ -65,7 +65,7 @@ static inline U64 getTime(int cid DEFAULT(0)){
 
 static inline U64 pTime(int cid DEFAULT(0)){
     U64 t = diffTime(startT[cid], stopT[cid]);
-    printf("time:%d\n", t);
+    printf("time:%ld\n", t);
 	return t;
 }
 
