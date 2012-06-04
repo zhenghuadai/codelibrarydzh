@@ -18,53 +18,56 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <rdtsc.h>
+#include <mm_malloc.h>
 
-class RGB
+
+struct RGB
 {
-    public:
         int r;
         int g;
         int b;
 };
 
-class RGBref
+struct RGBshadow
 {
-    public:
-        RGBref(int& r, int& g, int& b):r(r),g(g),b(b){}
-    public:
+        RGBshadow(int& r, int& g, int& b):r(r),g(g),b(b){}
         int& r;
         int& g;
         int& b;
 };
 
-
+template<class Shadow, typename T1, typename T2, typename T3>
 class SOA
 {
     public:
+        typedef T1 aligned_t1 __attribute__((aligned(16)));
+        typedef T2 aligned_t2 __attribute__((aligned(16)));
+        typedef T3 aligned_t3 __attribute__((aligned(16)));
+    public:
         SOA(int n){
-            r = new int[n];
-            g = new int[n];
-            b = new int[n];
+            r = (aligned_t1*)_mm_malloc(n*sizeof(T1), 64);
+            g = (aligned_t2*)_mm_malloc(n*sizeof(T2), 64);
+            b = (aligned_t3*)_mm_malloc(n*sizeof(T3), 64);
         }
         ~SOA(){
-            if(r) delete r;
-            if(g) delete g;
-            if(b) delete b;
+            if(r) _mm_free(r);
+            if(g) _mm_free(g);
+            if(b) _mm_free(b);
         }
-        RGBref operator [] ( size_t i){
-            return RGBref(r[i],g[i],b[i]);
+        Shadow operator [] ( size_t i){
+            return Shadow(r[i],g[i],b[i]);
         }
     private:
-        int* r;
-        int* g;
-        int* b;
+        aligned_t1* r ;
+        aligned_t2* g ;
+        aligned_t3* b ;
 };
 
 #define SIZE 65536
 int main()
 {
     RGB* rgb = new RGB[SIZE]; 
-    SOA soa(SIZE); 
+    SOA<RGBshadow, int, int,int> soa(SIZE); 
     int i =0;
     for(i=0;i<SIZE;i++){
         rgb[i].r = 3*i;
