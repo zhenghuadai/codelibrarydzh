@@ -1,0 +1,14 @@
+h1{
+  counter-reset: zhang;           /* 重置计数器成0 */
+}
+h2:before {
+  counter-increment: zhang;      /* 增加计数器值 */
+  content: "第" counter(zhang) "章 "; /* 显示计数器 */
+}
+h2{
+    counter-reset: jie;
+}
+h3:before {
+ counter-increment: jie;
+ content: counter(zhang) "." counter(jie) " ";
+}
