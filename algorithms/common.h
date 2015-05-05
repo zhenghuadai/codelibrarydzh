@@ -3,6 +3,8 @@
 #include <stack>
 #include <queue>
 #include <limits.h>
+#include <stdlib.h>
+#include <stdio.h>
 using namespace std;
 struct TreeNode {
 	int val;
@@ -15,3 +17,12 @@ struct ListNode {
 	ListNode *next;
 	ListNode(int x) : val(x), next(NULL) {}
 };
+
+class Test {
+public:
+	Test(void(*foo)());
+	static void run();
+};
+
+#define APPEND_TO_TEST() \
+	static Test t(test);

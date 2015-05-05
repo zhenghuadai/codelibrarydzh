@@ -16,3 +16,7 @@ public:
         return R;
     }
 };
+static void test()
+{
+}
+APPEND_TO_TEST(); 

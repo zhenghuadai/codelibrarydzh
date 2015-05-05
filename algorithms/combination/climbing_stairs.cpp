@@ -13,3 +13,7 @@ public:
         return NN;
     }
 };
+static void test()
+{
+}
+APPEND_TO_TEST(); 

@@ -52,4 +52,10 @@ public:
         }
         return nums[L];
     }
+
 };
+
+static void test()
+{
+}
+APPEND_TO_TEST(); 

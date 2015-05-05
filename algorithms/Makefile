@@ -7,7 +7,10 @@ SOURCEFILE:= main.cpp \
 	tree/is_balanced.cpp \
 	\
 	sort/kway_merge.cpp \
+	\
 	combination/climbing_stairs.cpp \
+	\
+        binary_search/kth_element.cpp \
 
 
 
