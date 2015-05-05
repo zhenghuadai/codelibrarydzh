@@ -17,20 +17,21 @@ INC_PATH+=$(foreach i, ${ext_inc},-I$(i))
 LIB_PATH+=$(foreach i, ${ext_libpath},-L$(i))
 XLIBS= -lglut -lGLU -lGL -lXext -lX11 -lm #-lXmu 
 CLEAN_OBJ+=${clean_obj}
+
 ifeq ($(debug),yes)
 CFLAGS:=-g 
-OBJ_DIR =debug/
+OBJ_DIR =.debug/
 else
 ifeq ($(debug),go2)
 CFLAGS:=-g -O2
-OBJ_DIR =debug/
+OBJ_DIR =i.debug/
 else
 CFLAGS:=-O2
-OBJ_DIR =release/
+OBJ_DIR =.release/
 endif
 endif
 
-CPPFLAGS:=${CFLAGS}
+CPPFLAGS:=${CFLAGS} $(ext_cflags)
 
 $(shell mkdir -p $(OBJ_DIR))
 ##############define template###########################################
@@ -39,7 +40,7 @@ define linktemplate
 endef    
 LINK=$(call linktemplate)
 define linktemplate++
-	${LD++} ${CFLAGS} ${INC_PATH} ${LIB_PATH} ${LIBS} -o ${OBJ_DIR}$@ $^ 
+	${LD++} ${CFLAGS} ${INC_PATH} ${LIB_PATH} ${LIBS} -o ${OBJ_DIR}$@ $^
 endef    
 LINK++ =$(call linktemplate++)
 
@@ -56,10 +57,10 @@ COMPILE=$(call compiletemplate)
 define compiletemplate++
 	@test -x ${dir $@} || mkdir -p ${dir $@} 
 	ch2=`head -c 2 $<`; if [ "$$ch2" != '#!' ]; then \
-	${CXX} ${CFLAGS}  ${INC_PATH} -c $< -o $@ -MMD ;\
+	${CXX} ${CPPFLAGS}  ${INC_PATH} -c $< -o $@ -MMD ;\
 	else \
 	tail --lines=+2 $< > ${dir $@}/$<.cpp;\
-	${CXX} ${CFLAGS}  ${INC_PATH} -c ${dir $@}/$<.cpp -o $@ -MMD ;\
+	${CXX} ${CPPFLAGS}  ${INC_PATH} -c ${dir $@}/$<.cpp -o $@ -MMD ;\
 	fi;
 endef    
 COMPILE++ =$(call compiletemplate++)
@@ -99,4 +100,4 @@ depfile=$(wildcard ${OBJ_DIR}*.d)
 -include ${depfile}
 clean:
 	rm -f *.o *.exe *.d ${CLEAN_OBJ}
-	rm  -rf release debug
+	rm  -rf .release .debug
