@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <stack>
 #include <queue>
+#include <algorithm>
 #include <limits.h>
 #include <stdlib.h>
 #include <stdio.h>
