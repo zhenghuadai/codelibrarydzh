@@ -18,6 +18,11 @@
 #include "common.h"
 class Solution {
 public:
+
+    /****************************
+     *将n用二进制表示，例如 21 === 00010101
+     *x**21 == x**(1 + 4 + 16) == x**1 + 0*x**2 + x**4 + 0*x**8 + x**16
+     ****************************/
     double myPow(double x, int n){
        if (n == 0) return 1;  
        double result = 1;
@@ -41,9 +46,7 @@ public:
          if(n&1){
            y*=x;
          }
-       //if(n<2)break;
          x*=x;
-        
         }
         return t?y:1/y;}
 };
