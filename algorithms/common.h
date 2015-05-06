@@ -6,6 +6,10 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <iostream>
+#include <fstream>
+#include "json.hpp"
+using json = nlohmann::json;
 using namespace std;
 struct TreeNode {
 	int val;
@@ -27,3 +31,5 @@ public:
 
 #define APPEND_TO_TEST() \
 	static Test t(test);
+
+int doTests(string filename,  function<bool(json&)> func);

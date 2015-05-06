@@ -23,6 +23,9 @@ SOURCEFILE:= main.cpp \
 	dp/permutation_sequence.cpp \
 	\
 	linkedlist/add_two_numbers.cpp \
+	\
+	graph/islands.cpp \
+	graph/clone.cpp \
 
 
 
