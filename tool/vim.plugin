@@ -70,7 +70,7 @@ fi
 
 # supertab
 if [ ! -e ./plugin/supertab.vim ]; then
-	http://www.vim.org/scripts/download_script.php?src_id=11533 -O plugin/supertab.vim  
+	wget http://www.vim.org/scripts/download_script.php?src_id=11533 -O plugin/supertab.vim  
 fi
 
 fi # if[ 0 ]
