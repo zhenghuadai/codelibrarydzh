@@ -16,9 +16,10 @@
  * =====================================================================================
  */
 
-#include "power.cpp"
+#include "common.h"
+#include "utils.h"
 
-
+double test_myPow(double x, int n);
 static void test()
 {
 }

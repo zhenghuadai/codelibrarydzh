@@ -50,3 +50,8 @@ public:
         }
         return t?y:1/y;}
 };
+
+double test_myPow(double x, int n){
+    Solution s;
+    return s.myPow(x,n);
+}

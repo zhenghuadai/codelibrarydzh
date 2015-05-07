@@ -39,15 +39,7 @@ public:
     }
 };
 
-static void test()
-{
-    doTests("string/longest_nonrepeating_substring.testcases", [](json& testcase)->bool{
-        Solution s;
-        string a = testcase["text"];
-        int result = testcase["result"];
-        int r = s.lengthOfLongestSubstring(a);
-        return (result == r);
-        });
-
+int test_lengthOfLongestSubstring(string& str) {
+    Solution s;
+    return s.lengthOfLongestSubstring(str);
 }
-APPEND_TO_TEST(); 

@@ -16,8 +16,10 @@
  * =====================================================================================
  */
 
-#include "median_two_sort_array.cpp"
+#include "common.h"
+#include "utils.h"
 
+double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2); 
 static void test()
 {
 }

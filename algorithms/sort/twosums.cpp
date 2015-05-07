@@ -51,3 +51,8 @@ public:
         return result;
     }
 };
+
+vector<int> test_twoSum(vector<int>& nums, int target) { 
+    Solution s;
+    return s.twoSum(nums, target);
+}

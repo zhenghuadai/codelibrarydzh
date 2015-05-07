@@ -20,3 +20,8 @@ public:
         return balanced;
     }
 };
+
+bool test_isBalanced(TreeNode* root) {
+    Solution s;
+    return s.isBalanced(root);
+}

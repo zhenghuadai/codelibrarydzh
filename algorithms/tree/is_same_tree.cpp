@@ -54,3 +54,8 @@ public:
         return isSame;
     }
 };
+
+bool test_isSameTree(TreeNode* p, TreeNode* q) {
+    Solution s;
+    return s.isSameTree(p, q);
+}

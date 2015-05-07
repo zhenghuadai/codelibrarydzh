@@ -1,4 +1,6 @@
 #include "common.h"
+#include "utils.h"
+#include <fstream>
 
 static vector<void(*)()> tests;
 Test::Test(void (*foo)())

@@ -77,3 +77,8 @@ public:
         }
     }
 };
+
+double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+    Solution s;
+    return s.findMedianSortedArrays(nums1, nums2);
+}

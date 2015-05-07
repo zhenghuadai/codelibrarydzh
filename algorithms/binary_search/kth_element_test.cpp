@@ -16,8 +16,10 @@
  * =====================================================================================
  */
 
-#include "kth_element.cpp"
+#include "common.h"
+#include "utils.h"
 
+int test_findKthLargest(vector<int>& nums, int k); 
 static void test()
 {
 }

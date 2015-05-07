@@ -16,9 +16,10 @@
  * =====================================================================================
  */
 
-#include "longest_valid_parentheses.cpp"
+#include "common.h"
+#include "utils.h"
 
-
+int test_longestValidParentheses(string& s) ;
 static void test()
 {
 }

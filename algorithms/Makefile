@@ -1,37 +1,40 @@
 ext_cflags:=-std=c++11
-ext_inc:= ./
-SOURCEFILE:= main.cpp \
-	tree/pre_order_binary_tree.cpp \
-	tree/post_order_binary_tree.cpp \
-	tree/in_order_binary_tree.cpp \
-	tree/is_balanced.cpp \
-	tree/arrary_to_binary_tree.cpp \
-	tree/arrary_to_binary_tree.cpp \
-	tree/is_same_tree.cpp \
+ext_inc:= ./ ./utils
+ALGORITHMS:= \
+	tree/pre_order_binary_tree \
+	tree/post_order_binary_tree \
+	tree/in_order_binary_tree \
+	tree/is_balanced \
+	tree/arrary_to_binary_tree \
+	tree/arrary_to_binary_tree \
+	tree/is_same_tree \
 	\
-	sort/kway_merge.cpp \
-	sort/twosums.cpp \
+	sort/kway_merge \
+	sort/twosums \
 	\
-	combination/climbing_stairs.cpp \
+	combination/climbing_stairs \
 	\
-    binary_search/kth_element_test.cpp \
-	binary_search/median_two_sort_array_test.cpp \
-	binary_search/power_test.cpp \
+    binary_search/kth_element \
+	binary_search/median_two_sort_array \
+	binary_search/power \
 	\
-	dp/pascal_triangle.cpp \
-	dp/longest_valid_parentheses.cpp \
-	dp/permutation_sequence.cpp \
+	dp/pascal_triangle \
+	dp/longest_valid_parentheses \
+	dp/permutation_sequence \
 	\
-	linkedlist/add_two_numbers.cpp \
+	linkedlist/add_two_numbers \
 	\
-	graph/islands.cpp \
-	graph/clone.cpp \
+	graph/islands \
+	graph/clone \
 	\
-	string/longest_nonrepeating_substring.cpp \
-	string/isIsomorphic.cpp \
+	string/longest_nonrepeating_substring \
+	string/isIsomorphic \
 	\
-	utils/utils.cpp
 
+
+TEST_LIST=$(foreach i, ${ALGORITHMS},$(i)_test.cpp)
+ALGO_LIST=$(foreach i, ${ALGORITHMS},$(i).cpp)
+SOURCEFILE:= main.cpp $(TEST_LIST) $(ALGO_LIST) utils/utils.cpp 
 
 
 EXECUTABLE:=main

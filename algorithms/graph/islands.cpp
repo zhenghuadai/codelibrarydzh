@@ -110,3 +110,7 @@ int numIslands(vector<vector<char>>& grid) {
 
 };
 
+int test_numIslands(vector<vector<char>>& grid) {
+    Solution s;
+    return s.numIslands(grid);
+}

@@ -16,4 +16,11 @@
  * =====================================================================================
  */
 
-#include "add_two_numbers.cpp"
+#include "common.h"
+#include "utils.h"
+
+ListNode* test_addTwoNumbers(ListNode* l1, ListNode* l2);
+static void test()
+{
+}
+APPEND_TO_TEST(); 

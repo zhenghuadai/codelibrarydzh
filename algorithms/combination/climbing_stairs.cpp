@@ -37,3 +37,9 @@ public:
        return result;
    }
 };
+
+
+int test_climbStairs(int n) {
+    Solution s;
+    return s.climbStairs(n);
+}

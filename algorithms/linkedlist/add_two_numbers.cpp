@@ -49,3 +49,8 @@ public:
         return result;
     }
 };
+
+ListNode* test_addTwoNumbers(ListNode* l1, ListNode* l2){
+    Solution s;
+    return s.addTwoNumbers(l1,l2);
+}

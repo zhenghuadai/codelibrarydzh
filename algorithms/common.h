@@ -1,15 +1,14 @@
+#ifndef  COMMON_ALGORITHM_TEST_INC
+#define  COMMON_ALGORITHM_TEST_INC
+
+#include <limits.h>
 #include <vector>
 #include <unordered_map>
 #include <stack>
 #include <queue>
 #include <algorithm>
-#include <limits.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <iostream>
 #include <fstream>
-#include "json.hpp"
-using json = nlohmann::json;
 using namespace std;
 struct TreeNode {
 	int val;
@@ -21,19 +20,7 @@ typedef TreeNode BinaryTree;
 struct ListNode {
 	int val;
 	ListNode *next;
-	ListNode(int x) : val(x), next(NULL) {}
+	ListNode(int x) : val(x), next(nullptr) {}
 };
 
-class Test {
-public:
-	Test(void(*foo)());
-	static void run();
-};
-
-#define APPEND_TO_TEST() \
-	static Test t(test);
-
-int doTests(string filename,  function<bool(json&)> func);
-namespace DM{
-void readBinaryTree(BinaryTree *&p, istream &fin) ;
-}
+#endif   /* ----- #ifndef COMMON_ALGORITHM_TEST_INC  ----- */

@@ -47,3 +47,8 @@ public:
         return root;
     }
 };
+
+TreeNode* test_sortedArrayToBST(vector<int>& nums) {
+    Solution s;
+    return s.sortedArrayToBST(nums);
+}

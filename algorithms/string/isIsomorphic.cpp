@@ -42,16 +42,8 @@ public:
         return ret;
     }
 };
-static void test()
-{
-    doTests("string/isIsomorphic.testcases", [](json& testcase)->bool{
-        Solution s;
-        string a = testcase["text1"];
-        string b = testcase["text2"];
-//        bool result = testcase["result"].get<int>() == 0? false:true;
-        bool result = testcase["result"];
-        bool r = s.isIsomorphic(a,b);
-        return (result == r);
-        });
+
+bool test_isIsomorphic(string str, string t) {
+    Solution s;
+    return s.isIsomorphic(str,t);
 }
-APPEND_TO_TEST(); 

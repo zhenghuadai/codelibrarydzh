@@ -54,3 +54,8 @@ public:
     }
 
 };
+
+int test_findKthLargest(vector<int>& nums, int k) {
+    Solution s;
+    return s.findKthLargest(nums, k);
+}

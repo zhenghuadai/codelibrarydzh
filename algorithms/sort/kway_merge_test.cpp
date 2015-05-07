@@ -15,9 +15,10 @@
  *
  * =====================================================================================
  */
+#include "common.h"
+#include "utils.h"
 
-#include "kway_merge.cpp"
-
+ListNode* test_mergeKLists(vector<ListNode*>& lists) ;
 static void test()
 {
 }

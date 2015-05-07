@@ -15,9 +15,11 @@
  *
  * =====================================================================================
  */
+#include "common.h"
+#include "utils.h"
 
-#include "twosums.cpp"
 
+vector<int> test_twoSum(vector<int>& nums, int target); 
 static void test()
 {
 }

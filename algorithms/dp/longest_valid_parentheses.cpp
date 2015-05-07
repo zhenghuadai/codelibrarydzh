@@ -42,3 +42,9 @@ public:
         return ret;
     }
 };
+
+
+int test_longestValidParentheses(string& s) {
+    Solution S;
+    return S.longestValidParentheses(s);
+}

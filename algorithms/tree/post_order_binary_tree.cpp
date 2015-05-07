@@ -26,18 +26,8 @@ public:
         return R;
     }
 };
-static void test()
-{
-    doTests("tree/post_order_binary_tree.testcases", [](json& testcase)->bool{
-        Solution s;
-        string a = testcase["tree"];
-        vector<int> result = testcase["result"];
-        TreeNode *root;
-        istringstream fin(a);
-        DM::readBinaryTree(root, fin) ;
-        vector<int> r = s.postorderTraversal(root);
-        return (result == r);
-        });
 
+vector<int> test_postorderTraversal(TreeNode* root) {
+    Solution s;
+    return s.postorderTraversal(root);
 }
-APPEND_TO_TEST(); 

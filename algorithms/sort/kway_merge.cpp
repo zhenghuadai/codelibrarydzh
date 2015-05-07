@@ -88,3 +88,7 @@ class Solution {
 			return mergedList;
 		}
 };
+ListNode* test_mergeKLists(vector<ListNode*>& lists) {
+    Solution s;
+    return s.mergeKLists(lists);
+}

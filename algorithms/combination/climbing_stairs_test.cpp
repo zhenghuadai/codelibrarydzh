@@ -16,9 +16,10 @@
  * =====================================================================================
  */
 
-#include "climbing_stairs.cpp"
+#include "common.h"
+#include "utils.h"
 
-
+int test_climbStairs(int n) ;
 static void test()
 {
 }

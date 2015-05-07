@@ -16,8 +16,8 @@
  * =====================================================================================
  */
 
-#include "permutation_sequence.cpp"
-
+#include "common.h"
+#include "utils.h"
 
 static void test()
 {
