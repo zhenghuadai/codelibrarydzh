@@ -1,7 +1,17 @@
 #include "common.h"
+#include "tree.hxx"
+
 class Solution {
 public:
     vector<int> inorderTraversal(TreeNode* root) {
+        vector<int> R;
+        ::inorderTraversal<TreeNode>(root, [&R](TreeNode* p){
+                R.push_back(p->val);
+                });
+        return R;
+    }
+
+    vector<int> inorderTraversal1(TreeNode* root) {
         vector<int> R;
         TreeNode* p = root;
         stack<TreeNode*> S;

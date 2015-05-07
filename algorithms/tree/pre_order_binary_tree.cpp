@@ -1,7 +1,18 @@
 #include "common.h"
+#include "tree.hxx"
+
+
 class Solution {
 public:
     vector<int> preorderTraversal(TreeNode* root) {
+        vector<int> R;
+        if(root == NULL) return R;
+        ::preorderTraversal<TreeNode>(root, [&R](TreeNode* p){
+                R.push_back(p->val);
+                });
+
+    }
+    vector<int> preorderTraversal1(TreeNode* root) {
         vector<int> R;
         if(root == NULL) return R;
         stack<TreeNode*> S;
