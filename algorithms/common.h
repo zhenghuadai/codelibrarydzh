@@ -23,4 +23,7 @@ struct ListNode {
 	ListNode(int x) : val(x), next(nullptr) {}
 };
 
+#define ClassName0(aa) Solution_ ## aa 
+#define ClassName(aa) ClassName0(aa) 
+#define Solution ClassName(__FILE_NAME__)
 #endif   /* ----- #ifndef COMMON_ALGORITHM_TEST_INC  ----- */

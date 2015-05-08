@@ -32,6 +32,11 @@ ALGORITHMS:= \
 	string/edit_distance \
 	string/approximate_search \
 	\
+	compiler/basic_calculator \
+	compiler/basic_calculatorII \
+	compiler/basic_calculatorIII \
+	\
+
 
 
 TEST_LIST=$(foreach i, ${ALGORITHMS},$(i)_test.cpp)

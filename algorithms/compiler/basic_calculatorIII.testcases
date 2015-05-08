@@ -1,0 +1,5 @@
+
+[
+ {"expression":"(3+2)*2 ", "result":10},
+ {"expression":"3+2*(2+1) ", "result":9}
+]

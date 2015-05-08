@@ -56,11 +56,12 @@ COMPILE=$(call compiletemplate)
 #endef    
 define compiletemplate++
 	@test -x ${dir $@} || mkdir -p ${dir $@} 
+    basebasename=$(basename  $(notdir $<))
 	ch2=`head -c 2 $<`; if [ "$$ch2" != '#!' ]; then \
-	${CXX} ${CPPFLAGS}  ${INC_PATH} -c $< -o $@ -MMD ;\
+	${CXX} ${CPPFLAGS} -D__FILE_NAME__=$(basename $(notdir $<)) ${INC_PATH} -c $< -o $@ -MMD ;\
 	else \
 	tail --lines=+2 $< > ${dir $@}/$<.cpp;\
-	${CXX} ${CPPFLAGS}  ${INC_PATH} -c ${dir $@}/$<.cpp -o $@ -MMD ;\
+	${CXX} ${CPPFLAGS}  -D__FILE_NAME__=$(basename $(notdir $<))  ${INC_PATH} -c ${dir $@}/$<.cpp -o $@ -MMD ;\
 	fi;
 endef    
 COMPILE++ =$(call compiletemplate++)
