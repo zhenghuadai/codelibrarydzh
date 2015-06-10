@@ -14,9 +14,9 @@ SOURCEFILE:= main.cpp \
 	\
 	combination/climbing_stairs.cpp \
 	\
-    binary_search/kth_element.cpp \
-	binary_search/median_two_sort_array.cpp \
-	binary_search/power.cpp \
+    binary_search/kth_element_test.cpp \
+	binary_search/median_two_sort_array_test.cpp \
+	binary_search/power_test.cpp \
 	\
 	dp/pascal_triangle.cpp \
 	dp/longest_valid_parentheses.cpp \

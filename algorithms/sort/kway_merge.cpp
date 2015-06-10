@@ -88,8 +88,3 @@ class Solution {
 			return mergedList;
 		}
 };
-
-static void test()
-{
-}
-APPEND_TO_TEST(); 
