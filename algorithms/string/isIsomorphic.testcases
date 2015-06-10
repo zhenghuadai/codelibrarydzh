@@ -1,0 +1,4 @@
+[
+{"text1":"aaaa", "text2":"aaab", "result":false},
+{"text1":"acac", "text2":"abab", "result":true}
+]

@@ -26,6 +26,11 @@ SOURCEFILE:= main.cpp \
 	\
 	graph/islands.cpp \
 	graph/clone.cpp \
+	\
+	string/longest_nonrepeating_substring.cpp \
+	string/isIsomorphic.cpp \
+	\
+	utils/utils.cpp
 
 
 

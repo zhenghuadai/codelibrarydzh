@@ -17,6 +17,7 @@ struct TreeNode {
 	TreeNode *right;
 	TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
 };
+typedef TreeNode BinaryTree;
 struct ListNode {
 	int val;
 	ListNode *next;
@@ -33,3 +34,6 @@ public:
 	static Test t(test);
 
 int doTests(string filename,  function<bool(json&)> func);
+namespace DM{
+void readBinaryTree(BinaryTree *&p, istream &fin) ;
+}
