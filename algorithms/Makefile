@@ -30,6 +30,7 @@ ALGORITHMS:= \
 	string/longest_nonrepeating_substring \
 	string/isIsomorphic \
 	string/edit_distance \
+	string/approximate_search \
 	\
 
 
