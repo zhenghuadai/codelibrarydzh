@@ -39,7 +39,7 @@ class Solution{
 
         for(int j = 0; j < s1.size(); j++){
             int pre = j + 1;
-            pre = min( j+2, D[0] + 1, j  + ((s0[0] == s1[0])?0:1));
+            pre = min( j+2, D[0] + 1, j  + ((s0[0] == s1[j])?0:1));
             for(int i = 1; i< s0.size(); i++){
                 int R = pre + 1;
                 int S = D[i] + 1;
