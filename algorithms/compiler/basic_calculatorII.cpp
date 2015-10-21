@@ -30,6 +30,7 @@ Some examples:
 " 3+5 / 2 " = 5
 */
 #include "common.h"
+namespace{
 
 class Solution {
 private:
@@ -116,6 +117,7 @@ public:
         return sum;
     }
 };
+} /// namespace
 
 int test_calculateII(string& exp) {
     Solution S;

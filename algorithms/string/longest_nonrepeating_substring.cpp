@@ -17,6 +17,7 @@
  */
 
 #include "common.h"
+namespace{
 
 class Solution {
 public:
@@ -38,6 +39,7 @@ public:
         return (maxDistance + 1);
     }
 };
+} /// namespace
 
 int test_lengthOfLongestSubstring(string& str) {
     Solution s;

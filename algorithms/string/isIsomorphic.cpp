@@ -16,6 +16,8 @@
  * =====================================================================================
  */
 #include "common.h"
+
+namespace{
 class Solution {
 public:
     bool isIsomorphic(string s, string t) {
@@ -42,6 +44,7 @@ public:
         return ret;
     }
 };
+} /// namespace 
 
 bool test_isIsomorphic(string str, string t) {
     Solution s;

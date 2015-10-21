@@ -30,6 +30,8 @@ Some examples:
 */
 #include "common.h"
 
+namespace{
+
 class Solution {
 private:
     bool isOp(char c){
@@ -123,6 +125,7 @@ public:
         return sum;
     }
 };
+} /// namespace
 
 int test_calculateIII(string& exp) {
     Solution S;

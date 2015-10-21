@@ -1,4 +1,5 @@
 #include "common.h"
+namespace{
 class Solution {
 public:
    int climbStairs1(int n) {
@@ -38,6 +39,7 @@ public:
    }
 };
 
+} /// namespace
 
 int test_climbStairs(int n) {
     Solution s;

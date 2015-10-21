@@ -1,7 +1,7 @@
 #include "common.h"
 #include "tree.hxx"
 
-
+namespace{
 class Solution {
 public:
     vector<int> preorderTraversal(TreeNode* root) {
@@ -27,6 +27,7 @@ public:
         return R;
     }
 };
+}/// namespace
 
 vector<int> test_preorderTraversal(TreeNode* root) {
     Solution s;

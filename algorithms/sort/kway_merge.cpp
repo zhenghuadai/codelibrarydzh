@@ -1,4 +1,6 @@
 #include "common.h"
+
+namespace{
 class Solution {	
 	private:
 		typedef struct TreeNode{
@@ -88,6 +90,7 @@ class Solution {
 			return mergedList;
 		}
 };
+} /// namespace
 ListNode* test_mergeKLists(vector<ListNode*>& lists) {
     Solution s;
     return s.mergeKLists(lists);

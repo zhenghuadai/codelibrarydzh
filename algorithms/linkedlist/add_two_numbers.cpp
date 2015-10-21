@@ -17,6 +17,7 @@
  */
 
 #include "common.h"
+namespace{
 class Solution {
 public:
     ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
@@ -49,6 +50,7 @@ public:
         return result;
     }
 };
+} /// namespace
 
 ListNode* test_addTwoNumbers(ListNode* l1, ListNode* l2){
     Solution s;

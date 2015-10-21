@@ -1,4 +1,6 @@
 #include "common.h"
+namespace {
+
 class Solution {
     void getMedian(int& a0, int& a1, int& a2){
         if(a0 > a1) {
@@ -54,6 +56,8 @@ public:
     }
 
 };
+
+} /// end namespace
 
 int test_findKthLargest(vector<int>& nums, int k) {
     Solution s;

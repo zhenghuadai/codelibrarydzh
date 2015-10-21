@@ -16,6 +16,7 @@
  * =====================================================================================
  */
 #include "common.h"
+namespace{
 class Solution {
     enum{LEFT = 0, RIGHT =1};
     struct Node{
@@ -43,6 +44,7 @@ public:
     }
 };
 
+}
 
 int test_longestValidParentheses(string& s) {
     Solution S;

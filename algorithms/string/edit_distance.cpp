@@ -26,6 +26,7 @@
  * e 5
  */
 #include "common.h"
+namespace{
 class Solution{
     public:
     int distance(string& s0, string& s1){
@@ -60,6 +61,7 @@ class Solution{
         }
 };
 
+}/// namespace
 int test_distance(string& s0, string& s1){
     Solution s;
     return s.distance(s0, s1);

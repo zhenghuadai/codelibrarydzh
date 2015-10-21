@@ -1,5 +1,6 @@
 #include "common.h"
 #include "tree.hxx"
+namespace{ 
 
 class Solution {
 public:
@@ -29,6 +30,7 @@ public:
         return R;
     }
 };
+} ///namespace
 
 vector<int> test_inorderTraversal(TreeNode* root) {
     Solution s;

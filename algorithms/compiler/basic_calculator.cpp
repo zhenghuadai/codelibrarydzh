@@ -31,6 +31,7 @@ Some examples:
 */
 
 #include "common.h"
+namespace{
 
 class Solution {
 public:
@@ -74,6 +75,7 @@ public:
         return sum;
     }
 };
+}/// namespace
 
 int test_calculate(string& s) {
     Solution S;

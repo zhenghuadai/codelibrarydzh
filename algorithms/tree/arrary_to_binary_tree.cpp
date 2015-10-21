@@ -16,6 +16,7 @@
  * =====================================================================================
  */
 #include "common.h"
+namespace{
 class Solution {
 public:
 
@@ -47,6 +48,7 @@ public:
         return root;
     }
 };
+} ///namespace
 
 TreeNode* test_sortedArrayToBST(vector<int>& nums) {
     Solution s;

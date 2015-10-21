@@ -17,6 +17,7 @@
  */
 
 #include "common.h"
+namespace{
 class Solution{
     enum{MATCH_SCORE = 0, MISMATCH_SCORE = -1, DELETION_SCORE = -1, INSERTION_SCORE = -1};
     public:
@@ -90,6 +91,7 @@ class Solution{
             return std::max(rs, T);
         }
 };
+}/// namespace
 
 int test_approximate_search(string& text, string& pattern){
     Solution s;

@@ -16,6 +16,9 @@
  * =====================================================================================
  */
 #include "common.h"
+
+namespace{
+
 class Solution {
 public:
 
@@ -50,6 +53,7 @@ public:
         }
         return t?y:1/y;}
 };
+} /// namespace
 
 double test_myPow(double x, int n){
     Solution s;

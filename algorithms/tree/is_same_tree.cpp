@@ -17,6 +17,7 @@
  */
 
 #include "common.h"
+namespace{
 class Solution {
 public:
     bool isSameTree(TreeNode* p, TreeNode* q) {
@@ -54,6 +55,7 @@ public:
         return isSame;
     }
 };
+} /// namespace
 
 bool test_isSameTree(TreeNode* p, TreeNode* q) {
     Solution s;
