@@ -31,7 +31,7 @@ OBJ_DIR =.release/
 endif
 endif
 
-CPPFLAGS:=${CFLAGS} $(ext_cflags)
+CPPFLAGS:=${CFLAGS} $(ext_cflags) -std=c++11
 
 $(shell mkdir -p $(OBJ_DIR))
 ##############define template###########################################
